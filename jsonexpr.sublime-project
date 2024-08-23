@@ -1,0 +1,43 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+		}
+	],
+	"settings":
+	{
+		"ClangFormat":
+		{
+		    "format_on_save": true,
+		},
+	},
+	"build_systems":
+	[
+		{
+			"config": "Default",
+			"env":
+			{
+			},
+			"generator": "Unix Makefiles",
+			"name": "Default",
+			"target": "cmake_build",
+			"variants":
+			[
+				{
+					"build_target": "graph",
+					"name": "graph"
+				},
+				{
+					"build_target": "uninstall",
+					"name": "uninstall"
+				},
+				{
+					"name": "ctest",
+					"target": "ctest_run"
+				}
+			],
+			"working_dir": "$folder/build"
+		}
+	],
+}
