@@ -10,9 +10,9 @@ FetchContent_Declare(json
 FetchContent_MakeAvailable(json)
 
 add_library(libjsonexpr
+    ${PROJECT_SOURCE_DIR}/src/base.cpp
     ${PROJECT_SOURCE_DIR}/src/ast.cpp
     ${PROJECT_SOURCE_DIR}/src/parse.cpp
-    ${PROJECT_SOURCE_DIR}/src/eval.cpp
     ${PROJECT_SOURCE_DIR}/src/jsonexpr.cpp)
 
 target_compile_features(libjsonexpr PUBLIC cxx_std_20)

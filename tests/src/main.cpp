@@ -56,6 +56,41 @@ TEST_CASE("string literal", "[string]") {
     }
 }
 
+TEST_CASE("string operations", "[string]") {
+    SECTION("bad") {
+        CHECK(!evaluate("'a'+").has_value());
+        CHECK(!evaluate("+'b'").has_value());
+        CHECK(!evaluate("-'b'").has_value());
+        CHECK(!evaluate("'a'*'b'").has_value());
+        CHECK(!evaluate("'a'/'b'").has_value());
+        CHECK(!evaluate("'a'%'b'").has_value());
+        CHECK(!evaluate("'a'^'b'").has_value());
+        CHECK(!evaluate("'a' && 'b'").has_value());
+        CHECK(!evaluate("'a' || 'b'").has_value());
+        CHECK(!evaluate("'a' < 1").has_value());
+        CHECK(!evaluate("'a' <= 1").has_value());
+        CHECK(!evaluate("'a' > 1").has_value());
+        CHECK(!evaluate("'a' >= 1").has_value());
+        CHECK(!evaluate("!'a'").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("'a'+'b'") == R"("ab")"_json);
+        CHECK(evaluate("''+'b'") == R"("b")"_json);
+        CHECK(evaluate("'a'+''") == R"("a")"_json);
+        CHECK(evaluate("'a' == ''") == "false"_json);
+        CHECK(evaluate("'a' == 'a'") == "true"_json);
+        CHECK(evaluate("'a' != ''") == "true"_json);
+        CHECK(evaluate("'a' != 'a'") == "false"_json);
+        CHECK(evaluate("'a' < 'b'") == "true"_json);
+        CHECK(evaluate("'b' <= 'b'") == "true"_json);
+        CHECK(evaluate("'b' <= 'a'") == "false"_json);
+        CHECK(evaluate("'a' > 'b'") == "false"_json);
+        CHECK(evaluate("'b' >= 'b'") == "true"_json);
+        CHECK(evaluate("'b' >= 'a'") == "true"_json);
+    }
+}
+
 TEST_CASE("number literal", "[maths]") {
     SECTION("bad") {
         CHECK(!evaluate("01").has_value());
@@ -430,4 +465,6 @@ TEST_CASE("wishlist for later", "[future]") {
     CHECK(!evaluate("identity(object).a", vars, funcs).has_value());
     // Object access on array access not supported
     CHECK(!evaluate("nested_object[0].c", vars, funcs).has_value());
+    // No short-circuiting
+    CHECK(!evaluate("size(array) >= 10 && array[9] == 1", vars, funcs).has_value());
 }

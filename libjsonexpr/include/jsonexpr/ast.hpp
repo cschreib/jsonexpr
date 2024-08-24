@@ -1,22 +1,14 @@
 #ifndef JSONEXPR_AST_HPP
 #define JSONEXPR_AST_HPP
 
-#include <nlohmann/json.hpp>
-#include <optional>
+#include "jsonexpr/base.hpp"
+
 #include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
 
-namespace jsonexpr {
-using json = nlohmann::json;
-
-struct source_location {
-    std::size_t      position;
-    std::string_view content;
-};
-
-namespace ast {
+namespace jsonexpr::ast {
 struct node;
 
 struct variable {
@@ -38,7 +30,11 @@ struct node {
 };
 
 std::string dump(const node& n, std::size_t indent = 0);
-} // namespace ast
-} // namespace jsonexpr
+
+tl::expected<json, error> evaluate(
+    const ast::node&         n,
+    const variable_registry& vreg = {},
+    const function_registry& freg = default_functions());
+} // namespace jsonexpr::ast
 
 #endif
