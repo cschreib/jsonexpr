@@ -467,4 +467,8 @@ TEST_CASE("wishlist for later", "[future]") {
     CHECK(!evaluate("nested_object[0].c", vars, funcs).has_value());
     // No short-circuiting
     CHECK(!evaluate("size(array) >= 10 && array[9] == 1", vars, funcs).has_value());
+    // No array literal
+    CHECK(!evaluate("[1,2,3,4]", vars, funcs).has_value());
+    // No object literal
+    CHECK(!evaluate("{'a':'b'}", vars, funcs).has_value());
 }
