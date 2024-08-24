@@ -11,6 +11,18 @@
 		{
 		    "format_on_save": true,
 		},
+		"TestExplorer":
+		{
+			"data_location": ".sublime-tests",
+			"frameworks": [
+				{
+					"id": "catch2",
+					"type": "catch2",
+					"executable_pattern": "build/tests/jsonexpr_tests",
+					"path_prefix_style": "basename"
+				}
+			]
+		},
 	},
 	"build_systems":
 	[
@@ -22,22 +34,8 @@
 			"generator": "Unix Makefiles",
 			"name": "Default",
 			"target": "cmake_build",
-			"variants":
-			[
-				{
-					"build_target": "graph",
-					"name": "graph"
-				},
-				{
-					"build_target": "uninstall",
-					"name": "uninstall"
-				},
-				{
-					"name": "ctest",
-					"target": "ctest_run"
-				}
-			],
-			"working_dir": "$folder/build"
+			"variants": [],
+			"working_dir": "$folder/build",
 		}
 	],
 }
