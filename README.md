@@ -2,7 +2,7 @@
 
 Simple expression language implemented in C++, meant to operate on JSON values. It understands:
  - The following types: numbers (float and integers), strings (single or double-quoted), booleans, objects.
- - The usual mathematical operators for numbers (`*` `/` `+` `-`), modulo (`%``) and exponentiation (`^` or `**`).
+ - The usual mathematical operators for numbers (`*` `/` `+` `-`), modulo (`%`) and exponentiation (`^` or `**`).
  - The usual boolean operators (`&&` `||` `!`) and comparison operators (`>` `>=` `<` `<=` `!=` `==`).
  - Array access (`a[1]`).
  - Sub-object access (`a.b`).
