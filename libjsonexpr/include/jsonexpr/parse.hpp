@@ -5,7 +5,7 @@
 #include "jsonexpr/expected.hpp"
 
 namespace jsonexpr {
-expected<ast::node, error> parse(std::string_view expression) noexcept;
+JSONEXPR_EXPORT expected<ast::node, error> parse(std::string_view expression) noexcept;
 } // namespace jsonexpr
 
 #endif

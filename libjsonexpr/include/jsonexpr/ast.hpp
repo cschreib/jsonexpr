@@ -30,9 +30,9 @@ struct node {
     std::variant<variable, literal, function> content;
 };
 
-std::string dump(const node& n, std::size_t indent = 0);
+JSONEXPR_EXPORT std::string dump(const node& n, std::size_t indent = 0);
 
-error node_error(const ast::node& n, std::string message);
+JSONEXPR_EXPORT error node_error(const ast::node& n, std::string message);
 } // namespace jsonexpr::ast
 
 #endif

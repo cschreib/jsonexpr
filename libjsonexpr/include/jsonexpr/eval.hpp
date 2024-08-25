@@ -8,7 +8,7 @@
 #include "jsonexpr/functions.hpp"
 
 namespace jsonexpr {
-expected<json, error> evaluate(
+JSONEXPR_EXPORT expected<json, error> evaluate(
     const ast::node&         n,
     const variable_registry& vreg = {},
     const function_registry& freg = default_functions());

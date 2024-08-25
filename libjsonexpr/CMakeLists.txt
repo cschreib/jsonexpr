@@ -19,6 +19,10 @@ if (NOT JSONEXPR_USE_STD_EXPECTED AND NOT JSONEXPR_USE_SYSTEM_EXPECTED)
     FetchContent_MakeAvailable(expected)
 endif()
 
+if (DEFINED BUILD_SHARED_LIBS)
+    set(JSONEXPR_SHARED_LIBRARY ${BUILD_SHARED_LIBS})
+endif()
+
 configure_file("${PROJECT_SOURCE_DIR}/include/jsonexpr/config.hpp.config"
                "${PROJECT_BINARY_DIR}/jsonexpr/config.hpp")
 
@@ -44,6 +48,19 @@ if (JSONEXPR_DEV)
         target_compile_options(libjsonexpr PRIVATE /W4)
         target_compile_options(libjsonexpr PRIVATE /WX)
         target_compile_options(libjsonexpr PRIVATE /EHs)
+    endif()
+endif()
+
+if (BUILD_SHARED_LIBS)
+    target_compile_definitions(libjsonexpr PRIVATE JSONEXPR_EXPORTS)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR MINGW)
+        # Nothing to do; default is already to hide symbols unless exported.
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
+        CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
+        CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        # Set default visibility to "hidden" so only exported symbols are visible.
+        target_compile_options(libjsonexpr PRIVATE -fvisibility=hidden)
+        target_compile_options(libjsonexpr PRIVATE -fvisibility-inlines-hidden)
     endif()
 endif()
 
