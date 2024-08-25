@@ -87,7 +87,7 @@ constexpr bool is_safe_to_compare = (std::is_same_v<T, U> && !std::is_same_v<T, 
     template<typename T, typename U>                                                               \
         requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool    \
     safe_##NAME(const T& lhs, const U& rhs) {                                                      \
-        if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
+        if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
                 OPERATOR static_cast<json::number_float_t>(rhs);                                   \
         } else {                                                                                   \
@@ -110,6 +110,28 @@ bool safe_eq(T lhs, T rhs) {
 template<std::same_as<bool> T>
 bool safe_ne(T lhs, T rhs) {
     return lhs != rhs;
+}
+
+template<typename T, typename U>
+    requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs <= rhs; })
+auto safe_min(const T& lhs, const U& rhs) {
+    if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
+        return safe_min(
+            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+    } else {
+        return lhs <= rhs ? lhs : rhs;
+    }
+}
+
+template<typename T, typename U>
+    requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs >= rhs; })
+auto safe_max(const T& lhs, const U& rhs) {
+    if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
+        return safe_max(
+            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+    } else {
+        return lhs >= rhs ? lhs : rhs;
+    }
 }
 
 template<typename T, typename U>
@@ -267,8 +289,8 @@ function_registry jsonexpr::default_functions() {
     BINARY_FUNCTION("**", safe_pow(lhs, rhs));
     BINARY_FUNCTION("^", safe_pow(lhs, rhs));
     BINARY_FUNCTION("[]", safe_access(lhs, rhs));
-    BINARY_FUNCTION("min", lhs <= rhs ? lhs : rhs);
-    BINARY_FUNCTION("max", lhs >= rhs ? lhs : rhs);
+    BINARY_FUNCTION("min", safe_min(lhs, rhs));
+    BINARY_FUNCTION("max", safe_max(lhs, rhs));
     UNARY_FUNCTION("abs", safe_abs(lhs));
     UNARY_FUNCTION("sqrt", safe_sqrt(lhs));
     UNARY_FUNCTION("round", safe_round(lhs));
