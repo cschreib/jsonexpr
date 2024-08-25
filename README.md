@@ -1,5 +1,7 @@
 # jsonexpr
 
+![Build Status](https://github.com/cschreib/jsonexpr/actions/workflows/cmake.yml/badge.svg) [![codecov](https://codecov.io/gh/cschreib/jsonexpr/graph/badge.svg?token=9XE89TMDJ8)](https://codecov.io/gh/cschreib/jsonexpr)
+
 ## Introduction
 
 Simple expression language implemented in C++, meant to operate on JSON values. It understands:
