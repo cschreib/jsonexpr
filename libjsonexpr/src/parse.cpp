@@ -567,7 +567,7 @@ expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept
         std::cout << std::endl;
     }
 
-    std::span<const token> tokens       = tokenizer_result.value();
+    std::span<const token> tokens(tokenizer_result.value().begin(), tokenizer_result.value().end());
     const auto             parse_result = try_parse_expr(tokens);
     if (!parse_result.has_value()) {
         const auto err = parse_result.error();
