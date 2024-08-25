@@ -44,6 +44,21 @@ void jsonexpr::register_function(
 }
 
 namespace {
+// Define our own traits to identify acceptable types in operations.
+// Mainly this disallows mixed-type operations with bool.
+template<typename T>
+constexpr bool is_arithmetic_not_bool =
+    std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
+
+template<typename T, typename U>
+constexpr bool is_safe_to_compare =
+    ((std::is_same_v<T, U> && !std::is_same_v<T, json::boolean_t>) ||
+     (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>)) &&
+    requires(T lhs, U rhs) { lhs <= rhs; };
+
+template<typename T, typename U>
+constexpr bool is_safe_for_maths = is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>;
+
 #define UNARY_FUNCTION(NAME, EXPR)                                                                 \
     register_function(freg, NAME, 1, [](const json& args) -> basic_function_result {               \
         return std::visit(                                                                         \
@@ -75,17 +90,9 @@ namespace {
             to_variant(args[0]), to_variant(args[1]));                                             \
     })
 
-template<typename T>
-constexpr bool is_arithmetic_not_bool =
-    std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
-
-template<typename T, typename U>
-constexpr bool is_safe_to_compare = (std::is_same_v<T, U> && !std::is_same_v<T, json::boolean_t>) ||
-                                    (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>);
-
 #define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
-        requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool    \
+        requires(is_safe_to_compare<T, U>) bool                                                    \
     safe_##NAME(const T& lhs, const U& rhs) {                                                      \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
@@ -113,7 +120,7 @@ bool safe_ne(T lhs, T rhs) {
 }
 
 template<typename T, typename U>
-    requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs <= rhs; })
+    requires(is_safe_to_compare<T, U>)
 auto safe_min(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         return safe_min(
@@ -124,7 +131,7 @@ auto safe_min(const T& lhs, const U& rhs) {
 }
 
 template<typename T, typename U>
-    requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs >= rhs; })
+    requires(is_safe_to_compare<T, U>)
 auto safe_max(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         return safe_max(
@@ -133,9 +140,6 @@ auto safe_max(const T& lhs, const U& rhs) {
         return lhs >= rhs ? lhs : rhs;
     }
 }
-
-template<typename T, typename U>
-constexpr bool is_safe_for_maths = is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>;
 
 #define MATHS_OPERATOR(NAME, OPERATOR)                                                             \
     template<typename T, typename U>                                                               \
