@@ -111,7 +111,7 @@ constexpr std::string_view string_chars           = "\"'";
 constexpr std::string_view whitespace_chars       = " \t\n\r";
 constexpr char             escape_char            = '\\';
 
-tl::expected<std::vector<token>, error> tokenize(std::string_view expression) noexcept {
+expected<std::vector<token>, error> tokenize(std::string_view expression) noexcept {
     std::vector<token> tokens;
     std::size_t        read_pos = 0;
 
@@ -137,7 +137,7 @@ tl::expected<std::vector<token>, error> tokenize(std::string_view expression) no
     std::string_view last_expression;
     while (!expression.empty()) {
         if (expression == last_expression) {
-            return tl::unexpected(error{read_pos, 1, "infinite loop detected in tokenizer (bug)"});
+            return unexpected(error{read_pos, 1, "infinite loop detected in tokenizer (bug)"});
         }
 
         last_expression = expression;
@@ -183,26 +183,26 @@ tl::expected<std::vector<token>, error> tokenize(std::string_view expression) no
         } else if (is_any_of(current_char, string_chars)) {
             const auto end = scan_string(expression, 1, current_char, escape_char);
             if (!end.has_value()) {
-                return tl::unexpected(error{read_pos, expression.size(), "unterminated string"});
+                return unexpected(error{read_pos, expression.size(), "unterminated string"});
             }
 
             extract_as(end.value(), token::STRING);
         } else {
-            return tl::unexpected(error{read_pos, 1, "unexpected character"});
+            return unexpected(error{read_pos, 1, "unexpected character"});
         }
     }
 
     return tokens;
 }
 
-tl::expected<ast::node, parse_error> try_parse_variable(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_variable(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected identifier"));
+        return unexpected(match_failed("expected identifier"));
     }
 
     token t = tokens.front();
     if (t.type != token::IDENTIFIER) {
-        return tl::unexpected(match_failed(t, "expected identifier"));
+        return unexpected(match_failed(t, "expected identifier"));
     }
 
     tokens = tokens.subspan(1);
@@ -240,14 +240,14 @@ std::string single_to_double_quote(std::string_view input) noexcept {
     return str;
 }
 
-tl::expected<ast::node, parse_error> try_parse_literal(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_literal(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected literal (number or string)"));
+        return unexpected(match_failed("expected literal (number or string)"));
     }
 
     token t = tokens.front();
     if (t.type != token::NUMBER && t.type != token::STRING) {
-        return tl::unexpected(match_failed(t, "expected literal (number or string)"));
+        return unexpected(match_failed(t, "expected literal (number or string)"));
     }
 
     json parsed;
@@ -260,12 +260,12 @@ tl::expected<ast::node, parse_error> try_parse_literal(std::span<const token>& t
             parsed = json::parse(single_to_double_quote(t.location.content), nullptr, false);
         }
         if (parsed.type() == json::value_t::discarded) {
-            return tl::unexpected(abort_parse(t, "could not parse string"));
+            return unexpected(abort_parse(t, "could not parse string"));
         }
     } else {
         parsed = json::parse(t.location.content, nullptr, false);
         if (parsed.type() == json::value_t::discarded) {
-            return tl::unexpected(abort_parse(t, "could not parse number"));
+            return unexpected(abort_parse(t, "could not parse number"));
         }
     }
 
@@ -273,20 +273,20 @@ tl::expected<ast::node, parse_error> try_parse_literal(std::span<const token>& t
     return ast::node{.location = t.location, .content = ast::literal{std::move(parsed)}};
 }
 
-tl::expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
+expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
 
-tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_function(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected function"));
+        return unexpected(match_failed("expected function"));
     }
     if (tokens.size() < 3) {
-        return tl::unexpected(match_failed(tokens.front(), "expected function"));
+        return unexpected(match_failed(tokens.front(), "expected function"));
     }
     if (tokens[0].type != token::IDENTIFIER) {
-        return tl::unexpected(match_failed(tokens[0], "expected identifier"));
+        return unexpected(match_failed(tokens[0], "expected identifier"));
     }
     if (tokens[1].type != token::GROUP_OPEN) {
-        return tl::unexpected(match_failed(tokens[1], "expected function argument list"));
+        return unexpected(match_failed(tokens[1], "expected function argument list"));
     }
 
     const token& func = tokens.front();
@@ -297,7 +297,7 @@ tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& 
     bool                   first       = true;
     while (!args_tokens.empty()) {
         if (args_tokens.size() == prev_size) {
-            return tl::unexpected(abort_parse(
+            return unexpected(abort_parse(
                 args_tokens.front(), "infinite loop detected in function parser (bug)"));
         }
 
@@ -309,8 +309,7 @@ tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& 
 
         if (!first) {
             if (args_tokens.front().type != token::SEPARATOR) {
-                return tl::unexpected(
-                    abort_parse(args_tokens.front(), "expected argument separator"));
+                return unexpected(abort_parse(args_tokens.front(), "expected argument separator"));
             }
 
             args_tokens = args_tokens.subspan(1);
@@ -318,7 +317,7 @@ tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& 
 
         auto arg = try_parse_expr(args_tokens);
         if (!arg.has_value()) {
-            return tl::unexpected(arg.error());
+            return unexpected(arg.error());
         }
 
         args.push_back(std::move(arg.value()));
@@ -326,7 +325,7 @@ tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& 
     }
 
     if (args_tokens.empty()) {
-        return tl::unexpected(abort_parse("expected ')'"));
+        return unexpected(abort_parse("expected ')'"));
     }
 
     const token& end_token = args_tokens.front();
@@ -342,38 +341,37 @@ tl::expected<ast::node, parse_error> try_parse_function(std::span<const token>& 
         .content = ast::function{func.location.content, std::move(args)}};
 }
 
-tl::expected<ast::node, parse_error>
-try_parse_array_access(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected array access"));
+        return unexpected(match_failed("expected array access"));
     }
     if (tokens.size() < 3) {
-        return tl::unexpected(match_failed(tokens.front(), "expected array access"));
+        return unexpected(match_failed(tokens.front(), "expected array access"));
     }
     if (tokens[0].type != token::IDENTIFIER) {
-        return tl::unexpected(match_failed(tokens[0], "expected identifier"));
+        return unexpected(match_failed(tokens[0], "expected identifier"));
     }
     if (tokens[1].type != token::ARRAY_ACCESS_OPEN) {
-        return tl::unexpected(match_failed(tokens[1], "expected array index"));
+        return unexpected(match_failed(tokens[1], "expected array index"));
     }
 
     auto access_tokens = tokens;
     auto array         = try_parse_variable(access_tokens);
     if (!array.has_value()) {
-        return tl::unexpected(array.error());
+        return unexpected(array.error());
     }
 
     access_tokens = access_tokens.subspan(1);
     auto index    = try_parse_expr(access_tokens);
     if (!index.has_value()) {
-        return tl::unexpected(index.error());
+        return unexpected(index.error());
     }
 
     if (access_tokens.empty()) {
-        return tl::unexpected(abort_parse("expected ']'"));
+        return unexpected(abort_parse("expected ']'"));
     }
     if (access_tokens.front().type != token::ARRAY_ACCESS_CLOSE) {
-        return tl::unexpected(abort_parse(access_tokens.front(), "expected ']'"));
+        return unexpected(abort_parse(access_tokens.front(), "expected ']'"));
     }
 
     const token& end_token = access_tokens.front();
@@ -389,24 +387,24 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
         .content = ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
 }
 
-tl::expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected group"));
+        return unexpected(match_failed("expected group"));
     }
     if (tokens.size() < 2 || tokens.front().type != token::GROUP_OPEN) {
-        return tl::unexpected(match_failed(tokens.front(), "expected group"));
+        return unexpected(match_failed(tokens.front(), "expected group"));
     }
 
     auto group_tokens = tokens.subspan(1);
     auto expr         = try_parse_expr(group_tokens);
     if (!expr.has_value()) {
-        return tl::unexpected(expr.error());
+        return unexpected(expr.error());
     }
 
     if (group_tokens.empty()) {
-        return tl::unexpected(abort_parse("expected group end"));
+        return unexpected(abort_parse("expected group end"));
     } else if (group_tokens.front().type != token::GROUP_CLOSE) {
-        return tl::unexpected(abort_parse(group_tokens.front(), "expected group end"));
+        return unexpected(abort_parse(group_tokens.front(), "expected group end"));
     }
 
     group_tokens = group_tokens.subspan(1);
@@ -414,13 +412,13 @@ tl::expected<ast::node, parse_error> try_parse_group(std::span<const token>& tok
     return expr;
 }
 
-bool is_match(const tl::expected<ast::node, parse_error>& result) {
+bool is_match(const expected<ast::node, parse_error>& result) {
     return result.has_value() || std::holds_alternative<error>(result.error());
 }
 
-tl::expected<ast::node, parse_error> try_parse_operand(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_operand(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected operand"));
+        return unexpected(match_failed("expected operand"));
     }
 
     if (auto op = try_parse_group(tokens); is_match(op)) {
@@ -439,12 +437,12 @@ tl::expected<ast::node, parse_error> try_parse_operand(std::span<const token>& t
         return op;
     }
 
-    return tl::unexpected(match_failed(tokens.front(), "expected operand"));
+    return unexpected(match_failed(tokens.front(), "expected operand"));
 }
 
-tl::expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected unary expression"));
+        return unexpected(match_failed("expected unary expression"));
     }
 
     if (tokens.front().type != token::OPERATOR) {
@@ -459,7 +457,7 @@ tl::expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tok
 
     auto operand = try_parse_unary(unary_tokens);
     if (!operand.has_value()) {
-        return tl::unexpected(operand.error());
+        return unexpected(operand.error());
     }
 
     tokens = unary_tokens;
@@ -492,9 +490,9 @@ struct tagged_operator {
     std::size_t      precedence = 0;
 };
 
-tl::expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return tl::unexpected(match_failed("expected expression"));
+        return unexpected(match_failed("expected expression"));
     }
 
     std::vector<ast::node>       nodes;
@@ -505,7 +503,7 @@ tl::expected<ast::node, parse_error> try_parse_expr(std::span<const token>& toke
     bool        first      = true;
     while (!ops_tokens.empty()) {
         if (ops_tokens.size() == prev_size) {
-            return tl::unexpected(abort_parse(
+            return unexpected(abort_parse(
                 ops_tokens.front(), "infinite loop detected in expression parser (bug)"));
         }
 
@@ -523,7 +521,7 @@ tl::expected<ast::node, parse_error> try_parse_expr(std::span<const token>& toke
 
         auto operand = try_parse_unary(ops_tokens);
         if (!operand.has_value()) {
-            return tl::unexpected(operand.error());
+            return unexpected(operand.error());
         }
 
         nodes.push_back(std::move(operand.value()));
@@ -559,10 +557,10 @@ tl::expected<ast::node, parse_error> try_parse_expr(std::span<const token>& toke
 }
 } // namespace
 
-tl::expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept {
+expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept {
     const auto tokenizer_result = tokenize(expression);
     if (!tokenizer_result.has_value()) {
-        return tl::unexpected(tokenizer_result.error());
+        return unexpected(tokenizer_result.error());
     }
 
     if constexpr (debug) {
@@ -577,10 +575,10 @@ tl::expected<ast::node, error> jsonexpr::parse(std::string_view expression) noex
     const auto             parse_result = try_parse_expr(tokens);
     if (!parse_result.has_value()) {
         const auto err = parse_result.error();
-        return tl::unexpected(std::visit([](const auto& e) -> error { return e; }, err));
+        return unexpected(std::visit([](const auto& e) -> error { return e; }, err));
     }
     if (!tokens.empty()) {
-        return tl::unexpected(abort_parse(tokens.front(), "unexpected content in expression"));
+        return unexpected(abort_parse(tokens.front(), "unexpected content in expression"));
     }
 
     if constexpr (debug) {

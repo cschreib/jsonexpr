@@ -2,8 +2,29 @@ cmake_minimum_required(VERSION 3.18)
 
 project(jsonexpr LANGUAGES CXX VERSION 1.0.0)
 
+# Figure out git hash, if any
+execute_process(
+    COMMAND git log -1 --format=%h
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    RESULT_VARIABLE GIT_COMMAND_SUCCESS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+
+if (GIT_COMMAND_SUCCESS EQUAL 0)
+    set(JSONEXPR_FULL_VERSION "${PROJECT_VERSION}.${GIT_COMMIT_HASH}")
+else()
+    set(JSONEXPR_FULL_VERSION "${PROJECT_VERSION}")
+endif()
+
+# Components (library is always built).
 set(JSONEXPR_APP   ON  CACHE BOOL "Build command line application.")
 set(JSONEXPR_TEST  ON  CACHE BOOL "Build tests.")
+
+# Dependencies
+set(JSONEXPR_USE_SYSTEM_JSON OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
+set(JSONEXPR_USE_SYSTEM_EXPECTED OFF CACHE BOOL "Use a pre-installed version of tl::expected. Else, download.")
+set(JSONEXPR_USE_STD_EXPECTED OFF CACHE BOOL "Use std::expected (requires C++23). Else, use tl::expected.")
 
 add_subdirectory(libjsonexpr)
 

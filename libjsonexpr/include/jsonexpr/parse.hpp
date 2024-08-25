@@ -7,7 +7,7 @@
 #include <cstdint>
 
 namespace jsonexpr {
-tl::expected<ast::node, error> parse(std::string_view expression) noexcept;
+expected<ast::node, error> parse(std::string_view expression) noexcept;
 } // namespace jsonexpr
 
 #endif

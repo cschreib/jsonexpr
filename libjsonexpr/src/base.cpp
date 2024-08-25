@@ -59,7 +59,7 @@ json_variant to_variant(const json& j) {
                 if constexpr (requires { EXPR; }) {                                                \
                     return EXPR;                                                                   \
                 } else {                                                                           \
-                    return tl::unexpected(                                                         \
+                    return unexpected(                                                             \
                         std::string("incompatible type for '" NAME "', got ") +                    \
                         std::string(get_type_name(args[0])));                                      \
                 }                                                                                  \
@@ -74,7 +74,7 @@ json_variant to_variant(const json& j) {
                 if constexpr (requires { EXPR; }) {                                                \
                     return EXPR;                                                                   \
                 } else {                                                                           \
-                    return tl::unexpected(                                                         \
+                    return unexpected(                                                             \
                         std::string("incompatible types for '" NAME "', got ") +                   \
                         std::string(get_type_name(args[0])) + " and " +                            \
                         std::string(get_type_name(args[1])));                                      \
@@ -93,7 +93,7 @@ function_result safe_div(T lhs, U rhs) {
     using return_type = decltype(lhs / rhs);
     if constexpr (std::is_integral_v<return_type>) {
         if (rhs == 0) {
-            return tl::unexpected(std::string("division by zero"));
+            return unexpected(std::string("division by zero"));
         }
     }
 
@@ -105,13 +105,13 @@ template<typename T, typename U>
 function_result safe_access(const T& lhs, U rhs) {
     if constexpr (std::is_arithmetic_v<U>) {
         if (rhs >= lhs.size()) {
-            return tl::unexpected(
+            return unexpected(
                 std::string("out-of-bounds access at position ") + std::to_string(rhs) +
                 " in array of size " + std::to_string(lhs.size()));
         }
     } else {
         if (!lhs.contains(rhs)) {
-            return tl::unexpected(std::string("unknown field '") + rhs + "'");
+            return unexpected(std::string("unknown field '") + rhs + "'");
         }
     }
 

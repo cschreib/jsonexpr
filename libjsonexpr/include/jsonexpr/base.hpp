@@ -1,6 +1,7 @@
 #ifndef JSONEXPR_BASE_HPP
 #define JSONEXPR_BASE_HPP
 
+#include "jsonexpr/config.hpp"
 #include "jsonexpr/expected.hpp"
 
 #include <cstdint>
@@ -29,7 +30,7 @@ std::string format_error(std::string_view expression, const error& e);
 std::string_view get_type_name(const json& j) noexcept;
 
 using variable_registry = std::unordered_map<std::string_view, json>;
-using function_result   = tl::expected<json, std::string>;
+using function_result   = expected<json, std::string>;
 using function          = std::function<function_result(const json&)>;
 using function_registry =
     std::unordered_map<std::string_view, std::unordered_map<std::size_t, function>>;

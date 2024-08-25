@@ -42,7 +42,7 @@ error make_error(std::string message) {
 } // namespace
 
 namespace {
-tl::expected<json, error> eval(
+expected<json, error> eval(
     const ast::node&         n,
     const ast::variable&     v,
     const variable_registry& vreg,
@@ -52,7 +52,7 @@ tl::expected<json, error> eval(
     auto name    = v.name.substr(0, dot_pos);
     auto iter    = vreg.find(name.substr(0, dot_pos));
     if (iter == vreg.end()) {
-        return tl::unexpected(error{
+        return unexpected(error{
             n.location.position, name.size(), "unknown variable '" + std::string(name) + "'"});
     }
 
@@ -64,7 +64,7 @@ tl::expected<json, error> eval(
         name    = v.name.substr(prev_pos, dot_pos - prev_pos);
 
         if (!object->contains(name)) {
-            return tl::unexpected(error{
+            return unexpected(error{
                 n.location.position + prev_pos, name.size(),
                 "unknown field '" + std::string(name) + "'"});
         }
@@ -75,15 +75,15 @@ tl::expected<json, error> eval(
     return *object;
 }
 
-tl::expected<json, error>
+expected<json, error>
 eval(const ast::node&, const ast::literal& v, const variable_registry&, const function_registry&) {
     return v.value;
 }
 
-tl::expected<json, error>
+expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg);
 
-tl::expected<json, error> eval(
+expected<json, error> eval(
     const ast::node&         n,
     const ast::function&     f,
     const variable_registry& vreg,
@@ -91,12 +91,12 @@ tl::expected<json, error> eval(
 
     auto iter = freg.find(f.name);
     if (iter == freg.end()) {
-        return tl::unexpected(make_error(n, "unknown function '" + std::string(f.name) + "'"));
+        return unexpected(make_error(n, "unknown function '" + std::string(f.name) + "'"));
     }
 
     auto overload = iter->second.find(f.args.size());
     if (overload == iter->second.end()) {
-        return tl::unexpected(make_error(
+        return unexpected(make_error(
             n, "function does not take '" + std::to_string(f.args.size()) + "' arguments"));
     }
 
@@ -104,7 +104,7 @@ tl::expected<json, error> eval(
     for (const auto& arg : f.args) {
         auto eval_arg = eval(arg, vreg, freg);
         if (!eval_arg.has_value()) {
-            return tl::unexpected(eval_arg.error());
+            return unexpected(eval_arg.error());
         }
         args.push_back(std::move(eval_arg.value()));
     }
@@ -114,23 +114,23 @@ tl::expected<json, error> eval(
         if (result.has_value()) {
             return result.value();
         } else {
-            return tl::unexpected(make_error(n, result.error()));
+            return unexpected(make_error(n, result.error()));
         }
     } catch (const std::exception& error) {
-        return tl::unexpected(
+        return unexpected(
             make_error(n, "exception when evaluating function: " + std::string(error.what())));
     } catch (...) {
-        return tl::unexpected(make_error(n, "unknown exception when evaluating function"));
+        return unexpected(make_error(n, "unknown exception when evaluating function"));
     }
 }
 
-tl::expected<json, error>
+expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg) {
     return std::visit([&](const auto& c) { return eval(n, c, vreg, freg); }, n.content);
 }
 } // namespace
 
-tl::expected<json, error> jsonexpr::ast::evaluate(
+expected<json, error> jsonexpr::ast::evaluate(
     const ast::node& n, const variable_registry& vreg, const function_registry& freg) {
     return eval(n, vreg, freg);
 }

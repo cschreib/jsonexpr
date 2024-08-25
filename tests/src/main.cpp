@@ -15,7 +15,7 @@ bool append(snitch::small_string_span ss, const error& e) {
 }
 
 template<typename T, typename E>
-bool append(snitch::small_string_span ss, const tl::expected<T, E>& r) {
+bool append(snitch::small_string_span ss, const expected<T, E>& r) {
     if (r.has_value()) {
         return append(ss, r.value());
     } else {

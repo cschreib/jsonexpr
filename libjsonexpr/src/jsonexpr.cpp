@@ -5,7 +5,7 @@
 
 using namespace jsonexpr;
 
-tl::expected<json, error> jsonexpr::evaluate(
+expected<json, error> jsonexpr::evaluate(
     std::string_view expression, const variable_registry& vreg, const function_registry& freg) {
 
     const auto ast = parse(expression);
@@ -15,12 +15,12 @@ tl::expected<json, error> jsonexpr::evaluate(
             e.position = expression.size();
         }
 
-        return tl::unexpected(e);
+        return unexpected(e);
     }
 
     const auto result = ast::evaluate(ast.value(), vreg, freg);
     if (!result.has_value()) {
-        return tl::unexpected(error(result.error()));
+        return unexpected(error(result.error()));
     }
 
     return result.value();

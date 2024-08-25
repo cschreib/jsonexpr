@@ -31,7 +31,7 @@ struct node {
 
 std::string dump(const node& n, std::size_t indent = 0);
 
-tl::expected<json, error> evaluate(
+expected<json, error> evaluate(
     const ast::node&         n,
     const variable_registry& vreg = {},
     const function_registry& freg = default_functions());

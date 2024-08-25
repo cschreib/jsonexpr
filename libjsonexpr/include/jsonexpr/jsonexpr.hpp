@@ -4,7 +4,7 @@
 #include "jsonexpr/base.hpp"
 
 namespace jsonexpr {
-tl::expected<json, error> evaluate(
+expected<json, error> evaluate(
     std::string_view         expression,
     const variable_registry& vreg = {},
     const function_registry& freg = default_functions());
