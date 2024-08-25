@@ -22,7 +22,6 @@ Limitations (on purpose):
  - Objects are just data (think JSON object), they have no member functions.
 
 Limitations (for lack of motivation/time):
- - Object access is only possible on named variables (`a.b`), not on function calls (`f(a).b`) or nested arrays (`a[1].b`).
  - Arrays and objects can only be created by reading variables (`[1,2,3]` or `{"abc": "def"}` isn't legal code).
 
 
