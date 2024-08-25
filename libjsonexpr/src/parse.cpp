@@ -63,6 +63,14 @@ bool is_none_of(char c, std::string_view list) noexcept {
     return list.find_first_of(c) == list.npos;
 }
 
+const char* view_begin(std::string_view s) noexcept {
+    return s.data();
+}
+
+const char* view_end(std::string_view s) noexcept {
+    return s.data() + s.size();
+}
+
 std::size_t
 scan_class(std::string_view expression, std::size_t start, std::string_view chars) noexcept {
     for (std::size_t i = start; i < expression.size(); ++i) {
@@ -204,7 +212,7 @@ expected<ast::node, parse_error> try_parse_variable(std::span<const token>& toke
     }
 
     tokens = tokens.subspan(1);
-    return ast::node{.location = t.location, .content = ast::variable{t.location.content}};
+    return ast::node{t.location, ast::variable{t.location.content}};
 }
 
 std::string single_to_double_quote(std::string_view input) noexcept {
@@ -268,7 +276,7 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
     }
 
     tokens = tokens.subspan(1);
-    return ast::node{.location = t.location, .content = ast::literal{std::move(parsed)}};
+    return ast::node{t.location, ast::literal{std::move(parsed)}};
 }
 
 expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
@@ -332,11 +340,9 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     tokens      = args_tokens;
 
     return ast::node{
-        .location =
-            {.position = func.location.position,
-             .content =
-                 std::string_view(func.location.content.begin(), end_token.location.content.end())},
-        .content = ast::function{func.location.content, std::move(args)}};
+        {func.location.position,
+         std::string_view(view_begin(func.location.content), view_end(end_token.location.content))},
+        ast::function{func.location.content, std::move(args)}};
 }
 
 expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& tokens) noexcept {
@@ -378,11 +384,10 @@ expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& 
     tokens        = access_tokens;
 
     return ast::node{
-        .location =
-            {.position = array.value().location.position,
-             .content  = std::string_view(
-                 array.value().location.content.begin(), end_token.location.content.end())},
-        .content = ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
+        {array.value().location.position,
+         std::string_view(
+             view_begin(array.value().location.content), view_end(end_token.location.content))},
+        ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
 }
 
 expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
@@ -459,11 +464,10 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
     tokens = unary_tokens;
 
     return ast::node{
-        .location =
-            {.position = parsed_operator.location.position,
-             .content  = std::string_view(
-                 parsed_operator.location.content.begin(), operand.value().location.content.end())},
-        .content = ast::function{parsed_operator.location.content, {std::move(operand.value())}}};
+        {parsed_operator.location.position, std::string_view(
+                                                view_begin(parsed_operator.location.content),
+                                                view_end(operand.value().location.content))},
+        ast::function{parsed_operator.location.content, {std::move(operand.value())}}};
 }
 
 // From least to highest precedence. Operators with the same precedence are evaluated left-to-right.
@@ -533,12 +537,10 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
     for (std::size_t i = 0; i < operators.size();) {
         if (i == operators.size() - 1 || operators[i].precedence >= operators[i + 1].precedence) {
             nodes[i] = ast::node{
-                .location =
-                    {.position = nodes[i].location.position,
-                     .content  = std::string_view(
-                         nodes[i].location.content.begin(), nodes[i + 1].location.content.end())},
-                .content = ast::function{
-                    operators[i].token, {std::move(nodes[i]), std::move(nodes[i + 1])}}};
+                {nodes[i].location.position, std::string_view(
+                                                 view_begin(nodes[i].location.content),
+                                                 view_end(nodes[i + 1].location.content))},
+                ast::function{operators[i].token, {std::move(nodes[i]), std::move(nodes[i + 1])}}};
             nodes.erase(nodes.begin() + (i + 1));
             operators.erase(operators.begin() + i);
             if (i > 0) {
