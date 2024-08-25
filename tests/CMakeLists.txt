@@ -12,3 +12,9 @@ FetchContent_MakeAvailable(snitch)
 add_executable(jsonexpr_tests src/main.cpp)
 target_link_libraries(jsonexpr_tests PRIVATE jsonexpr::libjsonexpr)
 target_link_libraries(jsonexpr_tests PRIVATE snitch::snitch)
+
+add_custom_target(jsonexpr_tests_run
+    COMMAND jsonexpr_tests
+    WORKING_DIRECTORY ${RUNTIME_TEST_WORKING_DIRECTORY}
+    SOURCES ${RUNTIME_TEST_FILES})
+set_target_properties(jsonexpr_tests_run PROPERTIES EXCLUDE_FROM_ALL True)
