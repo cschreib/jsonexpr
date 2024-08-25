@@ -57,6 +57,9 @@ TEST_CASE("string literal", "[string]") {
 }
 
 TEST_CASE("string operations", "[string]") {
+    variable_registry vars;
+    vars["a"] = R"("abcdef")"_json;
+
     SECTION("bad") {
         CHECK(!evaluate("'a'+").has_value());
         CHECK(!evaluate("+'b'").has_value());
@@ -72,6 +75,8 @@ TEST_CASE("string operations", "[string]") {
         CHECK(!evaluate("'a' > 1").has_value());
         CHECK(!evaluate("'a' >= 1").has_value());
         CHECK(!evaluate("!'a'").has_value());
+        CHECK(!evaluate("a[6]", vars).has_value());
+        CHECK(!evaluate("a[-7]", vars).has_value());
     }
 
     SECTION("good") {
@@ -88,6 +93,13 @@ TEST_CASE("string operations", "[string]") {
         CHECK(evaluate("'a' > 'b'") == "false"_json);
         CHECK(evaluate("'b' >= 'b'") == "true"_json);
         CHECK(evaluate("'b' >= 'a'") == "true"_json);
+        CHECK(evaluate("'b' >= 'a'") == "true"_json);
+        CHECK(evaluate("a[0]", vars) == R"("a")"_json);
+        CHECK(evaluate("a[1]", vars) == R"("b")"_json);
+        CHECK(evaluate("a[2]", vars) == R"("c")"_json);
+        CHECK(evaluate("a[-1]", vars) == R"("f")"_json);
+        CHECK(evaluate("a[-2]", vars) == R"("e")"_json);
+        CHECK(evaluate("a[-3]", vars) == R"("d")"_json);
     }
 }
 
@@ -275,8 +287,9 @@ TEST_CASE("array", "[general]") {
         CHECK(!evaluate("obj[", vars).has_value());
         CHECK(!evaluate("obj]", vars).has_value());
         CHECK(!evaluate("obj[1)", vars).has_value());
-        CHECK(!evaluate("obj[-1]", vars).has_value());
         CHECK(!evaluate("obj[1,2]", vars).has_value());
+        CHECK(!evaluate("obj[5]", vars).has_value());
+        CHECK(!evaluate("obj[-6]", vars).has_value());
     }
 
     SECTION("good") {
@@ -289,6 +302,11 @@ TEST_CASE("array", "[general]") {
         CHECK(evaluate("obj[2]", vars) == "3"_json);
         CHECK(evaluate("obj[3]", vars) == "4"_json);
         CHECK(evaluate("obj[4]", vars) == "5"_json);
+        CHECK(evaluate("obj[-1]", vars) == "5"_json);
+        CHECK(evaluate("obj[-2]", vars) == "4"_json);
+        CHECK(evaluate("obj[-3]", vars) == "3"_json);
+        CHECK(evaluate("obj[-4]", vars) == "2"_json);
+        CHECK(evaluate("obj[-5]", vars) == "1"_json);
         CHECK(evaluate("obj[1+1]", vars) == "3"_json);
         CHECK(evaluate("obj[abs(-1)]", vars) == "2"_json);
         CHECK(evaluate("obj[obj[0]]", vars) == "2"_json);

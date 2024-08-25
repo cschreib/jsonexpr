@@ -96,18 +96,34 @@ template<typename T, typename U>
     requires(!std::same_as<U, json> && requires(const T& lhs, U rhs) { lhs[rhs]; })
 basic_function_result safe_access(const T& lhs, U rhs) {
     if constexpr (std::is_arithmetic_v<U>) {
-        if (rhs >= lhs.size()) {
+        const std::size_t unsigned_rhs = [&] {
+            if constexpr (std::is_signed_v<U>) {
+                return static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
+            } else {
+                return rhs;
+            }
+        }();
+
+        if (unsigned_rhs >= lhs.size()) {
             return unexpected(
                 std::string("out-of-bounds access at position ") + std::to_string(rhs) + " in " +
                 std::string(get_type_name(lhs)) + " of size " + std::to_string(lhs.size()));
+        }
+
+        if constexpr (std::is_same_v<T, json::string_t>) {
+            // If we just returned lhs[rhs], we would get the numerical value of the 'char'.
+            // Return a new string instead with just that character, which will be more practical.
+            return json::string_t(1, lhs[unsigned_rhs]);
+        } else {
+            return lhs[unsigned_rhs];
         }
     } else {
         if (!lhs.contains(rhs)) {
             return unexpected(std::string("unknown field '") + rhs + "'");
         }
-    }
 
-    return lhs[rhs];
+        return lhs[rhs];
+    }
 }
 
 expected<bool, error> evaluate_as_bool(
