@@ -110,12 +110,12 @@ COMPARISON_OPERATOR(le, <=)
 COMPARISON_OPERATOR(gt, >)
 COMPARISON_OPERATOR(ge, >=)
 
-template<std::same_as<bool> T>
+template<std::same_as<json::boolean_t> T>
 bool safe_eq(T lhs, T rhs) {
     return lhs == rhs;
 }
 
-template<std::same_as<bool> T>
+template<std::same_as<json::boolean_t> T>
 bool safe_ne(T lhs, T rhs) {
     return lhs != rhs;
 }
@@ -160,7 +160,8 @@ MATHS_OPERATOR(mul, *)
 MATHS_OPERATOR(add, +)
 MATHS_OPERATOR(sub, -)
 
-json::string_t safe_add(const json::string_t& lhs, const json::string_t& rhs) {
+template<std::same_as<json::string_t> T>
+T safe_add(const T& lhs, const T& rhs) {
     return lhs + rhs;
 }
 
