@@ -1,6 +1,6 @@
 #include "jsonexpr/jsonexpr.hpp"
 
-#include "jsonexpr/ast.hpp"
+#include "jsonexpr/eval.hpp"
 #include "jsonexpr/parse.hpp"
 
 using namespace jsonexpr;
@@ -18,7 +18,7 @@ expected<json, error> jsonexpr::evaluate(
         return unexpected(e);
     }
 
-    const auto result = ast::evaluate(ast.value(), vreg, freg);
+    const auto result = evaluate(ast.value(), vreg, freg);
     if (!result.has_value()) {
         return unexpected(error(result.error()));
     }

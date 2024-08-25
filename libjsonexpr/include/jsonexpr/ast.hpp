@@ -2,6 +2,7 @@
 #define JSONEXPR_AST_HPP
 
 #include "jsonexpr/base.hpp"
+#include "jsonexpr/config.hpp"
 
 #include <string>
 #include <string_view>
@@ -30,11 +31,6 @@ struct node {
 };
 
 std::string dump(const node& n, std::size_t indent = 0);
-
-expected<json, error> evaluate(
-    const ast::node&         n,
-    const variable_registry& vreg = {},
-    const function_registry& freg = default_functions());
 } // namespace jsonexpr::ast
 
 #endif

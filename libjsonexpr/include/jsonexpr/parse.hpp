@@ -4,8 +4,6 @@
 #include "jsonexpr/ast.hpp"
 #include "jsonexpr/expected.hpp"
 
-#include <cstdint>
-
 namespace jsonexpr {
 expected<ast::node, error> parse(std::string_view expression) noexcept;
 } // namespace jsonexpr

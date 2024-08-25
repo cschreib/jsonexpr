@@ -23,8 +23,10 @@ configure_file("${PROJECT_SOURCE_DIR}/include/jsonexpr/config.hpp.config"
                "${PROJECT_BINARY_DIR}/jsonexpr/config.hpp")
 
 add_library(libjsonexpr
-    ${PROJECT_SOURCE_DIR}/src/base.cpp
     ${PROJECT_SOURCE_DIR}/src/ast.cpp
+    ${PROJECT_SOURCE_DIR}/src/base.cpp
+    ${PROJECT_SOURCE_DIR}/src/eval.cpp
+    ${PROJECT_SOURCE_DIR}/src/functions.cpp
     ${PROJECT_SOURCE_DIR}/src/parse.cpp
     ${PROJECT_SOURCE_DIR}/src/jsonexpr.cpp)
 
