@@ -102,6 +102,33 @@ basic_function_result safe_abs(T lhs) {
     }
 }
 
+template<typename T>
+constexpr bool is_arithmetic_not_bool =
+    std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
+
+template<typename T, typename U>
+constexpr bool is_safe_to_compare =
+    std::is_same_v<T, U> || (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>);
+
+#define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
+    template<typename T, typename U>                                                               \
+        requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool    \
+    safe_##NAME(const T& lhs, const U& rhs) {                                                      \
+        if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
+            return static_cast<json::number_float_t>(lhs)                                          \
+                OPERATOR static_cast<json::number_float_t>(rhs);                                   \
+        } else {                                                                                   \
+            return lhs OPERATOR rhs;                                                               \
+        }                                                                                          \
+    }
+
+COMPARISON_OPERATOR(eq, ==)
+COMPARISON_OPERATOR(ne, !=)
+COMPARISON_OPERATOR(lt, <)
+COMPARISON_OPERATOR(le, <=)
+COMPARISON_OPERATOR(gt, >)
+COMPARISON_OPERATOR(ge, >=)
+
 template<typename T, typename U>
     requires(
         (std::is_integral_v<U> || std::is_same_v<U, json::string_t>) &&
@@ -161,13 +188,13 @@ expected<bool, error> evaluate_as_bool(
 
 function_registry jsonexpr::default_functions() {
     function_registry freg;
-    BINARY_OPERATOR(==);
-    BINARY_OPERATOR(!=);
+    BINARY_FUNCTION("==", safe_eq(lhs, rhs));
+    BINARY_FUNCTION("!=", safe_ne(lhs, rhs));
     UNARY_OPERATOR(!);
-    BINARY_OPERATOR(>);
-    BINARY_OPERATOR(>=);
-    BINARY_OPERATOR(<);
-    BINARY_OPERATOR(<=);
+    BINARY_FUNCTION(">", safe_gt(lhs, rhs));
+    BINARY_FUNCTION(">=", safe_ge(lhs, rhs));
+    BINARY_FUNCTION("<", safe_lt(lhs, rhs));
+    BINARY_FUNCTION("<=", safe_le(lhs, rhs));
     BINARY_FUNCTION("/", safe_div(lhs, rhs));
     BINARY_OPERATOR(*);
     BINARY_OPERATOR(+);

@@ -14,6 +14,10 @@ bool append(snitch::small_string_span ss, const error& e) {
     return append(ss, std::string_view{e.message});
 }
 
+bool append(snitch::small_string_span ss, const std::string& s) {
+    return append(ss, std::string_view{s});
+}
+
 template<typename T, typename E>
 bool append(snitch::small_string_span ss, const expected<T, E>& r) {
     if (r.has_value()) {
@@ -465,12 +469,21 @@ TEST_CASE("function", "[general]") {
 }
 
 TEST_CASE("stress test", "[general]") {
+    variable_registry vars;
+    vars["arr"]  = "[1,2,3]"_json;
+    vars["int"]  = "1"_json;
+    vars["flt"]  = "1.0"_json;
+    vars["str"]  = R"("abc")"_json;
+    vars["obj"]  = "{}"_json;
+    vars["bool"] = "true"_json;
+
     SECTION("bad") {
         CHECK(!evaluate("").has_value());
         CHECK(!evaluate("()").has_value());
         CHECK(!evaluate("(").has_value());
         CHECK(!evaluate(")").has_value());
         CHECK(!evaluate(",").has_value());
+
         CHECK(!evaluate("            ").has_value());
         CHECK(!evaluate("\n\n\n\n\n\n").has_value());
         CHECK(!evaluate("((((((((((((").has_value());
@@ -486,10 +499,53 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("^^^^^^^^^^^^").has_value());
         CHECK(!evaluate("~~~~~~~~~~~~").has_value());
         CHECK(!evaluate("%%%%%%%%%%%%").has_value());
+
+        using namespace std::literals;
+        for (const auto& op : {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s}) {
+            CAPTURE(op);
+
+            CHECK(!evaluate("arr " + op + " int", vars).has_value());
+            CHECK(!evaluate("arr " + op + " flt", vars).has_value());
+            CHECK(!evaluate("arr " + op + " str", vars).has_value());
+            CHECK(!evaluate("arr " + op + " obj", vars).has_value());
+            CHECK(!evaluate("arr " + op + " bool", vars).has_value());
+
+            CHECK(!evaluate("obj " + op + " int", vars).has_value());
+            CHECK(!evaluate("obj " + op + " flt", vars).has_value());
+            CHECK(!evaluate("obj " + op + " str", vars).has_value());
+            CHECK(!evaluate("obj " + op + " arr", vars).has_value());
+            CHECK(!evaluate("obj " + op + " bool", vars).has_value());
+
+            CHECK(!evaluate("bool " + op + " int", vars).has_value());
+            CHECK(!evaluate("bool " + op + " flt", vars).has_value());
+            CHECK(!evaluate("bool " + op + " str", vars).has_value());
+            CHECK(!evaluate("bool " + op + " obj", vars).has_value());
+            CHECK(!evaluate("bool " + op + " arr", vars).has_value());
+
+            CHECK(!evaluate("str " + op + " int", vars).has_value());
+            CHECK(!evaluate("str " + op + " flt", vars).has_value());
+            CHECK(!evaluate("str " + op + " bool", vars).has_value());
+            CHECK(!evaluate("str " + op + " obj", vars).has_value());
+            CHECK(!evaluate("str " + op + " arr", vars).has_value());
+        }
     }
 
     SECTION("good") {
         CHECK(evaluate("((((((((((1+2)*3)-4)+2)/2)+6)*2)-7)+1)+0)") == "12"_json);
+
+        using namespace std::literals;
+        for (const auto& op : {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s}) {
+            CAPTURE(op);
+
+            CHECK(evaluate("str " + op + " str", vars).has_value());
+            CHECK(evaluate("int " + op + " int", vars).has_value());
+            CHECK(evaluate("flt " + op + " flt", vars).has_value());
+            CHECK(evaluate("arr " + op + " arr", vars).has_value());
+            CHECK(evaluate("obj " + op + " obj", vars).has_value());
+
+            CHECK(evaluate("int " + op + " flt", vars).has_value());
+            CHECK(evaluate("flt " + op + " int", vars).has_value());
+        }
     }
 }
 
