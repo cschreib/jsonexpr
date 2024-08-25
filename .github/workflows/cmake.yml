@@ -69,7 +69,7 @@ jobs:
       if: runner.os == 'Linux' && matrix.platform.compiler == 'g++' && matrix.build-type == 'Debug' && matrix.platform.name == 'Ubuntu GCC'
       run: |
         gcov ${{github.workspace}}/build/tests/CMakeFiles/jsonexpr_tests.dir/src/*.gcda
-        ls | grep '.gcov' | grep -v jsonexpr | xargs -d"\n" rm
+        ls | grep '.gcov' | grep -v libjsonexpr | xargs -d"\n" rm
         bash <(curl -s https://codecov.io/bash)
 
     - name: Install
