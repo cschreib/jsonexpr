@@ -30,6 +30,23 @@ add_library(libjsonexpr
     ${PROJECT_SOURCE_DIR}/src/parse.cpp
     ${PROJECT_SOURCE_DIR}/src/jsonexpr.cpp)
 
+if (JSONEXPR_DEV)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(libjsonexpr PRIVATE -Wall)
+        target_compile_options(libjsonexpr PRIVATE -Wextra)
+        target_compile_options(libjsonexpr PRIVATE -Werror)
+        target_compile_options(libjsonexpr PRIVATE -pedantic)
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        target_compile_options(libjsonexpr PRIVATE -Wall)
+        target_compile_options(libjsonexpr PRIVATE -Wextra)
+        target_compile_options(libjsonexpr PRIVATE -Werror)
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        target_compile_options(libjsonexpr PRIVATE /W4)
+        target_compile_options(libjsonexpr PRIVATE /WX)
+        target_compile_options(libjsonexpr PRIVATE /EHs)
+    endif()
+endif()
+
 target_compile_features(libjsonexpr PUBLIC cxx_std_20)
 target_include_directories(libjsonexpr PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

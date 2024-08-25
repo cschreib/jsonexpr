@@ -21,10 +21,13 @@ endif()
 set(JSONEXPR_APP   ON  CACHE BOOL "Build command line application.")
 set(JSONEXPR_TEST  ON  CACHE BOOL "Build tests.")
 
-# Dependencies
-set(JSONEXPR_USE_SYSTEM_JSON OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
+# Dependencies.
+set(JSONEXPR_USE_SYSTEM_JSON     OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
 set(JSONEXPR_USE_SYSTEM_EXPECTED OFF CACHE BOOL "Use a pre-installed version of tl::expected. Else, download.")
-set(JSONEXPR_USE_STD_EXPECTED OFF CACHE BOOL "Use std::expected (requires C++23). Else, use tl::expected.")
+set(JSONEXPR_USE_STD_EXPECTED    OFF CACHE BOOL "Use std::expected (requires C++23). Else, use tl::expected.")
+
+# Development options.
+set(JSONEXPR_DEV OFF CACHE BOOL "Enable warnings in compilation.")
 
 add_subdirectory(libjsonexpr)
 

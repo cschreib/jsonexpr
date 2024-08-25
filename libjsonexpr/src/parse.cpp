@@ -76,9 +76,7 @@ scan_class(std::string_view expression, std::size_t start, std::string_view char
 
 std::optional<std::size_t> scan_string(
     std::string_view expression, std::size_t start, char end_char, char escape_char) noexcept {
-    std::size_t end     = expression.size();
-    bool        escaped = false;
-    bool        found   = false;
+    bool escaped = false;
     for (std::size_t i = start; i < expression.size(); ++i) {
         if (expression[i] == escape_char && !escaped) {
             escaped = true;
@@ -448,8 +446,6 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
     if (tokens.front().type != token::OPERATOR) {
         return try_parse_operand(tokens);
     }
-
-    const source_location& start_location = tokens.front().location;
 
     auto         unary_tokens    = tokens;
     const token& parsed_operator = unary_tokens.front();
