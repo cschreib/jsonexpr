@@ -36,6 +36,15 @@ error abort_parse(const token& t, std::string message) {
         .message  = std::move(message)};
 }
 
+error abort_parse(const parse_error& e) {
+    if (std::holds_alternative<match_failure>(e)) {
+        const auto& f = std::get<match_failure>(e);
+        return error{.position = f.position, .length = f.length, .message = f.message};
+    } else {
+        return std::get<error>(e);
+    }
+}
+
 error abort_parse(std::string message) {
     return error{.message = std::move(message)};
 }
@@ -323,7 +332,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
 
         auto arg = try_parse_expr(args_tokens);
         if (!arg.has_value()) {
-            return unexpected(arg.error());
+            return unexpected(abort_parse(arg.error()));
         }
 
         args.push_back(std::move(arg.value()));
@@ -362,13 +371,13 @@ expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& 
     auto access_tokens = tokens;
     auto array         = try_parse_variable(access_tokens);
     if (!array.has_value()) {
-        return unexpected(array.error());
+        return unexpected(abort_parse(array.error()));
     }
 
     access_tokens = access_tokens.subspan(1);
     auto index    = try_parse_expr(access_tokens);
     if (!index.has_value()) {
-        return unexpected(index.error());
+        return unexpected(abort_parse(index.error()));
     }
 
     if (access_tokens.empty()) {
@@ -401,7 +410,7 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     auto group_tokens = tokens.subspan(1);
     auto expr         = try_parse_expr(group_tokens);
     if (!expr.has_value()) {
-        return unexpected(expr.error());
+        return unexpected(abort_parse(expr.error()));
     }
 
     if (group_tokens.empty()) {
@@ -458,7 +467,7 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
 
     auto operand = try_parse_unary(unary_tokens);
     if (!operand.has_value()) {
-        return unexpected(operand.error());
+        return unexpected(abort_parse(operand.error()));
     }
 
     tokens = unary_tokens;
