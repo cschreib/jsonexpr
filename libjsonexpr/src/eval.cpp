@@ -3,19 +3,6 @@
 using namespace jsonexpr;
 
 namespace {
-error make_error(const ast::node& n, std::string message) {
-    return error{
-        .position = n.location.position,
-        .length   = n.location.content.length(),
-        .message  = std::move(message)};
-}
-
-error make_error(std::string message) {
-    return error{.message = std::move(message)};
-}
-} // namespace
-
-namespace {
 expected<json, error> eval(
     const ast::node&         n,
     const ast::variable&     v,
@@ -65,12 +52,12 @@ expected<json, error> eval(
 
     auto iter = freg.find(f.name);
     if (iter == freg.end()) {
-        return unexpected(make_error(n, "unknown function '" + std::string(f.name) + "'"));
+        return unexpected(node_error(n, "unknown function '" + std::string(f.name) + "'"));
     }
 
     auto overload = iter->second.find(f.args.size());
     if (overload == iter->second.end()) {
-        return unexpected(make_error(
+        return unexpected(node_error(
             n, "function does not take '" + std::to_string(f.args.size()) + "' arguments"));
     }
 
@@ -88,13 +75,13 @@ expected<json, error> eval(
         if (result.has_value()) {
             return result.value();
         } else {
-            return unexpected(make_error(n, result.error()));
+            return unexpected(node_error(n, result.error()));
         }
     } catch (const std::exception& error) {
         return unexpected(
-            make_error(n, "exception when evaluating function: " + std::string(error.what())));
+            node_error(n, "exception when evaluating function: " + std::string(error.what())));
     } catch (...) {
-        return unexpected(make_error(n, "unknown exception when evaluating function"));
+        return unexpected(node_error(n, "unknown exception when evaluating function"));
     }
 }
 

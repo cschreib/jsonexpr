@@ -27,3 +27,10 @@ std::string dump_content(const ast::function& v, std::size_t indent) {
 std::string jsonexpr::ast::dump(const ast::node& n, std::size_t indent) {
     return std::visit([&](const auto& c) { return dump_content(c, indent); }, n.content);
 }
+
+error jsonexpr::ast::node_error(const ast::node& n, std::string message) {
+    return error{
+        .position = n.location.position,
+        .length   = n.location.content.length(),
+        .message  = std::move(message)};
+}
