@@ -1,0 +1,34 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "80...95"
+  status:
+  project:
+    default:
+      target: auto
+      # adjust accordingly based on how flaky your tests are
+      # this allows a drop from the previous base commit coverage
+      threshold: 1%
+    patch:
+      default:
+        target: 0%
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: yes
+      macro: no
+
+ignore:
+   - "tests"
+   - "jsonexpr"
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: no
