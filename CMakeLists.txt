@@ -19,7 +19,7 @@ endif()
 
 # Components (library is always built).
 set(JSONEXPR_APP   ON  CACHE BOOL "Build command line application.")
-set(JSONEXPR_TEST  ON  CACHE BOOL "Build tests.")
+set(JSONEXPR_TEST  OFF  CACHE BOOL "Build tests.")
 
 # Dependencies.
 set(JSONEXPR_USE_SYSTEM_JSON     OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
