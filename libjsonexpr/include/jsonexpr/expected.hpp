@@ -10,10 +10,18 @@
 namespace jsonexpr {
 #if JSONEXPR_USE_STD_EXPECTED
 using std::expected;
-using std::unexpected;
+
+template<typename T>
+std::unexpected<T> unexpected(const T& value) {
+    return std::unexpected<T>(value);
+}
 #else
 using tl::expected;
-using tl::unexpected;
+
+template<typename T>
+tl::unexpected<T> unexpected(const T& value) {
+    return tl::unexpected<T>(value);
+}
 #endif
 } // namespace jsonexpr
 

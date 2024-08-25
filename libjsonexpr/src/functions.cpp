@@ -92,8 +92,20 @@ basic_function_result safe_div(T lhs, U rhs) {
     return lhs / rhs;
 }
 
+template<typename T>
+    requires requires(T lhs) { std::abs(lhs); }
+basic_function_result safe_abs(T lhs) {
+    if constexpr (std::is_signed_v<T>) {
+        return std::abs(lhs);
+    } else {
+        return lhs;
+    }
+}
+
 template<typename T, typename U>
-    requires(!std::same_as<U, json> && requires(const T& lhs, U rhs) { lhs[rhs]; })
+    requires(
+        (std::is_integral_v<U> || std::is_same_v<U, json::string_t>) &&
+        requires(const T& lhs, U rhs) { lhs[rhs]; })
 basic_function_result safe_access(const T& lhs, U rhs) {
     if constexpr (std::is_arithmetic_v<U>) {
         const std::size_t unsigned_rhs = [&] {
@@ -168,7 +180,7 @@ function_registry jsonexpr::default_functions() {
     BINARY_FUNCTION("[]", safe_access(lhs, rhs));
     BINARY_FUNCTION("min", lhs <= rhs ? lhs : rhs);
     BINARY_FUNCTION("max", lhs >= rhs ? lhs : rhs);
-    UNARY_FUNCTION("abs", std::abs(lhs));
+    UNARY_FUNCTION("abs", safe_abs(lhs));
     UNARY_FUNCTION("sqrt", std::sqrt(lhs));
     UNARY_FUNCTION("round", std::round(lhs));
     UNARY_FUNCTION("floor", std::floor(lhs));

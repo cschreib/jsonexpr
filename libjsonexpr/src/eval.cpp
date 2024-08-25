@@ -64,7 +64,7 @@ expected<json, error> eval(
     const auto& func = overload->second.callable;
 
     try {
-        auto result = func(f.args, vreg, freg);
+        auto result = func(std::span<const ast::node>(f.args), vreg, freg);
         if (result.has_value()) {
             return result.value();
         } else {
