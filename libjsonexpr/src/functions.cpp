@@ -46,13 +46,13 @@ void jsonexpr::register_function(
 #define UNARY_FUNCTION(NAME, EXPR)                                                                 \
     register_function(freg, NAME, 1, [](const json& args) -> basic_function_result {               \
         return std::visit(                                                                         \
-            [&](const auto& lhs) -> basic_function_result {                                        \
+            [](const auto& lhs) -> basic_function_result {                                         \
                 if constexpr (requires { EXPR; }) {                                                \
                     return EXPR;                                                                   \
                 } else {                                                                           \
                     return unexpected(                                                             \
                         std::string("incompatible type for '" NAME "', got ") +                    \
-                        std::string(get_type_name(args[0])));                                      \
+                        std::string(get_type_name(lhs)));                                          \
                 }                                                                                  \
             },                                                                                     \
             to_variant(args[0]));                                                                  \
@@ -61,14 +61,14 @@ void jsonexpr::register_function(
 #define BINARY_FUNCTION(NAME, EXPR)                                                                \
     register_function(freg, NAME, 2, [](const json& args) -> basic_function_result {               \
         return std::visit(                                                                         \
-            [&](const auto& lhs, const auto& rhs) -> basic_function_result {                       \
+            [](const auto& lhs, const auto& rhs) -> basic_function_result {                        \
                 if constexpr (requires { EXPR; }) {                                                \
                     return EXPR;                                                                   \
                 } else {                                                                           \
                     return unexpected(                                                             \
                         std::string("incompatible types for '" NAME "', got ") +                   \
-                        std::string(get_type_name(args[0])) + " and " +                            \
-                        std::string(get_type_name(args[1])));                                      \
+                        std::string(get_type_name(lhs)) + " and " +                                \
+                        std::string(get_type_name(rhs)));                                          \
                 }                                                                                  \
             },                                                                                     \
             to_variant(args[0]), to_variant(args[1]));                                             \
@@ -85,7 +85,7 @@ basic_function_result safe_div(T lhs, U rhs) {
     using return_type = decltype(lhs / rhs);
     if constexpr (std::is_integral_v<return_type>) {
         if (rhs == 0) {
-            return unexpected(std::string("division by zero"));
+            return unexpected(std::string("integer division by zero"));
         }
     }
 
@@ -98,8 +98,8 @@ basic_function_result safe_access(const T& lhs, U rhs) {
     if constexpr (std::is_arithmetic_v<U>) {
         if (rhs >= lhs.size()) {
             return unexpected(
-                std::string("out-of-bounds access at position ") + std::to_string(rhs) +
-                " in array of size " + std::to_string(lhs.size()));
+                std::string("out-of-bounds access at position ") + std::to_string(rhs) + " in " +
+                std::string(get_type_name(lhs)) + " of size " + std::to_string(lhs.size()));
         }
     } else {
         if (!lhs.contains(rhs)) {

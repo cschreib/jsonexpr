@@ -44,6 +44,11 @@ using json_variant = std::variant<
 json_variant to_variant(const json& j);
 
 std::string_view get_type_name(const json& j) noexcept;
+std::string_view get_type_name(const json::number_float_t& j) noexcept;
+std::string_view get_type_name(const json::number_integer_t& j) noexcept;
+std::string_view get_type_name(const json::string_t& j) noexcept;
+std::string_view get_type_name(const json::array_t& j) noexcept;
+std::string_view get_type_name(const json::boolean_t& j) noexcept;
 
 using function_result       = expected<json, error>;
 using basic_function_result = expected<json, std::string>;

@@ -30,6 +30,22 @@ std::string_view jsonexpr::get_type_name(const json& j) noexcept {
     }
 }
 
+std::string_view jsonexpr::get_type_name(const json::number_float_t&) noexcept {
+    return "float";
+}
+std::string_view jsonexpr::get_type_name(const json::number_integer_t&) noexcept {
+    return "int";
+}
+std::string_view jsonexpr::get_type_name(const json::string_t&) noexcept {
+    return "string";
+}
+std::string_view jsonexpr::get_type_name(const json::array_t&) noexcept {
+    return "array";
+}
+std::string_view jsonexpr::get_type_name(const json::boolean_t&) noexcept {
+    return "bool";
+}
+
 json_variant jsonexpr::to_variant(const json& j) {
     switch (j.type()) {
     case json::value_t::array: return j.get<json::array_t>();
