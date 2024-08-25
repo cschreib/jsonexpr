@@ -299,6 +299,10 @@ TEST_CASE("array", "[general]") {
         CHECK(!evaluate("obj[1,2]", vars).has_value());
         CHECK(!evaluate("obj[5]", vars).has_value());
         CHECK(!evaluate("obj[-6]", vars).has_value());
+        CHECK(!evaluate("obj[+]", vars).has_value());
+        CHECK(!evaluate("obj[(]", vars).has_value());
+        CHECK(!evaluate("obj[>]", vars).has_value());
+        CHECK(!evaluate("obj[#]", vars).has_value());
     }
 
     SECTION("good") {
@@ -320,6 +324,21 @@ TEST_CASE("array", "[general]") {
         CHECK(evaluate("obj[round(-1)]", vars) == "5"_json);
         CHECK(evaluate("obj[obj[0]]", vars) == "2"_json);
         CHECK(evaluate("deep.sub[1]", vars) == "7"_json);
+    }
+
+    SECTION("precedence") {
+        CHECK(evaluate("1+obj[1]", vars) == "3"_json);
+        CHECK(evaluate("obj[1]+1", vars) == "3"_json);
+        CHECK(evaluate("obj[1]-1", vars) == "1"_json);
+        CHECK(evaluate("1-obj[1]", vars) == "-1"_json);
+        CHECK(evaluate("obj[1]*2", vars) == "4"_json);
+        CHECK(evaluate("2*obj[1]", vars) == "4"_json);
+        CHECK(evaluate("obj[1]/2", vars) == "1"_json);
+        CHECK(evaluate("2/obj[1]", vars) == "1"_json);
+        CHECK(evaluate("obj[1]%2", vars) == "0"_json);
+        CHECK(evaluate("2%obj[1]", vars) == "0"_json);
+        CHECK(evaluate("obj[1]^3", vars) == "8"_json);
+        CHECK(evaluate("3^obj[1]", vars) == "9"_json);
     }
 }
 
@@ -447,6 +466,12 @@ TEST_CASE("function", "[general]") {
         CHECK(!evaluate("abs(-1]").has_value());
         CHECK(!evaluate("abs(-1,2)").has_value());
         CHECK(!evaluate("min(1)").has_value());
+        CHECK(!evaluate("abs(+)").has_value());
+        CHECK(!evaluate("abs(()").has_value());
+        CHECK(!evaluate("abs(())").has_value());
+        CHECK(!evaluate("abs([)").has_value());
+        CHECK(!evaluate("abs(>)").has_value());
+        CHECK(!evaluate("abs(#)").has_value());
     }
 
     SECTION("unary") {
@@ -486,8 +511,12 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("").has_value());
         CHECK(!evaluate("()").has_value());
         CHECK(!evaluate("(").has_value());
+        CHECK(!evaluate("(1").has_value());
         CHECK(!evaluate(")").has_value());
+        CHECK(!evaluate("1)").has_value());
         CHECK(!evaluate(",").has_value());
+        CHECK(!evaluate("1,").has_value());
+        CHECK(!evaluate(",1").has_value());
 
         CHECK(!evaluate("            ").has_value());
         CHECK(!evaluate("\n\n\n\n\n\n").has_value());
