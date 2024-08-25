@@ -354,51 +354,6 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
         ast::function{func.location.content, std::move(args)}};
 }
 
-expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& tokens) noexcept {
-    if (tokens.empty()) {
-        return unexpected(match_failed("expected array access"));
-    }
-    if (tokens.size() < 3) {
-        return unexpected(match_failed(tokens.front(), "expected array access"));
-    }
-    if (tokens[0].type != token::IDENTIFIER) {
-        return unexpected(match_failed(tokens[0], "expected identifier"));
-    }
-    if (tokens[1].type != token::ARRAY_ACCESS_OPEN) {
-        return unexpected(match_failed(tokens[1], "expected array index"));
-    }
-
-    auto access_tokens = tokens;
-    auto array         = try_parse_variable(access_tokens);
-    if (!array.has_value()) {
-        return unexpected(abort_parse(array.error()));
-    }
-
-    access_tokens = access_tokens.subspan(1);
-    auto index    = try_parse_expr(access_tokens);
-    if (!index.has_value()) {
-        return unexpected(abort_parse(index.error()));
-    }
-
-    if (access_tokens.empty()) {
-        return unexpected(abort_parse("expected ']'"));
-    }
-    if (access_tokens.front().type != token::ARRAY_ACCESS_CLOSE) {
-        return unexpected(abort_parse(access_tokens.front(), "expected ']'"));
-    }
-
-    const token& end_token = access_tokens.front();
-
-    access_tokens = access_tokens.subspan(1);
-    tokens        = access_tokens;
-
-    return ast::node{
-        {array.value().location.position,
-         std::string_view(
-             view_begin(array.value().location.content), view_end(end_token.location.content))},
-        ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
-}
-
 expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected group"));
@@ -439,9 +394,6 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     if (auto op = try_parse_function(tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_array_access(tokens); is_match(op)) {
-        return op;
-    }
     if (auto op = try_parse_variable(tokens); is_match(op)) {
         return op;
     }
@@ -452,13 +404,48 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     return unexpected(match_failed(tokens.front(), "expected operand"));
 }
 
+expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected array access"));
+    }
+
+    auto array = try_parse_operand(tokens);
+    if (!array.has_value()) {
+        return unexpected(abort_parse(array.error()));
+    }
+
+    while (!tokens.empty() && tokens[0].type == token::ARRAY_ACCESS_OPEN) {
+        tokens = tokens.subspan(1);
+
+        auto index = try_parse_expr(tokens);
+        if (!index.has_value()) {
+            return unexpected(abort_parse(index.error()));
+        }
+
+        if (tokens.empty() || tokens[0].type != token::ARRAY_ACCESS_CLOSE) {
+            return unexpected(abort_parse("expected ']'"));
+        }
+
+        const token& end_token = tokens.front();
+        tokens                 = tokens.subspan(1);
+
+        array = ast::node{
+            {array.value().location.position,
+             std::string_view(
+                 view_begin(array.value().location.content), view_end(end_token.location.content))},
+            ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
+    }
+
+    return array;
+}
+
 expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected unary expression"));
     }
 
     if (tokens.front().type != token::OPERATOR) {
-        return try_parse_operand(tokens);
+        return try_parse_array_access(tokens);
     }
 
     auto         unary_tokens    = tokens;

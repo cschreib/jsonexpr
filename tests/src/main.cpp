@@ -287,8 +287,12 @@ TEST_CASE("variable", "[general]") {
 
 TEST_CASE("array", "[general]") {
     variable_registry vars;
-    vars["obj"]  = "[1,2,3,4,5]"_json;
-    vars["deep"] = R"({"sub": [6,7,8]})"_json;
+    vars["obj"]          = "[1,2,3,4,5]"_json;
+    vars["deep"]         = R"({"sub": [6,7,8]})"_json;
+    vars["nested_array"] = "[[1,2],[3,4]]"_json;
+
+    function_registry funcs = default_functions();
+    register_function(funcs, "identity", 1, [](const json& j) { return j[0]; });
 
     SECTION("bad") {
         CHECK(!evaluate("foo[1]", vars).has_value());
@@ -324,6 +328,12 @@ TEST_CASE("array", "[general]") {
         CHECK(evaluate("obj[round(-1)]", vars) == "5"_json);
         CHECK(evaluate("obj[obj[0]]", vars) == "2"_json);
         CHECK(evaluate("deep.sub[1]", vars) == "7"_json);
+        CHECK(evaluate("nested_array[0][0]", vars) == "1"_json);
+        CHECK(evaluate("nested_array[0][1]", vars) == "2"_json);
+        CHECK(evaluate("nested_array[1][0]", vars) == "3"_json);
+        CHECK(evaluate("nested_array[1][1]", vars) == "4"_json);
+        CHECK(evaluate("identity(obj)", vars, funcs) == "[1,2,3,4,5]"_json);
+        CHECK(evaluate("identity(obj)[0]", vars, funcs) == "1"_json);
     }
 
     SECTION("precedence") {
@@ -612,18 +622,12 @@ TEST_CASE("stress test", "[general]") {
 
 TEST_CASE("wishlist for later", "[future]") {
     variable_registry vars;
-    vars["array"]         = "[1,2,3,4,5]"_json;
     vars["object"]        = R"({"a": "b"})"_json;
-    vars["nested_array"]  = "[[1,2],[3,4]]"_json;
     vars["nested_object"] = R"([{"a": "b"}, {"a": "c"}])"_json;
 
     function_registry funcs = default_functions();
     register_function(funcs, "identity", 1, [](const json& j) { return j; });
 
-    // Nested arrays access not supported
-    CHECK(!evaluate("nested_array[0][1]", vars, funcs).has_value());
-    // Array access on function output not supported
-    CHECK(!evaluate("identity(array)[0]", vars, funcs).has_value());
     // Object access on function output not supported
     CHECK(!evaluate("identity(object).a", vars, funcs).has_value());
     // Object access on array access not supported
