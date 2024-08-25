@@ -18,3 +18,10 @@ add_custom_target(jsonexpr_tests_run
     WORKING_DIRECTORY ${RUNTIME_TEST_WORKING_DIRECTORY}
     SOURCES ${RUNTIME_TEST_FILES})
 set_target_properties(jsonexpr_tests_run PROPERTIES EXCLUDE_FROM_ALL True)
+
+if (BUILD_SHARED_LIBS AND WIN32)
+    add_custom_command(TARGET jsonexpr_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:jsonexpr::libjsonexpr> $<TARGET_FILE_DIR:jsonexpr_tests>)
+    add_custom_command(TARGET jsonexpr_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:snitch::snitch> $<TARGET_FILE_DIR:jsonexpr_tests>)
+endif()
