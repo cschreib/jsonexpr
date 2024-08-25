@@ -269,6 +269,7 @@ TEST_CASE("variable", "[general]") {
         CHECK(!evaluate("a b", vars).has_value());
         CHECK(!evaluate("c .d", vars).has_value());
         CHECK(!evaluate("c. d", vars).has_value());
+        CHECK(!evaluate("c.k", vars).has_value());
     }
 
     SECTION("good") {
