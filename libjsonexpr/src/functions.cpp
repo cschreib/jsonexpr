@@ -44,8 +44,9 @@ void jsonexpr::register_function(
 }
 
 namespace {
-// Define our own traits to identify acceptable types in operations.
-// Mainly this disallows mixed-type operations with bool.
+// We define our operators based on what is allowed in C++. However, C++ is not always sane,
+// for example when allowing mixed operations with booleans (true < 1.0).
+// Hence we define our own traits to identify acceptable types in operations.
 template<typename T>
 constexpr bool is_arithmetic_not_bool =
     std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
@@ -123,8 +124,9 @@ template<typename T, typename U>
     requires(is_safe_to_compare<T, U>)
 auto safe_min(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
-        return safe_min(
-            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+        const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
+        const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
+        return lhs_float <= rhs_float ? lhs_float : rhs_float;
     } else {
         return lhs <= rhs ? lhs : rhs;
     }
@@ -134,8 +136,9 @@ template<typename T, typename U>
     requires(is_safe_to_compare<T, U>)
 auto safe_max(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
-        return safe_max(
-            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+        const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
+        const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
+        return lhs_float >= rhs_float ? lhs_float : rhs_float;
     } else {
         return lhs >= rhs ? lhs : rhs;
     }
