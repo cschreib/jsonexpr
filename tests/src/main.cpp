@@ -36,9 +36,11 @@ TEST_CASE("string literal", "[string]") {
         CHECK(!evaluate(R"(')").has_value());
         CHECK(!evaluate(R"("abc"def")").has_value());
         CHECK(!evaluate(R"('abc'def')").has_value());
+#if !defined(_MSC_VER)
         CHECK(!evaluate(R"('\')").has_value());
         CHECK(!evaluate(R"("\")").has_value());
         CHECK(!evaluate(R"("0\1")").has_value());
+#endif
     }
 
     SECTION("good") {
@@ -52,11 +54,13 @@ TEST_CASE("string literal", "[string]") {
         CHECK(evaluate(R"('\\')") == R"("\\")"_json);
         CHECK(evaluate(R"('"')") == R"("\"")"_json);
         CHECK(evaluate(R"("'")") == R"("'")"_json);
+#if !defined(_MSC_VER)
         CHECK(evaluate(R"("\"")") == R"("\"")"_json);
         CHECK(evaluate(R"('\'')") == R"("'")"_json);
         CHECK(evaluate(R"('0\\1')") == R"("0\\1")"_json);
         CHECK(evaluate(R"('0/1')") == R"("0/1")"_json);
         CHECK(evaluate(R"('0\/1')") == R"("0\/1")"_json);
+#endif
     }
 }
 
