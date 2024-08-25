@@ -528,6 +528,11 @@ TEST_CASE("stress test", "[general]") {
             CHECK(!evaluate("str " + op + " obj", vars).has_value());
             CHECK(!evaluate("str " + op + " arr", vars).has_value());
         }
+
+        CHECK(!evaluate("bool < bool", vars).has_value());
+        CHECK(!evaluate("bool <= bool", vars).has_value());
+        CHECK(!evaluate("bool > bool", vars).has_value());
+        CHECK(!evaluate("bool >= bool", vars).has_value());
     }
 
     SECTION("good") {
@@ -546,6 +551,9 @@ TEST_CASE("stress test", "[general]") {
             CHECK(evaluate("int " + op + " flt", vars).has_value());
             CHECK(evaluate("flt " + op + " int", vars).has_value());
         }
+
+        CHECK(evaluate("bool == bool", vars).has_value());
+        CHECK(evaluate("bool != bool", vars).has_value());
     }
 }
 

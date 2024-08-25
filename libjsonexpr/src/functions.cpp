@@ -106,13 +106,16 @@ template<typename T>
 constexpr bool is_arithmetic_not_bool =
     std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
 
-template<typename T, typename U>
+template<typename T, typename U, bool AllowBool>
 constexpr bool is_safe_to_compare =
-    std::is_same_v<T, U> || (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>);
+    (std::is_same_v<T, U> || (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>)) &&
+    (AllowBool || (!std::is_same_v<T, json::boolean_t> && !std::is_same_v<T, json::boolean_t>));
 
-#define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
+#define COMPARISON_OPERATOR(NAME, OPERATOR, ALLOW_BOOL)                                            \
     template<typename T, typename U>                                                               \
-        requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool    \
+        requires(                                                                                  \
+            is_safe_to_compare<T, U, ALLOW_BOOL> &&                                                \
+            requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool                                     \
     safe_##NAME(const T& lhs, const U& rhs) {                                                      \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
@@ -122,12 +125,12 @@ constexpr bool is_safe_to_compare =
         }                                                                                          \
     }
 
-COMPARISON_OPERATOR(eq, ==)
-COMPARISON_OPERATOR(ne, !=)
-COMPARISON_OPERATOR(lt, <)
-COMPARISON_OPERATOR(le, <=)
-COMPARISON_OPERATOR(gt, >)
-COMPARISON_OPERATOR(ge, >=)
+COMPARISON_OPERATOR(eq, ==, true)
+COMPARISON_OPERATOR(ne, !=, true)
+COMPARISON_OPERATOR(lt, <, false)
+COMPARISON_OPERATOR(le, <=, false)
+COMPARISON_OPERATOR(gt, >, false)
+COMPARISON_OPERATOR(ge, >=, false)
 
 template<typename T, typename U>
     requires(
