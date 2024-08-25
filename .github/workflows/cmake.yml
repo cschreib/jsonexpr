@@ -8,8 +8,7 @@ on:
       - main
 
 env:
-  CODECOV_TOKEN: 'f8197851-e753-4291-a835-2d76090f2c92'
-  CMAKE_INSTALL_VERSION: 3.14.7
+  CODECOV_TOKEN: '6a04d166-33a3-46a9-b668-b981503a05df'
 
 jobs:
   build:
