@@ -61,21 +61,19 @@ expected<json, error> eval(
             n, "function does not take '" + std::to_string(f.args.size()) + "' arguments"));
     }
 
-    json args(json::value_t::array);
-    for (const auto& arg : f.args) {
-        auto eval_arg = eval(arg, vreg, freg);
-        if (!eval_arg.has_value()) {
-            return unexpected(eval_arg.error());
-        }
-        args.push_back(std::move(eval_arg.value()));
-    }
+    const auto& func = overload->second.callable;
 
     try {
-        auto result = overload->second(args);
+        auto result = func(f.args, vreg, freg);
         if (result.has_value()) {
             return result.value();
         } else {
-            return unexpected(node_error(n, result.error()));
+            const auto& e = result.error();
+            if (e.length == 0) {
+                return unexpected(node_error(n, e.message));
+            } else {
+                return unexpected(e);
+            }
         }
     } catch (const std::exception& error) {
         return unexpected(

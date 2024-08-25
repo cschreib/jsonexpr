@@ -45,13 +45,20 @@ json_variant to_variant(const json& j);
 
 std::string_view get_type_name(const json& j) noexcept;
 
-using variable_registry = std::unordered_map<std::string_view, json>;
+using function_result       = expected<json, error>;
+using basic_function_result = expected<json, std::string>;
 
-using function_result = expected<json, std::string>;
-using function        = std::function<function_result(const json&)>;
-
+struct function;
 using function_registry =
     std::unordered_map<std::string_view, std::unordered_map<std::size_t, function>>;
+
+using variable_registry = std::unordered_map<std::string_view, json>;
+
+struct function {
+    std::function<function_result(
+        std::span<const ast::node>, const variable_registry&, const function_registry&)>
+        callable;
+};
 } // namespace jsonexpr
 
 #endif

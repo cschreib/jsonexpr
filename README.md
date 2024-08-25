@@ -80,7 +80,7 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
 int main() {
     jsonexpr::function_registry funcs;
     // Define the function 'join' taking 2 arguments.
-    funcs["join"][2] = [](const jsonexpr::json& args) {
+    register_function(funcs, "join", 2, [](const jsonexpr::json& args) {
         // Custom functions take a single JSON object as argument,
         // with all actual arguments stored as a JSON array.
         std::string result;
@@ -90,7 +90,7 @@ int main() {
         }
 
         return result;
-    };
+    });
 
     // Define some variables to play with.
     jsonexpr::variable_registry vars;
@@ -108,30 +108,31 @@ The above relies on automatic type checks from the JSON library, which is safe b
 
 int main() {
     jsonexpr::function_registry funcs;
-    funcs["join"][2] = [](const jsonexpr::json& args) -> jsonexpr::function_result {
-        if (!args[0].is_array()) {
-            return jsonexpr::unexpected(
-                std::string{"expected array as first argument of 'join', got "} +
-                std::string{jsonexpr::get_type_name(args[0])});
-        }
-
-        for (std::size_t i = 0; i < args[0].size(); ++i) {
-            if (!args[0][i].is_string()) {
+    register_function(funcs, "join", 2,
+        [](const jsonexpr::json& args) -> jsonexpr::basic_function_result {
+            if (!args[0].is_array()) {
                 return jsonexpr::unexpected(
-                    std::string{"expected array of strings as first argument of 'join', got "} +
-                    std::string{jsonexpr::get_type_name(args[0][i])} + " for element " +
-                    std::to_string(i));
+                    std::string{"expected array as first argument of 'join', got "} +
+                    std::string{jsonexpr::get_type_name(args[0])});
             }
-        }
 
-        if (!args[1].is_string()) {
-            return jsonexpr::unexpected(
-                std::string{"expected string as second argument of 'join', got "} +
-                std::string{jsonexpr::get_type_name(args[1])});
-        }
+            for (std::size_t i = 0; i < args[0].size(); ++i) {
+                if (!args[0][i].is_string()) {
+                    return jsonexpr::unexpected(
+                        std::string{"expected array of strings as first argument of 'join', got "} +
+                        std::string{jsonexpr::get_type_name(args[0][i])} + " for element " +
+                        std::to_string(i));
+                }
+            }
 
-        // All types are now checked, continue with actual logic...
-    };
+            if (!args[1].is_string()) {
+                return jsonexpr::unexpected(
+                    std::string{"expected string as second argument of 'join', got "} +
+                    std::string{jsonexpr::get_type_name(args[1])});
+            }
+
+            // All types are now checked, continue with actual logic...
+        });
 
     // ...
 }

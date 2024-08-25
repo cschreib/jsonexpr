@@ -455,7 +455,7 @@ TEST_CASE("wishlist for later", "[future]") {
     vars["nested_object"] = R"([{"a": "b"}, {"a": "c"}])"_json;
 
     function_registry funcs = default_functions();
-    funcs["identity"][1]    = [](const json& j) { return j; };
+    register_function(funcs, "identity", 1, [](const json& j) { return j; });
 
     // Nested arrays access not supported
     CHECK(!evaluate("nested_array[0][1]", vars, funcs).has_value());
