@@ -1,0 +1,97 @@
+name: cmake
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  CODECOV_TOKEN: 'f8197851-e753-4291-a835-2d76090f2c92'
+  CMAKE_INSTALL_VERSION: 3.14.7
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { name: Ubuntu GCC,             os: ubuntu-latest,  publish: true,  compiler: g++,     arch: "64", build: "ubuntu64-libstdc++", cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='--coverage'"}
+        - { name: Ubuntu GCC shared,      os: ubuntu-latest,  publish: false, compiler: g++,     arch: "64", build: "ubuntu64-libstdc++", cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=g++ -DBUILD_SHARED_LIBS=1"}
+        - { name: Ubuntu Clang,           os: ubuntu-latest,  publish: true,  compiler: clang++, arch: "64", build: "ubuntu64-libc++",    cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS='-stdlib=libc++'"}
+        - { name: Windows 32,             os: windows-latest, publish: true,  compiler: vs2019,  arch: "32", build: "win32-vs2019",       cmakepp: "",        flags: "-A Win32"}
+        - { name: Windows 64,             os: windows-latest, publish: true,  compiler: vs2019,  arch: "64", build: "win64-vs2019",       cmakepp: "",        flags: "-A x64"}
+        - { name: Windows 64 shared,      os: windows-latest, publish: false, compiler: vs2019,  arch: "64", build: "win64-vs2019",       cmakepp: "",        flags: "-A x64 -DBUILD_SHARED_LIBS=1"}
+        build-type:
+        - Release
+        - Debug
+
+    name: ${{matrix.platform.name}} ${{matrix.build-type}}
+    runs-on: ${{matrix.platform.os}}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2 # necessary for codecov bash uploader
+        submodules: 'recursive'
+
+    - name: Setup Clang
+      if: matrix.platform.compiler == 'clang++' && matrix.platform.os == 'ubuntu-latest'
+      run: sudo apt install clang libc++-dev libc++abi-dev
+
+    - name: Setup GCC
+      if: matrix.platform.compiler == 'g++'
+      run: |
+        sudo apt install g++-11
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+        sudo update-alternatives --set gcc /usr/bin/gcc-11
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: ${{matrix.platform.cmakepp}} cmake .. -DCMAKE_BUILD_TYPE=${{matrix.build-type}} ${{matrix.platform.flags}} -DJSONEXPR_DEV=1 -DJSONEXPR_TEST=1 -DCMAKE_INSTALL_PREFIX=../install
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --config ${{matrix.build-type}} --parallel 2
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --config ${{matrix.build-type}} --target jsonexpr_tests_run
+
+    - name: Compute code coverage
+      if: runner.os == 'Linux' && matrix.platform.compiler == 'g++' && matrix.build-type == 'Debug' && matrix.platform.name == 'Ubuntu GCC'
+      run: |
+        gcov ${{github.workspace}}/build/tests/CMakeFiles/jsonexpr_tests.dir/src/*.gcda
+        ls | grep '.gcov' | grep -v jsonexpr | xargs -d"\n" rm
+        bash <(curl -s https://codecov.io/bash)
+
+    - name: Install
+      if: matrix.build-type == 'Release' && matrix.platform.publish && github.ref == 'refs/heads/main'
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake --build . --config ${{matrix.build-type}} --target install
+
+    # In action-zip, all paths are relative to ${{github.workspace}}
+    - name: Zip build
+      if: matrix.build-type == 'Release' && matrix.platform.publish && github.ref == 'refs/heads/main'
+      uses: vimtor/action-zip@v1
+      with:
+        files: install/ LICENSE
+        dest: jsonexpr-${{matrix.platform.build}}.zip
+
+    - name: Upload build as an artifact
+      if: matrix.build-type == 'Release' && matrix.platform.publish && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v2
+      with:
+        name: jsonexpr-build
+        path: |
+          ${{github.workspace}}/jsonexpr-${{matrix.platform.build}}.zip
+
