@@ -301,6 +301,10 @@ TEST_CASE("boolean", "[maths]") {
     vars["true"]  = "true"_json;
     vars["false"] = "false"_json;
 
+    function_registry funcs;
+    register_function(
+        funcs, "error", 0, [](const json&) { return unexpected(std::string("error")); });
+
     SECTION("bad") {
         CHECK(!evaluate("&", vars).has_value());
         CHECK(!evaluate("&&", vars).has_value());
@@ -378,6 +382,30 @@ TEST_CASE("boolean", "[maths]") {
         CHECK(evaluate("1 < 2 || 1 > 2", vars) == "true"_json);
         CHECK(evaluate("1+1 < 2", vars) == "false"_json);
         CHECK(evaluate("1 < -2", vars) == "false"_json);
+    }
+
+    SECTION("short-circuit") {
+        CHECK(!evaluate("error()", vars, funcs).has_value());
+
+        CHECK(evaluate("false && error()", vars) == "false"_json);
+        CHECK(!evaluate("error() && false", vars).has_value());
+
+        CHECK(evaluate("true || error()", vars) == "true"_json);
+        CHECK(!evaluate("error() || true", vars).has_value());
+
+        CHECK(evaluate("true && false && error()", vars) == "false"_json);
+        CHECK(evaluate("false && true && error()", vars) == "false"_json);
+        CHECK(evaluate("false && error() && true", vars) == "false"_json);
+        CHECK(!evaluate("error() && false && true", vars).has_value());
+        CHECK(!evaluate("error() && true && false", vars).has_value());
+        CHECK(!evaluate("true && error() && false", vars).has_value());
+
+        CHECK(evaluate("true || false || error()", vars) == "true"_json);
+        CHECK(evaluate("false || true || error()", vars) == "true"_json);
+        CHECK(evaluate("true || error() || false", vars) == "true"_json);
+        CHECK(!evaluate("error() || false || true", vars).has_value());
+        CHECK(!evaluate("error() || true || false", vars).has_value());
+        CHECK(!evaluate("false || error() || true", vars).has_value());
     }
 }
 
@@ -465,8 +493,6 @@ TEST_CASE("wishlist for later", "[future]") {
     CHECK(!evaluate("identity(object).a", vars, funcs).has_value());
     // Object access on array access not supported
     CHECK(!evaluate("nested_object[0].c", vars, funcs).has_value());
-    // No short-circuiting
-    CHECK(!evaluate("size(array) >= 10 && array[9] == 1", vars, funcs).has_value());
     // No array literal
     CHECK(!evaluate("[1,2,3,4]", vars, funcs).has_value());
     // No object literal

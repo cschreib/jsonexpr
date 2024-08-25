@@ -109,6 +109,26 @@ basic_function_result safe_access(const T& lhs, U rhs) {
 
     return lhs[rhs];
 }
+
+expected<bool, error> evaluate_as_bool(
+    const ast::node& node, const variable_registry& vars, const function_registry& funs) {
+    const auto value_json = evaluate(node, vars, funs);
+    if (!value_json.has_value()) {
+        return unexpected(value_json.error());
+    }
+
+    return std::visit(
+        [&](const auto& value) -> expected<bool, error> {
+            if constexpr (requires { static_cast<bool>(value); }) {
+                return static_cast<bool>(value);
+            } else {
+                return unexpected(node_error(
+                    node, std::string("expected type convertible to bool, got ") +
+                              std::string(get_type_name(value_json.value()))));
+            }
+        },
+        to_variant(value_json.value()));
+}
 } // namespace
 
 function_registry jsonexpr::default_functions() {
@@ -120,8 +140,6 @@ function_registry jsonexpr::default_functions() {
     BINARY_OPERATOR(>=);
     BINARY_OPERATOR(<);
     BINARY_OPERATOR(<=);
-    BINARY_OPERATOR(&&);
-    BINARY_OPERATOR(||);
     BINARY_FUNCTION("/", safe_div(lhs, rhs));
     BINARY_OPERATOR(*);
     BINARY_OPERATOR(+);
@@ -140,6 +158,55 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("floor", std::floor(lhs));
     UNARY_FUNCTION("ceil", std::ceil(lhs));
     UNARY_FUNCTION("size", lhs.size());
+
+    // Boolean operators are more complex since they short-circuit (avoid evaluation).
+    register_function(
+        freg, "&&", 2,
+        [](std::span<const ast::node> args, const variable_registry& vars,
+           const function_registry& funs) -> function_result {
+            // Evaluate left-hand-side first.
+            const auto lhs = evaluate_as_bool(args[0], vars, funs);
+            if (!lhs.has_value()) {
+                return unexpected(lhs.error());
+            }
+
+            // Value is falsy, short-circuit.
+            if (!lhs.value()) {
+                return false;
+            }
+
+            // Value is truthy, evaluate right-hand-side.
+            const auto rhs = evaluate_as_bool(args[1], vars, funs);
+            if (!rhs.has_value()) {
+                return unexpected(rhs.error());
+            }
+
+            return rhs.value();
+        });
+
+    register_function(
+        freg, "||", 2,
+        [](std::span<const ast::node> args, const variable_registry& vars,
+           const function_registry& funs) -> function_result {
+            // Evaluate left-hand-side first.
+            const auto lhs = evaluate_as_bool(args[0], vars, funs);
+            if (!lhs.has_value()) {
+                return unexpected(lhs.error());
+            }
+
+            // Value is truthy, short-circuit.
+            if (lhs.value()) {
+                return true;
+            }
+
+            // Value is falsy, evaluate right-hand-side.
+            const auto rhs = evaluate_as_bool(args[1], vars, funs);
+            if (!rhs.has_value()) {
+                return unexpected(rhs.error());
+            }
+
+            return rhs.value();
+        });
 
     return freg;
 }
