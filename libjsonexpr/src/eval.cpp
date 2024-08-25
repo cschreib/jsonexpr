@@ -5,7 +5,7 @@ using namespace jsonexpr;
 namespace {
 expected<json, error> eval(
     const ast::node&         n,
-    const ast::variable&     v,
+    const ast::identifier&   v,
     const variable_registry& vreg,
     const function_registry&) {
 
@@ -17,23 +17,7 @@ expected<json, error> eval(
             n.location.position, name.size(), "unknown variable '" + std::string(name) + "'"});
     }
 
-    const json* object = &iter->second;
-    while (dot_pos != v.name.npos) {
-        const auto prev_pos = dot_pos + 1;
-
-        dot_pos = v.name.find_first_of(".", prev_pos);
-        name    = v.name.substr(prev_pos, dot_pos - prev_pos);
-
-        if (!object->contains(name)) {
-            return unexpected(error{
-                n.location.position + prev_pos, name.size(),
-                "unknown field '" + std::string(name) + "'"});
-        }
-
-        object = &(*object)[name];
-    }
-
-    return *object;
+    return iter->second;
 }
 
 expected<json, error>

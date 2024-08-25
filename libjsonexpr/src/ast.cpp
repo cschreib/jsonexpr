@@ -5,8 +5,8 @@
 using namespace jsonexpr;
 
 namespace {
-std::string dump_content(const ast::variable& v, std::size_t indent) {
-    return std::string(2 * indent, ' ') + "variable(" + std::string(v.name) + ")";
+std::string dump_content(const ast::identifier& v, std::size_t indent) {
+    return std::string(2 * indent, ' ') + "identifier(" + std::string(v.name) + ")";
 }
 
 std::string dump_content(const ast::literal& l, std::size_t indent) {

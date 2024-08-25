@@ -263,12 +263,13 @@ TEST_CASE("variable", "[general]") {
     vars["b"] = "2"_json;
     vars["c"] = R"({"d": {"e": "f"}, "g": "h"})"_json;
 
+    function_registry funcs = default_functions();
+    register_function(funcs, "identity", 1, [](const json& j) { return j[0]; });
+
     SECTION("bad") {
         CHECK(!evaluate("d", vars).has_value());
         CHECK(!evaluate("ab", vars).has_value());
         CHECK(!evaluate("a b", vars).has_value());
-        CHECK(!evaluate("c .d", vars).has_value());
-        CHECK(!evaluate("c. d", vars).has_value());
         CHECK(!evaluate("c.k", vars).has_value());
     }
 
@@ -280,8 +281,11 @@ TEST_CASE("variable", "[general]") {
         CHECK(evaluate("(a)+(b)", vars) == "3"_json);
         CHECK(evaluate("c", vars) == R"({"d": {"e": "f"}, "g": "h"})"_json);
         CHECK(evaluate("c.d", vars) == R"({"e": "f"})"_json);
+        CHECK(evaluate("c .d", vars) == R"({"e": "f"})"_json);
+        CHECK(evaluate("c. d", vars) == R"({"e": "f"})"_json);
         CHECK(evaluate("c.d.e", vars) == R"("f")"_json);
         CHECK(evaluate("c.g", vars) == R"("h")"_json);
+        CHECK(evaluate("identity(c).d", vars, funcs) == R"({"e": "f"})"_json);
     }
 }
 
@@ -510,12 +514,13 @@ TEST_CASE("function", "[general]") {
 
 TEST_CASE("stress test", "[general]") {
     variable_registry vars;
-    vars["arr"]  = "[1,2,3]"_json;
-    vars["int"]  = "1"_json;
-    vars["flt"]  = "1.0"_json;
-    vars["str"]  = R"("abc")"_json;
-    vars["obj"]  = "{}"_json;
-    vars["bool"] = "true"_json;
+    vars["arr"]    = "[1,2,3]"_json;
+    vars["int"]    = "1"_json;
+    vars["flt"]    = "1.0"_json;
+    vars["str"]    = R"("abc")"_json;
+    vars["obj"]    = "{}"_json;
+    vars["bool"]   = "true"_json;
+    vars["objarr"] = R"([{"a": 1}, {"a": 2}, {"d": [3, 4]}])"_json;
 
     SECTION("bad") {
         CHECK(!evaluate("").has_value());
@@ -589,6 +594,10 @@ TEST_CASE("stress test", "[general]") {
     SECTION("good") {
         CHECK(evaluate("((((((((((1+2)*3)-4)+2)/2)+6)*2)-7)+1)+0)") == "12"_json);
 
+        CHECK(evaluate("objarr[0].a", vars) == "1"_json);
+        CHECK(evaluate("objarr[1].a", vars) == "2"_json);
+        CHECK(evaluate("objarr[2].d[objarr[0].a]", vars) == "4"_json);
+
         using namespace std::literals;
         for (const auto& op : {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s}) {
             CAPTURE(op);
@@ -621,19 +630,8 @@ TEST_CASE("stress test", "[general]") {
 }
 
 TEST_CASE("wishlist for later", "[future]") {
-    variable_registry vars;
-    vars["object"]        = R"({"a": "b"})"_json;
-    vars["nested_object"] = R"([{"a": "b"}, {"a": "c"}])"_json;
-
-    function_registry funcs = default_functions();
-    register_function(funcs, "identity", 1, [](const json& j) { return j; });
-
-    // Object access on function output not supported
-    CHECK(!evaluate("identity(object).a", vars, funcs).has_value());
-    // Object access on array access not supported
-    CHECK(!evaluate("nested_object[0].c", vars, funcs).has_value());
     // No array literal
-    CHECK(!evaluate("[1,2,3,4]", vars, funcs).has_value());
+    CHECK(!evaluate("[1,2,3,4]").has_value());
     // No object literal
-    CHECK(!evaluate("{'a':'b'}", vars, funcs).has_value());
+    CHECK(!evaluate("{'a':'b'}").has_value());
 }

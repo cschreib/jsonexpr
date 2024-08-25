@@ -18,6 +18,7 @@ struct token {
         GROUP_OPEN,
         GROUP_CLOSE,
         SEPARATOR,
+        OBJECT_ACCESS,
         ARRAY_ACCESS_OPEN,
         ARRAY_ACCESS_CLOSE
     } type;
@@ -111,7 +112,7 @@ std::optional<std::size_t> scan_string(
 }
 
 constexpr std::string_view identifier_chars_start = "abcdefghijklmnopqrstuvwxyz_";
-constexpr std::string_view identifier_chars       = "abcdefghijklmnopqrstuvwxyz_.0123456789";
+constexpr std::string_view identifier_chars       = "abcdefghijklmnopqrstuvwxyz_0123456789";
 constexpr std::string_view number_chars_start     = "0123456789";
 constexpr std::string_view number_chars           = "0123456789.";
 constexpr std::string_view number_exponent_chars  = "eE";
@@ -121,6 +122,7 @@ constexpr char             group_char_close       = ')';
 constexpr char             array_char_open        = '[';
 constexpr char             array_char_close       = ']';
 constexpr char             separator_char         = ',';
+constexpr char             access_char            = '.';
 constexpr std::string_view operators_chars        = "<>*/%+-^&|=!";
 constexpr std::string_view string_chars           = "\"'";
 constexpr std::string_view whitespace_chars       = " \t\n\r";
@@ -174,6 +176,8 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             extract_as(1, token::ARRAY_ACCESS_CLOSE);
         } else if (current_char == separator_char) {
             extract_as(1, token::SEPARATOR);
+        } else if (current_char == access_char) {
+            extract_as(1, token::OBJECT_ACCESS);
         } else if (is_any_of(current_char, operators_chars)) {
             if (expression.size() >= 2u &&
                 is_any_of(expression.substr(0, 2), ">=", "<=", "==", "!=", "**", "&&", "||")) {
@@ -210,7 +214,7 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
     return tokens;
 }
 
-expected<ast::node, parse_error> try_parse_variable(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_identifier(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected identifier"));
     }
@@ -221,7 +225,12 @@ expected<ast::node, parse_error> try_parse_variable(std::span<const token>& toke
     }
 
     tokens = tokens.subspan(1);
-    return ast::node{t.location, ast::variable{t.location.content}};
+    return ast::node{t.location, ast::identifier{t.location.content}};
+}
+
+ast::node identifier_to_string(ast::node id) noexcept {
+    return ast::node{
+        id.location, ast::literal{json(std::string(std::get<ast::identifier>(id.content).name))}};
 }
 
 std::string single_to_double_quote(std::string_view input) noexcept {
@@ -394,7 +403,7 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     if (auto op = try_parse_function(tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_variable(tokens); is_match(op)) {
+    if (auto op = try_parse_identifier(tokens); is_match(op)) {
         return op;
     }
     if (auto op = try_parse_literal(tokens); is_match(op)) {
@@ -404,39 +413,53 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     return unexpected(match_failed(tokens.front(), "expected operand"));
 }
 
-expected<ast::node, parse_error> try_parse_array_access(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return unexpected(match_failed("expected array access"));
+        return unexpected(match_failed("expected array or object access"));
     }
 
-    auto array = try_parse_operand(tokens);
-    if (!array.has_value()) {
-        return unexpected(abort_parse(array.error()));
+    auto object = try_parse_operand(tokens);
+    if (!object.has_value()) {
+        return unexpected(abort_parse(object.error()));
     }
 
-    while (!tokens.empty() && tokens[0].type == token::ARRAY_ACCESS_OPEN) {
-        tokens = tokens.subspan(1);
+    while (!tokens.empty() &&
+           (tokens[0].type == token::ARRAY_ACCESS_OPEN || tokens[0].type == token::OBJECT_ACCESS)) {
+        const bool array_access = tokens[0].type == token::ARRAY_ACCESS_OPEN;
+        tokens                  = tokens.subspan(1);
 
-        auto index = try_parse_expr(tokens);
+        expected<ast::node, parse_error> index;
+        if (array_access) {
+            index = try_parse_expr(tokens);
+        } else {
+            index = try_parse_identifier(tokens);
+        }
+
         if (!index.has_value()) {
             return unexpected(abort_parse(index.error()));
         }
 
-        if (tokens.empty() || tokens[0].type != token::ARRAY_ACCESS_CLOSE) {
-            return unexpected(abort_parse("expected ']'"));
+        const char* end_pos = nullptr;
+        if (array_access) {
+            if (tokens.empty() || tokens[0].type != token::ARRAY_ACCESS_CLOSE) {
+                return unexpected(abort_parse("expected ']'"));
+            }
+
+            const token& end_token = tokens.front();
+            tokens                 = tokens.subspan(1);
+            end_pos                = view_end(end_token.location.content);
+        } else {
+            index   = identifier_to_string(std::move(index.value()));
+            end_pos = view_end(index.value().location.content);
         }
 
-        const token& end_token = tokens.front();
-        tokens                 = tokens.subspan(1);
-
-        array = ast::node{
-            {array.value().location.position,
-             std::string_view(
-                 view_begin(array.value().location.content), view_end(end_token.location.content))},
-            ast::function{"[]", {std::move(array.value()), std::move(index.value())}}};
+        object = ast::node{
+            {object.value().location.position,
+             std::string_view(view_begin(object.value().location.content), end_pos)},
+            ast::function{"[]", {std::move(object.value()), std::move(index.value())}}};
     }
 
-    return array;
+    return object;
 }
 
 expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens) noexcept {
@@ -445,7 +468,7 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
     }
 
     if (tokens.front().type != token::OPERATOR) {
-        return try_parse_array_access(tokens);
+        return try_parse_access(tokens);
     }
 
     auto         unary_tokens    = tokens;

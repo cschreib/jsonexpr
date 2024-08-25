@@ -12,7 +12,7 @@
 namespace jsonexpr::ast {
 struct node;
 
-struct variable {
+struct identifier {
     std::string_view name;
 };
 
@@ -26,8 +26,8 @@ struct function {
 };
 
 struct node {
-    source_location                           location;
-    std::variant<variable, literal, function> content;
+    source_location                             location;
+    std::variant<identifier, literal, function> content;
 };
 
 JSONEXPR_EXPORT std::string dump(const node& n, std::size_t indent = 0);
