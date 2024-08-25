@@ -43,6 +43,7 @@ void jsonexpr::register_function(
     funcs[name][arity] = {std::move(func)};
 }
 
+namespace {
 #define UNARY_FUNCTION(NAME, EXPR)                                                                 \
     register_function(freg, NAME, 1, [](const json& args) -> basic_function_result {               \
         return std::visit(                                                                         \
@@ -74,50 +75,19 @@ void jsonexpr::register_function(
             to_variant(args[0]), to_variant(args[1]));                                             \
     })
 
-#define UNARY_OPERATOR(OPERATOR) UNARY_FUNCTION(#OPERATOR, OPERATOR lhs)
-
-#define BINARY_OPERATOR(OPERATOR) BINARY_FUNCTION(#OPERATOR, lhs OPERATOR rhs)
-
-namespace {
-template<typename T, typename U>
-    requires requires(T lhs, U rhs) { lhs / rhs; }
-basic_function_result safe_div(T lhs, U rhs) {
-    using return_type = decltype(lhs / rhs);
-    if constexpr (std::is_integral_v<return_type>) {
-        if (rhs == 0) {
-            return unexpected(std::string("integer division by zero"));
-        }
-    }
-
-    return lhs / rhs;
-}
-
-template<typename T>
-    requires requires(T lhs) { std::abs(lhs); }
-basic_function_result safe_abs(T lhs) {
-    if constexpr (std::is_signed_v<T>) {
-        return std::abs(lhs);
-    } else {
-        return lhs;
-    }
-}
-
 template<typename T>
 constexpr bool is_arithmetic_not_bool =
     std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
 
-template<typename T, typename U, bool AllowBool>
-constexpr bool is_safe_to_compare =
-    (std::is_same_v<T, U> || (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>)) &&
-    (AllowBool || (!std::is_same_v<T, json::boolean_t> && !std::is_same_v<T, json::boolean_t>));
+template<typename T, typename U>
+constexpr bool is_safe_to_compare = (std::is_same_v<T, U> && !std::is_same_v<T, json::boolean_t>) ||
+                                    (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>);
 
-#define COMPARISON_OPERATOR(NAME, OPERATOR, ALLOW_BOOL)                                            \
+#define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
-        requires(                                                                                  \
-            is_safe_to_compare<T, U, ALLOW_BOOL> &&                                                \
-            requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool                                     \
+        requires(is_safe_to_compare<T, U> && requires(T lhs, U rhs) { lhs OPERATOR rhs; }) bool    \
     safe_##NAME(const T& lhs, const U& rhs) {                                                      \
-        if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
+        if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
                 OPERATOR static_cast<json::number_float_t>(rhs);                                   \
         } else {                                                                                   \
@@ -125,12 +95,105 @@ constexpr bool is_safe_to_compare =
         }                                                                                          \
     }
 
-COMPARISON_OPERATOR(eq, ==, true)
-COMPARISON_OPERATOR(ne, !=, true)
-COMPARISON_OPERATOR(lt, <, false)
-COMPARISON_OPERATOR(le, <=, false)
-COMPARISON_OPERATOR(gt, >, false)
-COMPARISON_OPERATOR(ge, >=, false)
+COMPARISON_OPERATOR(eq, ==)
+COMPARISON_OPERATOR(ne, !=)
+COMPARISON_OPERATOR(lt, <)
+COMPARISON_OPERATOR(le, <=)
+COMPARISON_OPERATOR(gt, >)
+COMPARISON_OPERATOR(ge, >=)
+
+template<std::same_as<bool> T>
+bool safe_eq(T lhs, T rhs) {
+    return lhs == rhs;
+}
+
+template<std::same_as<bool> T>
+bool safe_ne(T lhs, T rhs) {
+    return lhs != rhs;
+}
+
+template<typename T, typename U>
+constexpr bool is_safe_for_maths = is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>;
+
+#define MATHS_OPERATOR(NAME, OPERATOR)                                                             \
+    template<typename T, typename U>                                                               \
+        requires(is_safe_for_maths<T, U>)                                                          \
+    auto safe_##NAME(const T& lhs, const U& rhs) {                                                 \
+        if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
+            return static_cast<json::number_float_t>(lhs)                                          \
+                OPERATOR static_cast<json::number_float_t>(rhs);                                   \
+        } else {                                                                                   \
+            return lhs OPERATOR rhs;                                                               \
+        }                                                                                          \
+    }
+
+MATHS_OPERATOR(mul, *)
+MATHS_OPERATOR(add, +)
+MATHS_OPERATOR(sub, -)
+
+json::string_t safe_add(const json::string_t& lhs, const json::string_t& rhs) {
+    return lhs + rhs;
+}
+
+template<typename T>
+    requires(is_arithmetic_not_bool<T>)
+T safe_unary_plus(T lhs) {
+    return lhs;
+}
+
+template<typename T>
+    requires(is_arithmetic_not_bool<T>)
+T safe_unary_minus(T lhs) {
+    return -lhs;
+}
+
+template<typename T, typename U>
+    requires(is_safe_for_maths<T, U>)
+basic_function_result safe_div(T lhs, U rhs) {
+    if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
+        return static_cast<json::number_float_t>(lhs) / static_cast<json::number_float_t>(rhs);
+    } else {
+        if (rhs == 0) {
+            return unexpected(std::string("integer division by zero"));
+        }
+
+        return lhs / rhs;
+    }
+}
+
+template<typename T, typename U>
+    requires(is_safe_for_maths<T, U>)
+basic_function_result safe_mod(T lhs, U rhs) {
+    if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
+        return std::fmod(
+            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+    } else {
+        if (rhs == 0) {
+            return unexpected(std::string("integer modulo by zero"));
+        }
+
+        return lhs % rhs;
+    }
+}
+
+#define UNARY_MATH_FUNCTION(NAME, FUNC, RETURN)                                                    \
+    template<typename T>                                                                           \
+        requires(is_arithmetic_not_bool<T>)                                                        \
+    RETURN safe_##NAME(T lhs) {                                                                    \
+        return static_cast<RETURN>(FUNC(static_cast<json::number_float_t>(lhs)));                  \
+    }
+
+UNARY_MATH_FUNCTION(floor, std::floor, json::number_integer_t)
+UNARY_MATH_FUNCTION(ceil, std::ceil, json::number_integer_t)
+UNARY_MATH_FUNCTION(round, std::round, json::number_integer_t)
+UNARY_MATH_FUNCTION(sqrt, std::sqrt, json::number_float_t)
+UNARY_MATH_FUNCTION(abs, std::abs, json::number_float_t)
+
+template<typename T, typename U>
+    requires(is_safe_for_maths<T, U>)
+auto safe_pow(T lhs, U rhs) {
+    return std::pow(static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+}
 
 template<typename T, typename U>
     requires(
@@ -175,17 +238,14 @@ expected<bool, error> evaluate_as_bool(
         return unexpected(value_json.error());
     }
 
-    return std::visit(
-        [&](const auto& value) -> expected<bool, error> {
-            if constexpr (requires { static_cast<bool>(value); }) {
-                return static_cast<bool>(value);
-            } else {
-                return unexpected(node_error(
-                    node, std::string("expected type convertible to bool, got ") +
-                              std::string(get_type_name(value_json.value()))));
-            }
-        },
-        to_variant(value_json.value()));
+    const auto value = to_variant(value_json.value());
+    if (std::holds_alternative<json::boolean_t>(value)) {
+        return std::get<json::boolean_t>(value);
+    } else {
+        return unexpected(node_error(
+            node, std::string("expected boolean, got ") +
+                      std::string(get_type_name(value_json.value()))));
+    }
 }
 } // namespace
 
@@ -193,29 +253,40 @@ function_registry jsonexpr::default_functions() {
     function_registry freg;
     BINARY_FUNCTION("==", safe_eq(lhs, rhs));
     BINARY_FUNCTION("!=", safe_ne(lhs, rhs));
-    UNARY_OPERATOR(!);
     BINARY_FUNCTION(">", safe_gt(lhs, rhs));
     BINARY_FUNCTION(">=", safe_ge(lhs, rhs));
     BINARY_FUNCTION("<", safe_lt(lhs, rhs));
     BINARY_FUNCTION("<=", safe_le(lhs, rhs));
     BINARY_FUNCTION("/", safe_div(lhs, rhs));
-    BINARY_OPERATOR(*);
-    BINARY_OPERATOR(+);
-    UNARY_OPERATOR(+);
-    BINARY_OPERATOR(-);
-    UNARY_OPERATOR(-);
-    BINARY_OPERATOR(%);
-    BINARY_FUNCTION("**", std::pow(lhs, rhs));
-    BINARY_FUNCTION("^", std::pow(lhs, rhs));
+    BINARY_FUNCTION("*", safe_mul(lhs, rhs));
+    BINARY_FUNCTION("+", safe_add(lhs, rhs));
+    UNARY_FUNCTION("+", safe_unary_plus(lhs));
+    BINARY_FUNCTION("-", safe_sub(lhs, rhs));
+    UNARY_FUNCTION("-", safe_unary_minus(lhs));
+    BINARY_FUNCTION("%", safe_mod(lhs, rhs));
+    BINARY_FUNCTION("**", safe_pow(lhs, rhs));
+    BINARY_FUNCTION("^", safe_pow(lhs, rhs));
     BINARY_FUNCTION("[]", safe_access(lhs, rhs));
     BINARY_FUNCTION("min", lhs <= rhs ? lhs : rhs);
     BINARY_FUNCTION("max", lhs >= rhs ? lhs : rhs);
     UNARY_FUNCTION("abs", safe_abs(lhs));
-    UNARY_FUNCTION("sqrt", std::sqrt(lhs));
-    UNARY_FUNCTION("round", std::round(lhs));
-    UNARY_FUNCTION("floor", std::floor(lhs));
-    UNARY_FUNCTION("ceil", std::ceil(lhs));
+    UNARY_FUNCTION("sqrt", safe_sqrt(lhs));
+    UNARY_FUNCTION("round", safe_round(lhs));
+    UNARY_FUNCTION("floor", safe_floor(lhs));
+    UNARY_FUNCTION("ceil", safe_ceil(lhs));
     UNARY_FUNCTION("size", lhs.size());
+
+    register_function(
+        freg, "!", 1,
+        [](std::span<const ast::node> args, const variable_registry& vars,
+           const function_registry& funs) -> function_result {
+            const auto lhs = evaluate_as_bool(args[0], vars, funs);
+            if (!lhs.has_value()) {
+                return unexpected(lhs.error());
+            }
+
+            return !lhs.value();
+        });
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_function(

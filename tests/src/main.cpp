@@ -312,7 +312,7 @@ TEST_CASE("array", "[general]") {
         CHECK(evaluate("obj[-4]", vars) == "2"_json);
         CHECK(evaluate("obj[-5]", vars) == "1"_json);
         CHECK(evaluate("obj[1+1]", vars) == "3"_json);
-        CHECK(evaluate("obj[abs(-1)]", vars) == "2"_json);
+        CHECK(evaluate("obj[round(-1)]", vars) == "5"_json);
         CHECK(evaluate("obj[obj[0]]", vars) == "2"_json);
         CHECK(evaluate("deep.sub[1]", vars) == "7"_json);
     }
@@ -501,7 +501,8 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("%%%%%%%%%%%%").has_value());
 
         using namespace std::literals;
-        for (const auto& op : {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s}) {
+        for (const auto& op :
+             {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s, "*"s, "/"s, "+"s, "-"s, "%"s, "**"s, "^"s}) {
             CAPTURE(op);
 
             CHECK(!evaluate("arr " + op + " int", vars).has_value());
@@ -533,6 +534,12 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("bool <= bool", vars).has_value());
         CHECK(!evaluate("bool > bool", vars).has_value());
         CHECK(!evaluate("bool >= bool", vars).has_value());
+
+        CHECK(!evaluate("!int", vars).has_value());
+        CHECK(!evaluate("!flt", vars).has_value());
+        CHECK(!evaluate("!str", vars).has_value());
+        CHECK(!evaluate("!arr", vars).has_value());
+        CHECK(!evaluate("!obj", vars).has_value());
     }
 
     SECTION("good") {
@@ -552,8 +559,20 @@ TEST_CASE("stress test", "[general]") {
             CHECK(evaluate("flt " + op + " int", vars).has_value());
         }
 
+        for (const auto& op : {"+"s, "-"s, "%"s, "**"s, "^"s}) {
+            CAPTURE(op);
+
+            CHECK(evaluate("int " + op + " int", vars).has_value());
+            CHECK(evaluate("flt " + op + " flt", vars).has_value());
+            CHECK(evaluate("int " + op + " flt", vars).has_value());
+            CHECK(evaluate("flt " + op + " int", vars).has_value());
+        }
+
         CHECK(evaluate("bool == bool", vars).has_value());
         CHECK(evaluate("bool != bool", vars).has_value());
+        CHECK(evaluate("!bool", vars).has_value());
+
+        CHECK(evaluate("str + str", vars).has_value());
     }
 }
 
