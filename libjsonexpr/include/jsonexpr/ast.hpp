@@ -20,14 +20,18 @@ struct literal {
     json value;
 };
 
+struct array {
+    std::vector<node> data;
+};
+
 struct function {
     std::string_view  name;
     std::vector<node> args;
 };
 
 struct node {
-    source_location                             location;
-    std::variant<identifier, literal, function> content;
+    source_location                                    location;
+    std::variant<identifier, literal, function, array> content;
 };
 
 JSONEXPR_EXPORT std::string dump(const node& n, std::size_t indent = 0);

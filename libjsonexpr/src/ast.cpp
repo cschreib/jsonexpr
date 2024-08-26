@@ -13,13 +13,21 @@ std::string dump_content(const ast::literal& l, std::size_t indent) {
     return std::string(2 * indent, ' ') + "literal(" + std::string(l.value.dump()) + ")";
 }
 
-std::string dump_content(const ast::function& v, std::size_t indent) {
-    std::string heading = std::string(2 * indent, ' ');
-    std::string str     = heading + "function(" + std::string(v.name) + ", args={\n";
-    for (const auto& a : v.args) {
-        str += dump(a, indent + 1) + "\n";
+std::string dump_content(const ast::array& a, std::size_t indent) {
+    std::string str = std::string(2 * indent, ' ') + "array({";
+    for (const auto& e : a.data) {
+        str += "\n" + dump(e, indent + 1);
     }
-    str += heading + "})";
+    str += "})";
+    return str;
+}
+
+std::string dump_content(const ast::function& v, std::size_t indent) {
+    std::string str = std::string(2 * indent, ' ') + "function(" + std::string(v.name) + ", args={";
+    for (const auto& a : v.args) {
+        str += "\n" + dump(a, indent + 1);
+    }
+    str += "})";
     return str;
 }
 } // namespace

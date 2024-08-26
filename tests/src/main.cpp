@@ -289,7 +289,34 @@ TEST_CASE("variable", "[general]") {
     }
 }
 
-TEST_CASE("array", "[general]") {
+TEST_CASE("array literal", "[array]") {
+    SECTION("bad") {
+        CHECK(!evaluate("[").has_value());
+        CHECK(!evaluate("]").has_value());
+        CHECK(!evaluate("[1").has_value());
+        CHECK(!evaluate("[1,").has_value());
+        CHECK(!evaluate("1]").has_value());
+        CHECK(!evaluate(",1]").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("[]") == "[]"_json);
+        CHECK(evaluate("[ ]") == "[ ]"_json);
+        CHECK(evaluate("[1]") == "[1]"_json);
+        CHECK(evaluate("[1,2]") == "[1,2]"_json);
+        CHECK(evaluate("[ 1,2]") == "[1,2]"_json);
+        CHECK(evaluate("[1 ,2]") == "[1,2]"_json);
+        CHECK(evaluate("[1, 2]") == "[1,2]"_json);
+        CHECK(evaluate("[1,2 ]") == "[1,2]"_json);
+        CHECK(evaluate("['a']") == R"(["a"])"_json);
+        CHECK(evaluate("[1,'a']") == R"([1,"a"])"_json);
+        CHECK(evaluate("[1,'a']") == R"([1,"a"])"_json);
+        CHECK(evaluate("[[1,2],[3,4]]") == "[[1,2],[3,4]]"_json);
+        CHECK(evaluate("[1+2]") == "[3]"_json);
+    }
+}
+
+TEST_CASE("array access", "[array]") {
     variable_registry vars;
     vars["obj"]          = "[1,2,3,4,5]"_json;
     vars["deep"]         = R"({"sub": [6,7,8]})"_json;
@@ -307,6 +334,8 @@ TEST_CASE("array", "[general]") {
         CHECK(!evaluate("obj[1,2]", vars).has_value());
         CHECK(!evaluate("obj[5]", vars).has_value());
         CHECK(!evaluate("obj[-6]", vars).has_value());
+        CHECK(!evaluate("obj[[0]]", vars).has_value());
+        CHECK(!evaluate("obj['a']", vars).has_value());
         CHECK(!evaluate("obj[+]", vars).has_value());
         CHECK(!evaluate("obj[(]", vars).has_value());
         CHECK(!evaluate("obj[>]", vars).has_value());
@@ -338,6 +367,7 @@ TEST_CASE("array", "[general]") {
         CHECK(evaluate("nested_array[1][1]", vars) == "4"_json);
         CHECK(evaluate("identity(obj)", vars, funcs) == "[1,2,3,4,5]"_json);
         CHECK(evaluate("identity(obj)[0]", vars, funcs) == "1"_json);
+        CHECK(evaluate("[[1,2],[3,4]][1][1]", vars) == "4"_json);
     }
 
     SECTION("precedence") {
@@ -630,8 +660,6 @@ TEST_CASE("stress test", "[general]") {
 }
 
 TEST_CASE("wishlist for later", "[future]") {
-    // No array literal
-    CHECK(!evaluate("[1,2,3,4]").has_value());
     // No object literal
     CHECK(!evaluate("{'a':'b'}").has_value());
 }

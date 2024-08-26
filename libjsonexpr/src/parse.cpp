@@ -19,8 +19,8 @@ struct token {
         GROUP_CLOSE,
         SEPARATOR,
         OBJECT_ACCESS,
-        ARRAY_ACCESS_OPEN,
-        ARRAY_ACCESS_CLOSE
+        ARRAY_OPEN,
+        ARRAY_CLOSE
     } type;
 };
 
@@ -171,9 +171,9 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
         } else if (current_char == group_char_close) {
             extract_as(1, token::GROUP_CLOSE);
         } else if (current_char == array_char_open) {
-            extract_as(1, token::ARRAY_ACCESS_OPEN);
+            extract_as(1, token::ARRAY_OPEN);
         } else if (current_char == array_char_close) {
-            extract_as(1, token::ARRAY_ACCESS_CLOSE);
+            extract_as(1, token::ARRAY_CLOSE);
         } else if (current_char == separator_char) {
             extract_as(1, token::SEPARATOR);
         } else if (current_char == access_char) {
@@ -299,6 +299,49 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
 
 expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
 
+expected<std::vector<ast::node>, parse_error>
+try_parse_list(std::span<const token>& tokens, auto end_token) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected list"));
+    }
+
+    std::vector<ast::node> args;
+    auto                   args_tokens = tokens;
+    std::size_t            prev_size   = 0;
+    bool                   first       = true;
+    while (!args_tokens.empty()) {
+        if (args_tokens.size() == prev_size) {
+            return unexpected(
+                abort_parse(args_tokens.front(), "infinite loop detected in list parser (bug)"));
+        }
+
+        prev_size = args_tokens.size();
+
+        if (args_tokens.front().type == end_token) {
+            break;
+        }
+
+        if (!first) {
+            if (args_tokens.front().type != token::SEPARATOR) {
+                return unexpected(abort_parse(args_tokens.front(), "expected ','"));
+            }
+
+            args_tokens = args_tokens.subspan(1);
+        }
+
+        auto arg = try_parse_expr(args_tokens);
+        if (!arg.has_value()) {
+            return unexpected(abort_parse(arg.error()));
+        }
+
+        args.push_back(std::move(arg.value()));
+        first = false;
+    }
+
+    tokens = args_tokens;
+    return args;
+}
+
 expected<ast::node, parse_error> try_parse_function(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected function"));
@@ -315,37 +358,10 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
 
     const token& func = tokens.front();
 
-    std::vector<ast::node> args;
-    auto                   args_tokens = tokens.subspan(2);
-    std::size_t            prev_size   = 0;
-    bool                   first       = true;
-    while (!args_tokens.empty()) {
-        if (args_tokens.size() == prev_size) {
-            return unexpected(abort_parse(
-                args_tokens.front(), "infinite loop detected in function parser (bug)"));
-        }
-
-        prev_size = args_tokens.size();
-
-        if (args_tokens.front().type == token::GROUP_CLOSE) {
-            break;
-        }
-
-        if (!first) {
-            if (args_tokens.front().type != token::SEPARATOR) {
-                return unexpected(abort_parse(args_tokens.front(), "expected argument separator"));
-            }
-
-            args_tokens = args_tokens.subspan(1);
-        }
-
-        auto arg = try_parse_expr(args_tokens);
-        if (!arg.has_value()) {
-            return unexpected(abort_parse(arg.error()));
-        }
-
-        args.push_back(std::move(arg.value()));
-        first = false;
+    auto args_tokens = tokens.subspan(2);
+    auto args        = try_parse_list(args_tokens, token::GROUP_CLOSE);
+    if (!args.has_value()) {
+        return unexpected(args.error());
     }
 
     if (args_tokens.empty()) {
@@ -360,7 +376,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     return ast::node{
         {func.location.position,
          std::string_view(view_begin(func.location.content), view_end(end_token.location.content))},
-        ast::function{func.location.content, std::move(args)}};
+        ast::function{func.location.content, std::move(args.value())}};
 }
 
 expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
@@ -396,6 +412,37 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     return expr;
 }
 
+expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected array"));
+    }
+    if (tokens.size() < 2 || tokens.front().type != token::ARRAY_OPEN) {
+        return unexpected(match_failed(tokens.front(), "expected array"));
+    }
+
+    const token& start_token = tokens.front();
+    auto         elem_tokens = tokens.subspan(1);
+    auto         elems       = try_parse_list(elem_tokens, token::ARRAY_CLOSE);
+    if (!elems.has_value()) {
+        return unexpected(elems.error());
+    }
+
+    if (elem_tokens.empty()) {
+        return unexpected(abort_parse("expected ']'"));
+    }
+
+    const token& end_token = elem_tokens.front();
+
+    elem_tokens = elem_tokens.subspan(1);
+    tokens      = elem_tokens;
+
+    return ast::node{
+        {start_token.location.position,
+         std::string_view(
+             view_begin(start_token.location.content), view_end(end_token.location.content))},
+        ast::array{std::move(elems.value())}};
+}
+
 bool is_match(const expected<ast::node, parse_error>& result) {
     return result.has_value() || std::holds_alternative<error>(result.error());
 }
@@ -406,6 +453,9 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     }
 
     if (auto op = try_parse_group(tokens); is_match(op)) {
+        return op;
+    }
+    if (auto op = try_parse_array(tokens); is_match(op)) {
         return op;
     }
     if (auto op = try_parse_function(tokens); is_match(op)) {
@@ -432,8 +482,8 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
     }
 
     while (!tokens.empty() &&
-           (tokens[0].type == token::ARRAY_ACCESS_OPEN || tokens[0].type == token::OBJECT_ACCESS)) {
-        const bool array_access = tokens[0].type == token::ARRAY_ACCESS_OPEN;
+           (tokens[0].type == token::ARRAY_OPEN || tokens[0].type == token::OBJECT_ACCESS)) {
+        const bool array_access = tokens[0].type == token::ARRAY_OPEN;
         tokens                  = tokens.subspan(1);
 
         expected<ast::node, parse_error> index;
@@ -449,7 +499,7 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
 
         const char* end_pos = nullptr;
         if (array_access) {
-            if (tokens.empty() || tokens[0].type != token::ARRAY_ACCESS_CLOSE) {
+            if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
                 return unexpected(abort_parse("expected ']'"));
             }
 

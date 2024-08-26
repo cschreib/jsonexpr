@@ -67,6 +67,25 @@ expected<json, error> eval(
     }
 }
 
+expected<json, error> eval(
+    const ast::node&,
+    const ast::array&        a,
+    const variable_registry& vreg,
+    const function_registry& freg) {
+
+    json output(json::value_t::array);
+    for (const auto& elem : a.data) {
+        auto result = eval(elem, vreg, freg);
+        if (!result.has_value()) {
+            return unexpected(result.error());
+        }
+
+        output.push_back(std::move(result.value()));
+    }
+
+    return output;
+}
+
 expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg) {
     return std::visit([&](const auto& c) { return eval(n, c, vreg, freg); }, n.content);
