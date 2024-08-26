@@ -199,6 +199,10 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             }
         } else if (is_any_of(current_char, identifier_chars_start)) {
             extract_as(scan_class(expression, 1, identifier_chars), token::IDENTIFIER);
+            if (tokens.back().location.content == "and" || tokens.back().location.content == "or" ||
+                tokens.back().location.content == "not") {
+                tokens.back().type = token::OPERATOR;
+            }
         } else if (is_any_of(current_char, number_chars_start)) {
             std::size_t end = scan_class(expression, 1, number_chars);
             if (end < expression.size() && is_any_of(expression[end], number_exponent_chars)) {
@@ -626,7 +630,8 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
 
 // From least to highest precedence. Operators with the same precedence are evaluated left-to-right.
 const std::vector<std::vector<std::string_view>> operator_precedence = {
-    {"||"}, {"&&"}, {"==", "!="}, {"<", "<=", ">", ">="}, {"+", "-"}, {"*", "/", "%"}, {"^", "**"}};
+    {"||", "or"}, {"&&", "and"},   {"==", "!="}, {"<", "<=", ">", ">="},
+    {"+", "-"},   {"*", "/", "%"}, {"^", "**"}};
 
 std::size_t get_precedence(std::string_view op) noexcept {
     for (std::size_t p = 0; p < operator_precedence.size(); ++p) {

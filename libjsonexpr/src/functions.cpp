@@ -277,6 +277,60 @@ expected<bool, error> evaluate_as_bool(
                       std::string(get_type_name(value_json.value()))));
     }
 }
+
+function_result safe_not(
+    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
+    const auto lhs = evaluate_as_bool(args[0], vars, funs);
+    if (!lhs.has_value()) {
+        return unexpected(lhs.error());
+    }
+
+    return !lhs.value();
+}
+
+function_result safe_and(
+    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
+    // Evaluate left-hand-side first.
+    const auto lhs = evaluate_as_bool(args[0], vars, funs);
+    if (!lhs.has_value()) {
+        return unexpected(lhs.error());
+    }
+
+    // Value is falsy, short-circuit.
+    if (!lhs.value()) {
+        return false;
+    }
+
+    // Value is truthy, evaluate right-hand-side.
+    const auto rhs = evaluate_as_bool(args[1], vars, funs);
+    if (!rhs.has_value()) {
+        return unexpected(rhs.error());
+    }
+
+    return rhs.value();
+}
+
+function_result safe_or(
+    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
+    // Evaluate left-hand-side first.
+    const auto lhs = evaluate_as_bool(args[0], vars, funs);
+    if (!lhs.has_value()) {
+        return unexpected(lhs.error());
+    }
+
+    // Value is truthy, short-circuit.
+    if (lhs.value()) {
+        return true;
+    }
+
+    // Value is falsy, evaluate right-hand-side.
+    const auto rhs = evaluate_as_bool(args[1], vars, funs);
+    if (!rhs.has_value()) {
+        return unexpected(rhs.error());
+    }
+
+    return rhs.value();
+}
 } // namespace
 
 function_registry jsonexpr::default_functions() {
@@ -306,66 +360,13 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("ceil", safe_ceil(lhs));
     UNARY_FUNCTION("size", lhs.size());
 
-    register_function(
-        freg, "!", 1,
-        [](std::span<const ast::node> args, const variable_registry& vars,
-           const function_registry& funs) -> function_result {
-            const auto lhs = evaluate_as_bool(args[0], vars, funs);
-            if (!lhs.has_value()) {
-                return unexpected(lhs.error());
-            }
-
-            return !lhs.value();
-        });
-
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
-    register_function(
-        freg, "&&", 2,
-        [](std::span<const ast::node> args, const variable_registry& vars,
-           const function_registry& funs) -> function_result {
-            // Evaluate left-hand-side first.
-            const auto lhs = evaluate_as_bool(args[0], vars, funs);
-            if (!lhs.has_value()) {
-                return unexpected(lhs.error());
-            }
-
-            // Value is falsy, short-circuit.
-            if (!lhs.value()) {
-                return false;
-            }
-
-            // Value is truthy, evaluate right-hand-side.
-            const auto rhs = evaluate_as_bool(args[1], vars, funs);
-            if (!rhs.has_value()) {
-                return unexpected(rhs.error());
-            }
-
-            return rhs.value();
-        });
-
-    register_function(
-        freg, "||", 2,
-        [](std::span<const ast::node> args, const variable_registry& vars,
-           const function_registry& funs) -> function_result {
-            // Evaluate left-hand-side first.
-            const auto lhs = evaluate_as_bool(args[0], vars, funs);
-            if (!lhs.has_value()) {
-                return unexpected(lhs.error());
-            }
-
-            // Value is truthy, short-circuit.
-            if (lhs.value()) {
-                return true;
-            }
-
-            // Value is falsy, evaluate right-hand-side.
-            const auto rhs = evaluate_as_bool(args[1], vars, funs);
-            if (!rhs.has_value()) {
-                return unexpected(rhs.error());
-            }
-
-            return rhs.value();
-        });
+    register_function(freg, "!", 1, &safe_not);
+    register_function(freg, "not", 1, &safe_not);
+    register_function(freg, "&&", 2, &safe_and);
+    register_function(freg, "and", 2, &safe_and);
+    register_function(freg, "||", 2, &safe_or);
+    register_function(freg, "or", 2, &safe_or);
 
     return freg;
 }
