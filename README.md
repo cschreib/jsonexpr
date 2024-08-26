@@ -61,9 +61,9 @@ White spaces are not significant and will be ignored (except inside strings).
  - Integer number (e.g., `1`). 64 bits signed integer.
  - Floating point number (e.g., `1.0`). 64 bits IEEE floating point number. Special floating point values "infinity" and "not-a-number" are supported.
  - Boolean (e.g., `true` or `false`).
- - String (e.g., `"abc"' or `'abc'`). Encoding is UTF-8. Can be double-quoted (`"a"`) or single-quoted (`'a'`). Otherwise, same escaping rules as for standard JSON (use backslash).
+ - String (e.g., `"abc"` or `'abc'`). Encoding is UTF-8. Can be double-quoted (`"a"`) or single-quoted (`'a'`). Otherwise, same escaping rules as for standard JSON (use backslash).
  - Array (e.g., `[1,2,3]`). Contiguous and ordered list of elements. Can be of any length (including zero), and can be heterogeneous (elements of different types). Can be nested.
- - Object (e.g., `{'a':1, 'b:4}`). Key-value dictionary. Keys can only be strings (case-sensitive). Can store any number of entries (including zero), each of different type. Can be nested.
+ - Object (e.g., `{'a':1, 'b':4}`). Key-value dictionary. Keys can only be strings (case-sensitive). Can store any number of entries (including zero), each of different type. Can be nested.
  - Null (e.g., `null`).
 
 
