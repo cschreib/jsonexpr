@@ -24,14 +24,18 @@ struct array {
     std::vector<node> data;
 };
 
+struct object {
+    std::vector<std::pair<node, node>> data;
+};
+
 struct function {
     std::string_view  name;
     std::vector<node> args;
 };
 
 struct node {
-    source_location                                    location;
-    std::variant<identifier, literal, function, array> content;
+    source_location                                            location;
+    std::variant<identifier, literal, function, array, object> content;
 };
 
 JSONEXPR_EXPORT std::string dump(const node& n, std::size_t indent = 0);

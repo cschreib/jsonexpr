@@ -86,6 +86,35 @@ expected<json, error> eval(
     return output;
 }
 
+expected<json, error> eval(
+    const ast::node&,
+    const ast::object&       a,
+    const variable_registry& vreg,
+    const function_registry& freg) {
+
+    json output(json::value_t::object);
+    for (const auto& elem : a.data) {
+        auto key = eval(elem.first, vreg, freg);
+        if (!key.has_value()) {
+            return unexpected(key.error());
+        }
+        if (!key.value().is_string()) {
+            return unexpected(node_error(
+                elem.first, "object key must be a string, got '" +
+                                std::string(get_type_name(key.value())) + "'"));
+        }
+
+        auto value = eval(elem.second, vreg, freg);
+        if (!value.has_value()) {
+            return unexpected(value.error());
+        }
+
+        output[key.value().get<std::string>()] = std::move(value.value());
+    }
+
+    return output;
+}
+
 expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg) {
     return std::visit([&](const auto& c) { return eval(n, c, vreg, freg); }, n.content);

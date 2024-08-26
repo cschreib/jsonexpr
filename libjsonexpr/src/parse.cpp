@@ -18,9 +18,12 @@ struct token {
         GROUP_OPEN,
         GROUP_CLOSE,
         SEPARATOR,
+        DECLARATOR,
         OBJECT_ACCESS,
         ARRAY_OPEN,
-        ARRAY_CLOSE
+        ARRAY_CLOSE,
+        OBJECT_OPEN,
+        OBJECT_CLOSE
     } type;
 };
 
@@ -123,6 +126,9 @@ constexpr char             array_char_open        = '[';
 constexpr char             array_char_close       = ']';
 constexpr char             separator_char         = ',';
 constexpr char             access_char            = '.';
+constexpr char             object_char_open       = '{';
+constexpr char             object_char_close      = '}';
+constexpr char             declarator_char        = ':';
 constexpr std::string_view operators_chars        = "<>*/%+-^&|=!";
 constexpr std::string_view string_chars           = "\"'";
 constexpr std::string_view whitespace_chars       = " \t\n\r";
@@ -176,6 +182,12 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             extract_as(1, token::ARRAY_CLOSE);
         } else if (current_char == separator_char) {
             extract_as(1, token::SEPARATOR);
+        } else if (current_char == object_char_open) {
+            extract_as(1, token::OBJECT_OPEN);
+        } else if (current_char == object_char_close) {
+            extract_as(1, token::OBJECT_CLOSE);
+        } else if (current_char == declarator_char) {
+            extract_as(1, token::DECLARATOR);
         } else if (current_char == access_char) {
             extract_as(1, token::OBJECT_ACCESS);
         } else if (is_any_of(current_char, operators_chars)) {
@@ -299,16 +311,17 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
 
 expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
 
-expected<std::vector<ast::node>, parse_error>
-try_parse_list(std::span<const token>& tokens, auto end_token) noexcept {
+template<typename ElemType, typename ElemParser>
+expected<std::vector<ElemType>, parse_error> try_parse_list(
+    std::span<const token>& tokens, auto end_token, ElemParser&& try_parse_elem) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected list"));
     }
 
-    std::vector<ast::node> args;
-    auto                   args_tokens = tokens;
-    std::size_t            prev_size   = 0;
-    bool                   first       = true;
+    std::vector<ElemType> args;
+    auto                  args_tokens = tokens;
+    std::size_t           prev_size   = 0;
+    bool                  first       = true;
     while (!args_tokens.empty()) {
         if (args_tokens.size() == prev_size) {
             return unexpected(
@@ -329,7 +342,7 @@ try_parse_list(std::span<const token>& tokens, auto end_token) noexcept {
             args_tokens = args_tokens.subspan(1);
         }
 
-        auto arg = try_parse_expr(args_tokens);
+        auto arg = try_parse_elem(args_tokens);
         if (!arg.has_value()) {
             return unexpected(abort_parse(arg.error()));
         }
@@ -359,7 +372,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     const token& func = tokens.front();
 
     auto args_tokens = tokens.subspan(2);
-    auto args        = try_parse_list(args_tokens, token::GROUP_CLOSE);
+    auto args        = try_parse_list<ast::node>(args_tokens, token::GROUP_CLOSE, &try_parse_expr);
     if (!args.has_value()) {
         return unexpected(args.error());
     }
@@ -422,7 +435,7 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
 
     const token& start_token = tokens.front();
     auto         elem_tokens = tokens.subspan(1);
-    auto         elems       = try_parse_list(elem_tokens, token::ARRAY_CLOSE);
+    auto elems = try_parse_list<ast::node>(elem_tokens, token::ARRAY_CLOSE, &try_parse_expr);
     if (!elems.has_value()) {
         return unexpected(elems.error());
     }
@@ -443,6 +456,67 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
         ast::array{std::move(elems.value())}};
 }
 
+expected<std::pair<ast::node, ast::node>, parse_error>
+try_parse_field(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected field"));
+    }
+
+    auto field_tokens = tokens;
+    auto key          = try_parse_expr(field_tokens);
+    if (!key.has_value()) {
+        return unexpected(key.error());
+    }
+
+    if (field_tokens.empty()) {
+        return unexpected(abort_parse("expected ':'"));
+    }
+    if (field_tokens.front().type != token::DECLARATOR) {
+        return unexpected(abort_parse(field_tokens.front(), "expected ':'"));
+    }
+
+    field_tokens = field_tokens.subspan(1);
+    auto value   = try_parse_expr(field_tokens);
+    if (!value.has_value()) {
+        return unexpected(abort_parse(value.error()));
+    }
+
+    tokens = field_tokens;
+    return std::pair<ast::node, ast::node>{std::move(key.value()), std::move(value.value())};
+}
+
+expected<ast::node, parse_error> try_parse_object(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected object"));
+    }
+    if (tokens.size() < 2 || tokens.front().type != token::OBJECT_OPEN) {
+        return unexpected(match_failed(tokens.front(), "expected object"));
+    }
+
+    const token& start_token = tokens.front();
+    auto         elem_tokens = tokens.subspan(1);
+    auto         elems       = try_parse_list<std::pair<ast::node, ast::node>>(
+        elem_tokens, token::OBJECT_CLOSE, &try_parse_field);
+    if (!elems.has_value()) {
+        return unexpected(elems.error());
+    }
+
+    if (elem_tokens.empty()) {
+        return unexpected(abort_parse("expected '}'"));
+    }
+
+    const token& end_token = elem_tokens.front();
+
+    elem_tokens = elem_tokens.subspan(1);
+    tokens      = elem_tokens;
+
+    return ast::node{
+        {start_token.location.position,
+         std::string_view(
+             view_begin(start_token.location.content), view_end(end_token.location.content))},
+        ast::object{std::move(elems.value())}};
+}
+
 bool is_match(const expected<ast::node, parse_error>& result) {
     return result.has_value() || std::holds_alternative<error>(result.error());
 }
@@ -456,6 +530,9 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
         return op;
     }
     if (auto op = try_parse_array(tokens); is_match(op)) {
+        return op;
+    }
+    if (auto op = try_parse_object(tokens); is_match(op)) {
         return op;
     }
     if (auto op = try_parse_function(tokens); is_match(op)) {

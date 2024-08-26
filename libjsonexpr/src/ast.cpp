@@ -22,6 +22,16 @@ std::string dump_content(const ast::array& a, std::size_t indent) {
     return str;
 }
 
+std::string dump_content(const ast::object& a, std::size_t indent) {
+    std::string str = std::string(2 * indent, ' ') + "object({";
+    for (const auto& e : a.data) {
+        str += "\n" + dump(e.first, indent + 1) + " : ";
+        str += "\n" + dump(e.second, indent + 1);
+    }
+    str += "})";
+    return str;
+}
+
 std::string dump_content(const ast::function& v, std::size_t indent) {
     std::string str = std::string(2 * indent, ' ') + "function(" + std::string(v.name) + ", args={";
     for (const auto& a : v.args) {
