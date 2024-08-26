@@ -371,8 +371,9 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
         return unexpected(match_failed(tokens.front(), "expected group"));
     }
 
-    auto group_tokens = tokens.subspan(1);
-    auto expr         = try_parse_expr(group_tokens);
+    const token& start_token  = tokens.front();
+    auto         group_tokens = tokens.subspan(1);
+    auto         expr         = try_parse_expr(group_tokens);
     if (!expr.has_value()) {
         return unexpected(abort_parse(expr.error()));
     }
@@ -383,8 +384,15 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
         return unexpected(abort_parse(group_tokens.front(), "expected group end"));
     }
 
+    const token& end_token = group_tokens.front();
+
     group_tokens = group_tokens.subspan(1);
     tokens       = group_tokens;
+
+    expr.value().location.position = start_token.location.position;
+    expr.value().location.content  = std::string_view(
+        view_begin(start_token.location.content), view_end(end_token.location.content));
+
     return expr;
 }
 
