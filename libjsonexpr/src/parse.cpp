@@ -15,6 +15,7 @@ struct token {
         OPERATOR,
         NUMBER,
         STRING,
+        LITERAL,
         GROUP_OPEN,
         GROUP_CLOSE,
         SEPARATOR,
@@ -202,6 +203,11 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             if (tokens.back().location.content == "and" || tokens.back().location.content == "or" ||
                 tokens.back().location.content == "not") {
                 tokens.back().type = token::OPERATOR;
+            } else if (
+                tokens.back().location.content == "true" ||
+                tokens.back().location.content == "false" ||
+                tokens.back().location.content == "null") {
+                tokens.back().type = token::LITERAL;
             }
         } else if (is_any_of(current_char, number_chars_start)) {
             std::size_t end = scan_class(expression, 1, number_chars);
@@ -282,12 +288,12 @@ std::string single_to_double_quote(std::string_view input) noexcept {
 
 expected<ast::node, parse_error> try_parse_literal(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return unexpected(match_failed("expected literal (number or string)"));
+        return unexpected(match_failed("expected literal (number, string, boolean, null)"));
     }
 
     token t = tokens.front();
-    if (t.type != token::NUMBER && t.type != token::STRING) {
-        return unexpected(match_failed(t, "expected literal (number or string)"));
+    if (t.type != token::NUMBER && t.type != token::STRING && t.type != token::LITERAL) {
+        return unexpected(match_failed(t, "expected literal (number, string, boolean, null)"));
     }
 
     json parsed;
@@ -305,7 +311,7 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
     } else {
         parsed = json::parse(t.location.content, nullptr, false);
         if (parsed.type() == json::value_t::discarded) {
-            return unexpected(abort_parse(t, "could not parse number"));
+            return unexpected(abort_parse(t, "could not parse literal"));
         }
     }
 
