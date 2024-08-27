@@ -51,7 +51,7 @@ expected<json, error> eval(
             return result.value();
         } else {
             const auto& e = result.error();
-            if (e.length == 0) {
+            if (e.location.length == 0) {
                 return unexpected(node_error(n, e.message));
             } else {
                 return unexpected(e);

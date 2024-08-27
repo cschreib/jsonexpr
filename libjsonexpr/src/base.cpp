@@ -10,8 +10,8 @@ using namespace jsonexpr;
 std::string jsonexpr::format_error(std::string_view expression, const error& e) {
     std::ostringstream str;
     str << expression << std::endl;
-    str << std::string(e.position, ' ') << '^' << std::string(e.length > 0 ? e.length - 1 : 0, '~')
-        << std::endl;
+    str << std::string(e.location.position, ' ') << '^'
+        << std::string(e.location.length > 0 ? e.location.length - 1 : 0, '~') << std::endl;
     str << "error: " << e.message << std::endl;
     return str.str();
 }

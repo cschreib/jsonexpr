@@ -11,8 +11,8 @@ expected<json, error> jsonexpr::evaluate(
     const auto ast = parse(expression);
     if (!ast.has_value()) {
         auto e = error(ast.error());
-        if (e.length == 0) {
-            e.position = expression.size();
+        if (e.location.length == 0) {
+            e.location.position = expression.size();
         }
 
         return unexpected(e);

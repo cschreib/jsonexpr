@@ -21,14 +21,13 @@ struct node;
 }
 
 struct source_location {
-    std::size_t      position;
-    std::string_view content;
+    std::size_t position = 0;
+    std::size_t length   = 0;
 };
 
 struct error {
-    std::size_t position = 0;
-    std::size_t length   = 0;
-    std::string message;
+    source_location location;
+    std::string     message;
 };
 
 JSONEXPR_EXPORT std::string format_error(std::string_view expression, const error& e);

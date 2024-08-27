@@ -47,8 +47,5 @@ std::string jsonexpr::ast::dump(const ast::node& n, std::size_t indent) {
 }
 
 error jsonexpr::ast::node_error(const ast::node& n, std::string message) {
-    return error{
-        .position = n.location.position,
-        .length   = n.location.content.length(),
-        .message  = std::move(message)};
+    return error{.location = n.location, .message = std::move(message)};
 }

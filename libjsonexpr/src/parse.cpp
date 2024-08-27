@@ -9,7 +9,8 @@ constexpr bool debug = false;
 
 namespace {
 struct token {
-    source_location location;
+    source_location  location;
+    std::string_view content;
     enum {
         IDENTIFIER,
         OPERATOR,
@@ -35,16 +36,13 @@ struct match_failure : error {};
 using parse_error = std::variant<match_failure, error>;
 
 error abort_parse(const token& t, std::string message) {
-    return error{
-        .position = t.location.position,
-        .length   = t.location.content.length(),
-        .message  = std::move(message)};
+    return error{.location = t.location, .message = std::move(message)};
 }
 
 error abort_parse(const parse_error& e) {
     if (std::holds_alternative<match_failure>(e)) {
         const auto& f = std::get<match_failure>(e);
-        return error{.position = f.position, .length = f.length, .message = f.message};
+        return error{.location = f.location, .message = f.message};
     } else {
         return std::get<error>(e);
     }
@@ -55,10 +53,7 @@ error abort_parse(std::string message) {
 }
 
 match_failure match_failed(const token& t, std::string message) {
-    return match_failure{
-        {.position = t.location.position,
-         .length   = t.location.content.length(),
-         .message  = std::move(message)}};
+    return match_failure{{.location = t.location, .message = std::move(message)}};
 }
 
 match_failure match_failed(std::string message) {
@@ -77,12 +72,8 @@ bool is_none_of(char c, std::string_view list) noexcept {
     return list.find_first_of(c) == list.npos;
 }
 
-const char* view_begin(std::string_view s) noexcept {
-    return s.data();
-}
-
-const char* view_end(std::string_view s) noexcept {
-    return s.data() + s.size();
+source_location extend(const source_location& s1, const source_location& s2) noexcept {
+    return {s1.position, s2.position + s2.length - s1.position};
 }
 
 std::size_t
@@ -141,8 +132,10 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
 
     auto extract_as = [&](std::size_t count, auto type) {
         tokens.push_back(
-            {.location = {.position = read_pos, .content = expression.substr(0, count)},
+            {.location = {.position = read_pos, .length = count},
+             .content  = expression.substr(0, count),
              .type     = type});
+
         expression = expression.substr(count);
         read_pos += count;
     };
@@ -247,7 +240,7 @@ expected<ast::node, parse_error> try_parse_identifier(std::span<const token>& to
     }
 
     tokens = tokens.subspan(1);
-    return ast::node{t.location, ast::identifier{t.location.content}};
+    return ast::node{t.location, ast::identifier{t.content}};
 }
 
 ast::node identifier_to_string(ast::node id) noexcept {
@@ -298,18 +291,18 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
 
     json parsed;
     if (t.type == token::STRING) {
-        if (t.location.content[0] == '"') {
-            parsed = json::parse(t.location.content, nullptr, false);
+        if (t.content[0] == '"') {
+            parsed = json::parse(t.content, nullptr, false);
         } else {
             // JSON doesn't know about single quote strings; we need to convert the string to
             // an escaped double quote one.
-            parsed = json::parse(single_to_double_quote(t.location.content), nullptr, false);
+            parsed = json::parse(single_to_double_quote(t.content), nullptr, false);
         }
         if (parsed.type() == json::value_t::discarded) {
             return unexpected(abort_parse(t, "could not parse string"));
         }
     } else {
-        parsed = json::parse(t.location.content, nullptr, false);
+        parsed = json::parse(t.content, nullptr, false);
         if (parsed.type() == json::value_t::discarded) {
             return unexpected(abort_parse(t, "could not parse literal"));
         }
@@ -397,9 +390,8 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     tokens      = args_tokens;
 
     return ast::node{
-        {func.location.position,
-         std::string_view(view_begin(func.location.content), view_end(end_token.location.content))},
-        ast::function{func.location.content, std::move(args.value())}};
+        extend(func.location, end_token.location),
+        ast::function{func.content, std::move(args.value())}};
 }
 
 expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
@@ -428,9 +420,7 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     group_tokens = group_tokens.subspan(1);
     tokens       = group_tokens;
 
-    expr.value().location.position = start_token.location.position;
-    expr.value().location.content  = std::string_view(
-        view_begin(start_token.location.content), view_end(end_token.location.content));
+    expr.value().location = extend(start_token.location, end_token.location);
 
     return expr;
 }
@@ -460,10 +450,7 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
     tokens      = elem_tokens;
 
     return ast::node{
-        {start_token.location.position,
-         std::string_view(
-             view_begin(start_token.location.content), view_end(end_token.location.content))},
-        ast::array{std::move(elems.value())}};
+        extend(start_token.location, end_token.location), ast::array{std::move(elems.value())}};
 }
 
 expected<std::pair<ast::node, ast::node>, parse_error>
@@ -521,10 +508,7 @@ expected<ast::node, parse_error> try_parse_object(std::span<const token>& tokens
     tokens      = elem_tokens;
 
     return ast::node{
-        {start_token.location.position,
-         std::string_view(
-             view_begin(start_token.location.content), view_end(end_token.location.content))},
-        ast::object{std::move(elems.value())}};
+        extend(start_token.location, end_token.location), ast::object{std::move(elems.value())}};
 }
 
 bool is_match(const expected<ast::node, parse_error>& result) {
@@ -584,7 +568,7 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
             return unexpected(abort_parse(index.error()));
         }
 
-        const char* end_pos = nullptr;
+        const source_location* end_location = nullptr;
         if (array_access) {
             if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
                 return unexpected(abort_parse("expected ']'"));
@@ -592,15 +576,14 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
 
             const token& end_token = tokens.front();
             tokens                 = tokens.subspan(1);
-            end_pos                = view_end(end_token.location.content);
+            end_location           = &end_token.location;
         } else {
-            index   = identifier_to_string(std::move(index.value()));
-            end_pos = view_end(index.value().location.content);
+            index        = identifier_to_string(std::move(index.value()));
+            end_location = &index.value().location;
         }
 
         object = ast::node{
-            {object.value().location.position,
-             std::string_view(view_begin(object.value().location.content), end_pos)},
+            extend(object.value().location, *end_location),
             ast::function{"[]", {std::move(object.value()), std::move(index.value())}}};
     }
 
@@ -628,10 +611,8 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
     tokens = unary_tokens;
 
     return ast::node{
-        {parsed_operator.location.position, std::string_view(
-                                                view_begin(parsed_operator.location.content),
-                                                view_end(operand.value().location.content))},
-        ast::function{parsed_operator.location.content, {std::move(operand.value())}}};
+        extend(parsed_operator.location, operand.value().location),
+        ast::function{parsed_operator.content, {std::move(operand.value())}}};
 }
 
 // From least to highest precedence. Operators with the same precedence are evaluated left-to-right.
@@ -679,7 +660,7 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
                 break;
             }
 
-            const auto op_token = ops_tokens.front().location.content;
+            const auto op_token = ops_tokens.front().content;
             operators.push_back({.token = op_token, .precedence = get_precedence(op_token)});
             ops_tokens = ops_tokens.subspan(1);
         }
@@ -702,9 +683,7 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
     for (std::size_t i = 0; i < operators.size();) {
         if (i == operators.size() - 1 || operators[i].precedence >= operators[i + 1].precedence) {
             nodes[i] = ast::node{
-                {nodes[i].location.position, std::string_view(
-                                                 view_begin(nodes[i].location.content),
-                                                 view_end(nodes[i + 1].location.content))},
+                extend(nodes[i].location, nodes[i + 1].location),
                 ast::function{operators[i].token, {std::move(nodes[i]), std::move(nodes[i + 1])}}};
             nodes.erase(nodes.begin() + (i + 1));
             operators.erase(operators.begin() + i);
@@ -729,7 +708,8 @@ expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept
     if constexpr (debug) {
         std::cout << "tokens:" << std::endl;
         for (auto token : tokenizer_result.value()) {
-            std::cout << token.location.content << std::endl;
+            std::cout << expression.substr(token.location.position, token.location.length)
+                      << std::endl;
         }
         std::cout << std::endl;
     }
