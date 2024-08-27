@@ -362,9 +362,12 @@ TEST_CASE("array access", "[array]") {
         CHECK(!evaluate("obj[1)", vars).has_value());
         CHECK(!evaluate("obj[1,2]", vars).has_value());
         CHECK(!evaluate("obj[5]", vars).has_value());
+        CHECK(!evaluate("obj[1.0]", vars).has_value());
         CHECK(!evaluate("obj[-6]", vars).has_value());
         CHECK(!evaluate("obj[[0]]", vars).has_value());
         CHECK(!evaluate("obj['a']", vars).has_value());
+        CHECK(!evaluate("obj[false]", vars).has_value());
+        CHECK(!evaluate("obj[{}]", vars).has_value());
         CHECK(!evaluate("obj[+]", vars).has_value());
         CHECK(!evaluate("obj[(]", vars).has_value());
         CHECK(!evaluate("obj[>]", vars).has_value());
@@ -469,6 +472,8 @@ TEST_CASE("object access", "[object]") {
         CHECK(!evaluate("obj['a')", vars).has_value());
         CHECK(!evaluate("obj['a','b']", vars).has_value());
         CHECK(!evaluate("obj[['a']]", vars).has_value());
+        CHECK(!evaluate("obj[false]", vars).has_value());
+        CHECK(!evaluate("obj[{}]", vars).has_value());
         CHECK(!evaluate("obj..a", vars).has_value());
         CHECK(!evaluate("obj[0]", vars).has_value());
         CHECK(!evaluate("obj[+]", vars).has_value());

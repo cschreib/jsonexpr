@@ -248,9 +248,10 @@ auto safe_pow(T lhs, U rhs) {
 
 template<typename T, typename U>
     requires(
-        (std::is_integral_v<U> || std::is_same_v<U, json::string_t>) &&
+        ((std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t>) ||
+         std::is_same_v<U, json::string_t>) &&
         requires(const T& lhs, U rhs) { lhs[rhs]; })
-basic_function_result safe_access(const T& lhs, U rhs) {
+basic_function_result safe_access(const T& lhs, const U& rhs) {
     if constexpr (std::is_integral_v<U>) {
         const std::size_t unsigned_rhs =
             static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
