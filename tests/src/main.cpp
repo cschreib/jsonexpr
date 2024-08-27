@@ -288,6 +288,9 @@ TEST_CASE("array literal", "[array]") {
         CHECK(!evaluate("[1,").has_value());
         CHECK(!evaluate("1]").has_value());
         CHECK(!evaluate(",1]").has_value());
+        CHECK(!evaluate("[1+'a']").has_value());
+        CHECK(!evaluate("[1,1+'a']").has_value());
+        CHECK(!evaluate("[1+'a',1]").has_value());
     }
 
     SECTION("good") {
@@ -331,6 +334,7 @@ TEST_CASE("array access", "[array]") {
         CHECK(!evaluate("obj[(]", vars).has_value());
         CHECK(!evaluate("obj[>]", vars).has_value());
         CHECK(!evaluate("obj[#]", vars).has_value());
+        CHECK(!evaluate("obj[1+'a']", vars).has_value());
     }
 
     SECTION("good") {
@@ -391,6 +395,8 @@ TEST_CASE("object literal", "[object]") {
         CHECK(!evaluate("'a':1}").has_value());
         CHECK(!evaluate(",'a':1}").has_value());
         CHECK(!evaluate("{1:'a'}").has_value());
+        CHECK(!evaluate("{1+'a':1}").has_value());
+        CHECK(!evaluate("{'a':1+'a'}").has_value());
     }
 
     SECTION("good") {
