@@ -11,8 +11,7 @@ expected<json, error> eval(
 
     auto iter = vreg.find(std::string{v.name});
     if (iter == vreg.end()) {
-        return unexpected(error{
-            n.location.position, v.name.size(), "unknown variable '" + std::string(v.name) + "'"});
+        return unexpected(node_error(n, "unknown variable '" + std::string(v.name) + "'"));
     }
 
     return iter->second;
