@@ -771,12 +771,20 @@ TEST_CASE("stress test", "[general]") {
             CHECK(!evaluate("str " + op + " bool", vars).has_value());
             CHECK(!evaluate("str " + op + " obj", vars).has_value());
             CHECK(!evaluate("str " + op + " arr", vars).has_value());
-        }
 
-        CHECK(!evaluate("bool < bool", vars).has_value());
-        CHECK(!evaluate("bool <= bool", vars).has_value());
-        CHECK(!evaluate("bool > bool", vars).has_value());
-        CHECK(!evaluate("bool >= bool", vars).has_value());
+            if (op != "==" && op != "!=") {
+                CHECK(!evaluate("obj " + op + " obj", vars).has_value());
+                CHECK(!evaluate("arr " + op + " arr", vars).has_value());
+                CHECK(!evaluate("bool " + op + " bool", vars).has_value());
+            }
+
+            if (op == "+" || op == "-") {
+                CHECK(!evaluate(op + " str", vars).has_value());
+                CHECK(!evaluate(op + " arr", vars).has_value());
+                CHECK(!evaluate(op + " obj", vars).has_value());
+                CHECK(!evaluate(op + " bool", vars).has_value());
+            }
+        }
 
         CHECK(!evaluate("!int", vars).has_value());
         CHECK(!evaluate("!flt", vars).has_value());
@@ -799,8 +807,12 @@ TEST_CASE("stress test", "[general]") {
             CHECK(evaluate("str " + op + " str", vars).has_value());
             CHECK(evaluate("int " + op + " int", vars).has_value());
             CHECK(evaluate("flt " + op + " flt", vars).has_value());
-            CHECK(evaluate("arr " + op + " arr", vars).has_value());
-            CHECK(evaluate("obj " + op + " obj", vars).has_value());
+
+            if (op == "==" || op == "!=") {
+                CHECK(evaluate("arr " + op + " arr", vars).has_value());
+                CHECK(evaluate("obj " + op + " obj", vars).has_value());
+                CHECK(evaluate("bool " + op + " bool", vars).has_value());
+            }
 
             CHECK(evaluate("int " + op + " flt", vars).has_value());
             CHECK(evaluate("flt " + op + " int", vars).has_value());
@@ -813,13 +825,18 @@ TEST_CASE("stress test", "[general]") {
             CHECK(evaluate("flt " + op + " flt", vars).has_value());
             CHECK(evaluate("int " + op + " flt", vars).has_value());
             CHECK(evaluate("flt " + op + " int", vars).has_value());
+
+            if (op == "+") {
+                CHECK(evaluate("str " + op + " str", vars).has_value());
+            }
+
+            if (op == "+" || op == "-") {
+                CHECK(evaluate(op + " int", vars).has_value());
+                CHECK(evaluate(op + " flt", vars).has_value());
+            }
         }
 
-        CHECK(evaluate("bool == bool", vars).has_value());
-        CHECK(evaluate("bool != bool", vars).has_value());
         CHECK(evaluate("!bool", vars).has_value());
-
-        CHECK(evaluate("str + str", vars).has_value());
     }
 }
 
