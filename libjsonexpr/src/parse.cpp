@@ -154,7 +154,7 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
     std::string_view last_expression;
     while (!expression.empty()) {
         if (expression == last_expression) {
-            return unexpected(error{read_pos, 1, "infinite loop detected in tokenizer (bug)"});
+            return unexpected(error{{read_pos, 1}, "infinite loop detected in tokenizer (bug)"});
         }
 
         last_expression = expression;
@@ -226,12 +226,12 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
         } else if (is_any_of(current_char, string_chars)) {
             const auto end = scan_string(expression, 1, current_char, escape_char);
             if (!end.has_value()) {
-                return unexpected(error{read_pos, expression.size(), "unterminated string"});
+                return unexpected(error{{read_pos, expression.size()}, "unterminated string"});
             }
 
             extract_as(end.value(), token::STRING);
         } else {
-            return unexpected(error{read_pos, 1, "unexpected character"});
+            return unexpected(error{{read_pos, 1}, "unexpected character"});
         }
     }
 
