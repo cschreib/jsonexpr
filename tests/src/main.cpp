@@ -109,14 +109,14 @@ TEST_CASE("string operations", "[string]") {
         CHECK(!evaluate("'a'*'b'").has_value());
         CHECK(!evaluate("'a'/'b'").has_value());
         CHECK(!evaluate("'a'%'b'").has_value());
-        CHECK(!evaluate("'a'^'b'").has_value());
-        CHECK(!evaluate("'a' && 'b'").has_value());
-        CHECK(!evaluate("'a' || 'b'").has_value());
+        CHECK(!evaluate("'a'**'b'").has_value());
+        CHECK(!evaluate("'a' and 'b'").has_value());
+        CHECK(!evaluate("'a' or 'b'").has_value());
         CHECK(!evaluate("'a' < 1").has_value());
         CHECK(!evaluate("'a' <= 1").has_value());
         CHECK(!evaluate("'a' > 1").has_value());
         CHECK(!evaluate("'a' >= 1").has_value());
-        CHECK(!evaluate("!'a'").has_value());
+        CHECK(!evaluate("not 'a'").has_value());
         CHECK(!evaluate("a[6]", vars).has_value());
         CHECK(!evaluate("a[-7]", vars).has_value());
     }
@@ -269,13 +269,13 @@ TEST_CASE("precedence", "[maths]") {
     }
 
     SECTION("three") {
-        CHECK(evaluate("1+2*3^2") == "19"_json);
-        CHECK(evaluate("1^2+3*2") == "7"_json);
-        CHECK(evaluate("1*2^3+2") == "10"_json);
+        CHECK(evaluate("1+2*3**2") == "19"_json);
+        CHECK(evaluate("1**2+3*2") == "7"_json);
+        CHECK(evaluate("1*2**3+2") == "10"_json);
 
-        CHECK(evaluate("1+2*(3^2)") == "19"_json);
-        CHECK(evaluate("1+(2*3)^2") == "37"_json);
-        CHECK(evaluate("(1+2)*3^2") == "27"_json);
+        CHECK(evaluate("1+2*(3**2)") == "19"_json);
+        CHECK(evaluate("1+(2*3)**2") == "37"_json);
+        CHECK(evaluate("(1+2)*3**2") == "27"_json);
 
         CHECK(evaluate("2*3+4*5") == "26"_json);
         CHECK(evaluate("2*3*4+5") == "29"_json);
@@ -283,8 +283,8 @@ TEST_CASE("precedence", "[maths]") {
     }
 
     SECTION("unary binary") {
-        CHECK(evaluate("-1^2") == "1"_json);
-        CHECK(evaluate("10.0^-2") == "0.01"_json);
+        CHECK(evaluate("-1**2") == "1"_json);
+        CHECK(evaluate("10.0**-2") == "0.01"_json);
         CHECK(evaluate("-1*-1") == "1"_json);
         CHECK(evaluate("+1*-1") == "-1"_json);
         CHECK(evaluate("-1*+1") == "-1"_json);
@@ -414,8 +414,8 @@ TEST_CASE("array access", "[array]") {
         CHECK(evaluate("2/obj[1]", vars) == "1"_json);
         CHECK(evaluate("obj[1]%2", vars) == "0"_json);
         CHECK(evaluate("2%obj[1]", vars) == "0"_json);
-        CHECK(evaluate("obj[1]^3", vars) == "8"_json);
-        CHECK(evaluate("3^obj[1]", vars) == "9"_json);
+        CHECK(evaluate("obj[1]**3", vars) == "8"_json);
+        CHECK(evaluate("3**obj[1]", vars) == "9"_json);
     }
 }
 
@@ -519,8 +519,8 @@ TEST_CASE("object access", "[object]") {
         CHECK(evaluate("2/obj['b']", vars) == "1"_json);
         CHECK(evaluate("obj['b']%2", vars) == "0"_json);
         CHECK(evaluate("2%obj['b']", vars) == "0"_json);
-        CHECK(evaluate("obj['b']^3", vars) == "8"_json);
-        CHECK(evaluate("3^obj['b']", vars) == "9"_json);
+        CHECK(evaluate("obj['b']**3", vars) == "8"_json);
+        CHECK(evaluate("3**obj['b']", vars) == "9"_json);
 
         CHECK(evaluate("1+obj.b", vars) == "3"_json);
         CHECK(evaluate("obj.b+1", vars) == "3"_json);
@@ -532,8 +532,8 @@ TEST_CASE("object access", "[object]") {
         CHECK(evaluate("2/obj.b", vars) == "1"_json);
         CHECK(evaluate("obj.b%2", vars) == "0"_json);
         CHECK(evaluate("2%obj.b", vars) == "0"_json);
-        CHECK(evaluate("obj.b^3", vars) == "8"_json);
-        CHECK(evaluate("3^obj.b", vars) == "9"_json);
+        CHECK(evaluate("obj.b**3", vars) == "8"_json);
+        CHECK(evaluate("3**obj.b", vars) == "9"_json);
     }
 }
 
@@ -541,9 +541,12 @@ TEST_CASE("boolean", "[maths]") {
     SECTION("bad") {
         CHECK(!evaluate("&").has_value());
         CHECK(!evaluate("&&").has_value());
+        CHECK(!evaluate("and").has_value());
         CHECK(!evaluate("|").has_value());
         CHECK(!evaluate("||").has_value());
+        CHECK(!evaluate("or").has_value());
         CHECK(!evaluate("!").has_value());
+        CHECK(!evaluate("not").has_value());
         CHECK(!evaluate("!=").has_value());
         CHECK(!evaluate("==").has_value());
         CHECK(!evaluate("=").has_value());
@@ -553,38 +556,25 @@ TEST_CASE("boolean", "[maths]") {
         CHECK(!evaluate(">=").has_value());
         CHECK(!evaluate("=<").has_value());
         CHECK(!evaluate("=>").has_value());
-        CHECK(!evaluate("&& &&").has_value());
-        CHECK(!evaluate("true &&").has_value());
-        CHECK(!evaluate("&& true").has_value());
-        CHECK(!evaluate("|| ||").has_value());
-        CHECK(!evaluate("true ||").has_value());
-        CHECK(!evaluate("|| true").has_value());
+        CHECK(!evaluate("and and").has_value());
+        CHECK(!evaluate("true and").has_value());
+        CHECK(!evaluate("and true").has_value());
+        CHECK(!evaluate("or or").has_value());
+        CHECK(!evaluate("true or").has_value());
+        CHECK(!evaluate("or true").has_value());
         CHECK(!evaluate("> >").has_value());
         CHECK(!evaluate("true >").has_value());
         CHECK(!evaluate("> true").has_value());
     }
 
     SECTION("good") {
-        CHECK(evaluate("!true") == "false"_json);
-        CHECK(evaluate("!false") == "true"_json);
-
         CHECK(evaluate("not true") == "false"_json);
         CHECK(evaluate("not false") == "true"_json);
-
-        CHECK(evaluate("true && true") == "true"_json);
-        CHECK(evaluate("true && false") == "false"_json);
-        CHECK(evaluate("false && true") == "false"_json);
-        CHECK(evaluate("false && false") == "false"_json);
 
         CHECK(evaluate("true and true") == "true"_json);
         CHECK(evaluate("true and false") == "false"_json);
         CHECK(evaluate("false and true") == "false"_json);
         CHECK(evaluate("false and false") == "false"_json);
-
-        CHECK(evaluate("true || true") == "true"_json);
-        CHECK(evaluate("true || false") == "true"_json);
-        CHECK(evaluate("false || true") == "true"_json);
-        CHECK(evaluate("false || false") == "false"_json);
 
         CHECK(evaluate("true or true") == "true"_json);
         CHECK(evaluate("true or false") == "true"_json);
@@ -607,25 +597,25 @@ TEST_CASE("boolean", "[maths]") {
     }
 
     SECTION("precedence") {
-        CHECK(evaluate("true || true && true") == "true"_json);
-        CHECK(evaluate("false || true && true") == "true"_json);
-        CHECK(evaluate("true || false && true") == "true"_json);
-        CHECK(evaluate("true || true && false") == "true"_json);
-        CHECK(evaluate("false || false && true") == "false"_json);
-        CHECK(evaluate("false || true && false") == "false"_json);
-        CHECK(evaluate("true || false && false") == "true"_json);
-        CHECK(evaluate("false || false && false") == "false"_json);
+        CHECK(evaluate("true or true and true") == "true"_json);
+        CHECK(evaluate("false or true and true") == "true"_json);
+        CHECK(evaluate("true or false and true") == "true"_json);
+        CHECK(evaluate("true or true and false") == "true"_json);
+        CHECK(evaluate("false or false and true") == "false"_json);
+        CHECK(evaluate("false or true and false") == "false"_json);
+        CHECK(evaluate("true or false and false") == "true"_json);
+        CHECK(evaluate("false or false and false") == "false"_json);
 
-        CHECK(evaluate("true && true || true") == "true"_json);
-        CHECK(evaluate("true && true || false") == "true"_json);
-        CHECK(evaluate("false && true || true") == "true"_json);
-        CHECK(evaluate("true && false || true") == "true"_json);
-        CHECK(evaluate("false && true || false") == "false"_json);
-        CHECK(evaluate("true && false || false") == "false"_json);
-        CHECK(evaluate("false && false || true") == "true"_json);
-        CHECK(evaluate("false && false || false") == "false"_json);
+        CHECK(evaluate("true and true or true") == "true"_json);
+        CHECK(evaluate("true and true or false") == "true"_json);
+        CHECK(evaluate("false and true or true") == "true"_json);
+        CHECK(evaluate("true and false or true") == "true"_json);
+        CHECK(evaluate("false and true or false") == "false"_json);
+        CHECK(evaluate("true and false or false") == "false"_json);
+        CHECK(evaluate("false and false or true") == "true"_json);
+        CHECK(evaluate("false and false or false") == "false"_json);
 
-        CHECK(evaluate("1 < 2 || 1 > 2") == "true"_json);
+        CHECK(evaluate("1 < 2 or 1 > 2") == "true"_json);
         CHECK(evaluate("1+1 < 2") == "false"_json);
         CHECK(evaluate("1 < -2") == "false"_json);
     }
@@ -633,25 +623,25 @@ TEST_CASE("boolean", "[maths]") {
     SECTION("short-circuit") {
         CHECK(!evaluate("error()").has_value());
 
-        CHECK(evaluate("false && error()") == "false"_json);
-        CHECK(!evaluate("error() && false").has_value());
+        CHECK(evaluate("false and error()") == "false"_json);
+        CHECK(!evaluate("error() and false").has_value());
 
-        CHECK(evaluate("true || error()") == "true"_json);
-        CHECK(!evaluate("error() || true").has_value());
+        CHECK(evaluate("true or error()") == "true"_json);
+        CHECK(!evaluate("error() or true").has_value());
 
-        CHECK(evaluate("true && false && error()") == "false"_json);
-        CHECK(evaluate("false && true && error()") == "false"_json);
-        CHECK(evaluate("false && error() && true") == "false"_json);
-        CHECK(!evaluate("error() && false && true").has_value());
-        CHECK(!evaluate("error() && true && false").has_value());
-        CHECK(!evaluate("true && error() && false").has_value());
+        CHECK(evaluate("true and false and error()") == "false"_json);
+        CHECK(evaluate("false and true and error()") == "false"_json);
+        CHECK(evaluate("false and error() and true") == "false"_json);
+        CHECK(!evaluate("error() and false and true").has_value());
+        CHECK(!evaluate("error() and true and false").has_value());
+        CHECK(!evaluate("true and error() and false").has_value());
 
-        CHECK(evaluate("true || false || error()") == "true"_json);
-        CHECK(evaluate("false || true || error()") == "true"_json);
-        CHECK(evaluate("true || error() || false") == "true"_json);
-        CHECK(!evaluate("error() || false || true").has_value());
-        CHECK(!evaluate("error() || true || false").has_value());
-        CHECK(!evaluate("false || error() || true").has_value());
+        CHECK(evaluate("true or false or error()") == "true"_json);
+        CHECK(evaluate("false or true or error()") == "true"_json);
+        CHECK(evaluate("true or error() or false") == "true"_json);
+        CHECK(!evaluate("error() or false or true").has_value());
+        CHECK(!evaluate("error() or true or false").has_value());
+        CHECK(!evaluate("false or error() or true").has_value());
     }
 }
 
@@ -981,7 +971,7 @@ TEST_CASE("in", "[functions]") {
         CHECK(evaluate("2-3 in [1,2,3]") == "false"_json);
         CHECK(evaluate("2*3 in [1,2,3]") == "false"_json);
         CHECK(evaluate("2/3 in [1,2,3]") == "false"_json);
-        CHECK(evaluate("2^3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2**3 in [1,2,3]") == "false"_json);
         CHECK(evaluate("2%3 in [1,2,3]") == "true"_json);
         CHECK(evaluate("1<2 in [true,false]") == "true"_json);
         CHECK(evaluate("1<=2 in [true,false]") == "true"_json);
@@ -1026,7 +1016,7 @@ TEST_CASE("not in", "[functions]") {
         CHECK(evaluate("2-3 not in [1,2,3]") == "true"_json);
         CHECK(evaluate("2*3 not in [1,2,3]") == "true"_json);
         CHECK(evaluate("2/3 not in [1,2,3]") == "true"_json);
-        CHECK(evaluate("2^3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2**3 not in [1,2,3]") == "true"_json);
         CHECK(evaluate("2%3 not in [1,2,3]") == "false"_json);
         CHECK(evaluate("1<2 not in [true,false]") == "false"_json);
         CHECK(evaluate("1<=2 not in [true,false]") == "false"_json);
@@ -1074,13 +1064,27 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("<<<<<<<<<<<<").has_value());
         CHECK(!evaluate("============").has_value());
         CHECK(!evaluate("||||||||||||").has_value());
-        CHECK(!evaluate("^^^^^^^^^^^^").has_value());
         CHECK(!evaluate("~~~~~~~~~~~~").has_value());
         CHECK(!evaluate("%%%%%%%%%%%%").has_value());
 
+        CHECK(!evaluate("1 << 2").has_value());
+        CHECK(!evaluate("1 >> 2").has_value());
+        CHECK(!evaluate("1 <> 2").has_value());
+        CHECK(!evaluate("1 >< 2").has_value());
+        CHECK(!evaluate("1 => 2").has_value());
+        CHECK(!evaluate("1 =< 2").has_value());
+        CHECK(!evaluate("1 =! 2").has_value());
+        CHECK(!evaluate("1 = 2").has_value());
+        CHECK(!evaluate("1 += 2").has_value());
+        CHECK(!evaluate("1 -= 2").has_value());
+        CHECK(!evaluate("1 *= 2").has_value());
+        CHECK(!evaluate("1 /= 2").has_value());
+        CHECK(!evaluate("1 %= 2").has_value());
+
         using namespace std::literals;
         for (const auto& op :
-             {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s, "*"s, "/"s, "+"s, "-"s, "%"s, "**"s, "^"s}) {
+             {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s, "*"s, "/"s, "+"s, "-"s, "%"s, "**"s, "and"s,
+              "or"s}) {
             CAPTURE(op);
 
             CHECK(!evaluate("arr " + op + " int", vars).has_value());
@@ -1094,6 +1098,10 @@ TEST_CASE("stress test", "[general]") {
             CHECK(!evaluate("obj " + op + " str", vars).has_value());
             CHECK(!evaluate("obj " + op + " arr", vars).has_value());
             CHECK(!evaluate("obj " + op + " bool", vars).has_value());
+
+            if (op == "or") {
+                vars["bool"] = false; // to avoid short-circuiting.
+            }
 
             CHECK(!evaluate("bool " + op + " int", vars).has_value());
             CHECK(!evaluate("bool " + op + " flt", vars).has_value());
@@ -1110,7 +1118,9 @@ TEST_CASE("stress test", "[general]") {
             if (op != "==" && op != "!=") {
                 CHECK(!evaluate("obj " + op + " obj", vars).has_value());
                 CHECK(!evaluate("arr " + op + " arr", vars).has_value());
-                CHECK(!evaluate("bool " + op + " bool", vars).has_value());
+                if (op != "and" && op != "or") {
+                    CHECK(!evaluate("bool " + op + " bool", vars).has_value());
+                }
             }
 
             if (op == "+" || op == "-") {
@@ -1121,11 +1131,11 @@ TEST_CASE("stress test", "[general]") {
             }
         }
 
-        CHECK(!evaluate("!int", vars).has_value());
-        CHECK(!evaluate("!flt", vars).has_value());
-        CHECK(!evaluate("!str", vars).has_value());
-        CHECK(!evaluate("!arr", vars).has_value());
-        CHECK(!evaluate("!obj", vars).has_value());
+        CHECK(!evaluate("not int", vars).has_value());
+        CHECK(!evaluate("not flt", vars).has_value());
+        CHECK(!evaluate("not str", vars).has_value());
+        CHECK(!evaluate("not arr", vars).has_value());
+        CHECK(!evaluate("not obj", vars).has_value());
     }
 
     SECTION("good") {
@@ -1134,6 +1144,11 @@ TEST_CASE("stress test", "[general]") {
         CHECK(evaluate("objarr[0].a", vars) == "1"_json);
         CHECK(evaluate("objarr[1].a", vars) == "2"_json);
         CHECK(evaluate("objarr[2].d[objarr[0].a]", vars) == "4"_json);
+
+        CHECK(evaluate("+++++++++++++++++1") == "1"_json);
+        CHECK(evaluate("++++++++++++++++++1") == "1"_json);
+        CHECK(evaluate("-----------------1") == "-1"_json);
+        CHECK(evaluate("------------------1") == "1"_json);
 
         using namespace std::literals;
         for (const auto& op : {"=="s, "!="s, ">"s, ">="s, "<"s, "<="s}) {
@@ -1153,7 +1168,7 @@ TEST_CASE("stress test", "[general]") {
             CHECK(evaluate("flt " + op + " int", vars).has_value());
         }
 
-        for (const auto& op : {"+"s, "-"s, "%"s, "**"s, "^"s}) {
+        for (const auto& op : {"+"s, "-"s, "%"s, "**"s}) {
             CAPTURE(op);
 
             CHECK(evaluate("int " + op + " int", vars).has_value());
@@ -1171,7 +1186,9 @@ TEST_CASE("stress test", "[general]") {
             }
         }
 
-        CHECK(evaluate("!bool", vars).has_value());
+        CHECK(evaluate("not bool", vars).has_value());
+        CHECK(evaluate("bool and bool", vars).has_value());
+        CHECK(evaluate("bool or bool", vars).has_value());
     }
 }
 
@@ -1187,7 +1204,7 @@ TEST_CASE("readme examples", "[general]") {
     })"_json;
 
     CHECK(evaluate("bee.legs != cat.legs", vars) == "true"_json);
-    CHECK(evaluate("bee.has_tail || cat.has_tail", vars) == "true"_json);
+    CHECK(evaluate("bee.has_tail or cat.has_tail", vars) == "true"_json);
     CHECK(evaluate("bee.legs + cat.legs", vars) == "10"_json);
     CHECK(evaluate("bee.legs + cat.legs == 12", vars) == "false"_json);
     CHECK(evaluate("min(bee.legs, cat.legs)", vars) == "4"_json);

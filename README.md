@@ -4,10 +4,10 @@
 
 ## Introduction
 
-Simple expression language implemented in C++, meant to operate on JSON values. It understands:
+Simple expression language with Python-like syntax, implemented in C++, and meant to operate on JSON values. It understands:
  - The following types: numbers (float and integers), strings (single or double-quoted), booleans, arrays, objects.
- - The usual mathematical operators for numbers (`*` `/` `+` `-`), modulo (`%`) and exponentiation (`^` or `**`).
- - The usual boolean operators (`&&` `||` `!`), with short-circuiting.
+ - The usual mathematical operators for numbers (`*` `/` `+` `-`), modulo (`%`) and exponentiation (`**`).
+ - The usual boolean operators (`and` `or` `not`), with short-circuiting.
  - The usual comparison operators (`>` `>=` `<` `<=` `!=` `==`).
  - Array literals (`[1,2,3]`) and array access (`a[1]`), with arbitrary nesting depth.
  - Object literals (`{'a':1, 'b':'c'}`) and sub-object access (`a.b` or `a['b']`).
@@ -37,7 +37,7 @@ The example expressions below assume the following JSON values are registered as
 Examples (and their value after `->`):
 ```
 bee.legs != cat.legs                  -> true
-bee.has_tail || cat.has_tail          -> true
+bee.has_tail or cat.has_tail          -> true
 bee.legs + cat.legs                   -> 10
 bee.legs + cat.legs == 12             -> false
 min(bee.legs, cat.legs)               -> 4
@@ -69,10 +69,10 @@ White spaces are not significant and will be ignored (except inside strings).
 
 ### Operators
 
- - Integers and floating point numbers can be mixed in all operations. If an operation involves an integer and a floating point number, the integer number is first converted to floating point before the operation. Available operations: `+`, `-`, `*`, `/`, `%` (modulo), `**`/`^` (exponentiation/power). Integer division and modulo by zero will raise an error. Integer overflow is undefined.
+ - Integers and floating point numbers can be mixed in all operations. If an operation involves an integer and a floating point number, the integer number is first converted to floating point before the operation. Available operations: `+`, `-`, `*`, `/`, `%` (modulo), `**` (exponentiation/power). Integer division and modulo by zero will raise an error. Integer overflow is undefined.
  - Numbers can also be tested for equality (`==` and `!=`) and compared for ordering (`>`, `>=`, `<`, `<=`), with the same conversion rules.
  - Strings can be concatenated with `+`. They can be tested for equality and compared for ordering (using simple alphabetical ordering). Individual characters can be accessed with angled brackets (`'str'[0]`); the index must be an integer, and is zero-based (first character had index zero).
- - Booleans can only be tested for equality, and combined with the boolean operators "and" (`&&`/`and`) and "or" (`||`/`or`). The boolean operators are "short-circuiting"; namely, when evaluating `a && b` and `a` evaluates to `false`, `b` will not be evaluated. This allows bypassing evaluation of operations that would otherwise be invalid (e.g. accessing elements beyond the length of an array). Finally, booleans can also be negated (`!a`/`not a`). No other operation is possible.
+ - Booleans can only be tested for equality, and combined with the boolean operators `and` and `or`. The boolean operators are "short-circuiting"; namely, when evaluating `a and b` and `a` evaluates to `false`, `b` will not be evaluated. This allows bypassing evaluation of operations that would otherwise be invalid (e.g. accessing elements beyond the length of an array). Finally, booleans can also be negated (`not a`). No other operation is possible.
  - Arrays can only be tested for equality. Individual elements can be accessed with angled brackets (`[1,2,3][0]`); the index must be an integer, and is zero-based (first character had index zero).
  - Object can only be tested for equality. Sub-objects (or fields, or values) can be accessed with angled brackets (`{'a':1}['a']`); the index must be a string. Equivalently, sub-objects can also be accessed with a single dot (`{'a':1}.a`).
  - Null values can only be tested for equality (and it is always true).
@@ -116,7 +116,7 @@ int main() {
 
     // Evaluate some expressions.
     jsonexpr::evaluate("bee.legs != cat.legs", vars).value();                // true
-    jsonexpr::evaluate("bee.has_tail || cat.has_tail", vars).value();        // true
+    jsonexpr::evaluate("bee.has_tail or cat.has_tail", vars).value();        // true
     jsonexpr::evaluate("bee.legs + cat.legs", vars).value();                 // 10
     jsonexpr::evaluate("bee.legs + cat.legs == 12", vars).value();           // false
     jsonexpr::evaluate("min(bee.legs, cat.legs)", vars).value();             // 4

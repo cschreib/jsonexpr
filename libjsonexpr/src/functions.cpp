@@ -400,11 +400,8 @@ function_registry jsonexpr::default_functions() {
     BINARY_FUNCTION("not in", safe_contains(false, lhs, rhs));
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
-    register_function(freg, "!", 1, &safe_not);
     register_function(freg, "not", 1, &safe_not);
-    register_function(freg, "&&", 2, &safe_and);
     register_function(freg, "and", 2, &safe_and);
-    register_function(freg, "||", 2, &safe_or);
     register_function(freg, "or", 2, &safe_or);
 
     return freg;

@@ -121,7 +121,7 @@ constexpr char             access_char            = '.';
 constexpr char             object_char_open       = '{';
 constexpr char             object_char_close      = '}';
 constexpr char             declarator_char        = ':';
-constexpr std::string_view operators_chars        = "<>*/%+-^&|=!";
+constexpr std::string_view operators_chars        = "<>*/%+-=!";
 constexpr std::string_view string_chars           = "\"'";
 constexpr std::string_view whitespace_chars       = " \t\n\r";
 constexpr char             escape_char            = '\\';
@@ -186,7 +186,7 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             extract_as(1, token::OBJECT_ACCESS);
         } else if (is_any_of(current_char, operators_chars)) {
             if (expression.size() >= 2u &&
-                is_any_of(expression.substr(0, 2), ">=", "<=", "==", "!=", "**", "&&", "||")) {
+                is_any_of(expression.substr(0, 2), ">=", "<=", "==", "!=", "**")) {
                 extract_as(2, token::OPERATOR);
             } else {
                 extract_as(1, token::OPERATOR);
@@ -608,9 +608,17 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
         return try_parse_access(tokens);
     }
 
-    auto         unary_tokens    = tokens;
+    auto unary_tokens = tokens;
+
     const token& parsed_operator = unary_tokens.front();
-    unary_tokens                 = unary_tokens.subspan(1);
+    if (parsed_operator.content != "+" && parsed_operator.content != "-" &&
+        parsed_operator.content != "not") {
+        return unexpected(abort_parse(
+            parsed_operator,
+            "unknown unary operator '" + std::string(parsed_operator.content) + "'"));
+    }
+
+    unary_tokens = unary_tokens.subspan(1);
 
     auto operand = try_parse_unary(unary_tokens);
     if (!operand.has_value()) {
@@ -669,8 +677,14 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
                 break;
             }
 
-            const auto op_token = ops_tokens.front().content;
-            operators.push_back({.token = op_token, .precedence = get_precedence(op_token)});
+            const auto op_token   = ops_tokens.front().content;
+            const auto precedence = get_precedence(op_token);
+            if (precedence == 0) {
+                return unexpected(abort_parse(
+                    ops_tokens.front(), "unknown operator '" + std::string(op_token) + "'"));
+            }
+
+            operators.push_back({.token = op_token, .precedence = precedence});
             ops_tokens = ops_tokens.subspan(1);
         }
 
