@@ -14,7 +14,7 @@ Simple expression language implemented in C++, meant to operate on JSON values. 
  - Custom functions registered in C++ (with arbitrary number of arguments).
  - Immutable variables registered in C++ (as JSON values).
 
-The intended use it to evaluate constraints on a set of JSON values, or apply simple transformations to JSON values.
+The intended use is to evaluate constraints on a set of JSON values, or apply simple transformations to JSON values.
 
 Limitations (on purpose):
  - This is not a full blown programming language.
