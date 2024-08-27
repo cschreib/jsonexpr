@@ -286,8 +286,8 @@ basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
 template<std::same_as<std::string> T, std::same_as<json> U>
 basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
     if (!rhs.is_object()) {
-        return unexpected(std::string(
-            "incompatible type for 'in', got '" + std::string(get_type_name(rhs)) + "'"));
+        return unexpected(
+            std::string("incompatible type for 'in', got " + std::string(get_type_name(rhs))));
     }
 
     return rhs.contains(lhs) == expected;

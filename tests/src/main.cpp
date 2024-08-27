@@ -948,8 +948,12 @@ TEST_CASE("in", "[functions]") {
         CHECK(!evaluate("1 in 1").has_value());
         CHECK(!evaluate("1 in 'a'").has_value());
         CHECK(!evaluate("1 in {}").has_value());
+        CHECK(!evaluate("1 in null").has_value());
+        CHECK(!evaluate("1 in true").has_value());
 
         CHECK(!evaluate("'' in 1").has_value());
+        CHECK(!evaluate("'' in null").has_value());
+        CHECK(!evaluate("'' in true").has_value());
     }
 
     SECTION("good") {
