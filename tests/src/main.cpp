@@ -919,23 +919,23 @@ TEST_CASE("ceil", "[functions]") {
     }
 }
 
-TEST_CASE("size", "[functions]") {
+TEST_CASE("len", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("size()").has_value());
-        CHECK(!evaluate("size('a','b')").has_value());
+        CHECK(!evaluate("len()").has_value());
+        CHECK(!evaluate("len('a','b')").has_value());
 
-        CHECK(!evaluate("size(true)").has_value());
-        CHECK(!evaluate("size(1)").has_value());
-        CHECK(!evaluate("size(1.0)").has_value());
+        CHECK(!evaluate("len(true)").has_value());
+        CHECK(!evaluate("len(1)").has_value());
+        CHECK(!evaluate("len(1.0)").has_value());
     }
 
     SECTION("good") {
-        CHECK(evaluate("size('')") == "0"_json);
-        CHECK(evaluate("size('abc')") == "3"_json);
-        CHECK(evaluate("size([])") == "0"_json);
-        CHECK(evaluate("size([1,2,3])") == "3"_json);
-        CHECK(evaluate("size({})") == "0"_json);
-        CHECK(evaluate("size({'a':1, 'b':2, 'c':3})") == "3"_json);
+        CHECK(evaluate("len('')") == "0"_json);
+        CHECK(evaluate("len('abc')") == "3"_json);
+        CHECK(evaluate("len([])") == "0"_json);
+        CHECK(evaluate("len([1,2,3])") == "3"_json);
+        CHECK(evaluate("len({})") == "0"_json);
+        CHECK(evaluate("len({'a':1, 'b':2, 'c':3})") == "3"_json);
     }
 }
 

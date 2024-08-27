@@ -81,8 +81,6 @@ White spaces are not significant and will be ignored (except inside strings).
 ### Default functions
 
 To keep the library lightweight, jsonexpr comes with only the most basic functions by default. This includes:
- - `a in b`: return true if `b` contains `a`, false otherwise.
- - `a not in b`: return true if `b` does not contains `a`, false otherwise.
  - `min(a,b)`: return the minimum of `a` and `b`.
  - `max(a,b)`: return the minimum of `a` and `b`.
  - `abs(a)`: return the absolute value of `a`.
@@ -90,7 +88,9 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
  - `round(a)`: return the nearest integer value to `a` (preserves the type of `a`).
  - `floor(a)`: return the nearest integer value to `a` (round down, preserves the type of `a`).
  - `ceil(a)`: return nearest integer value to `a` (round up, preserves the type of `a`).
- - `size(a)`: return the size (length) or an array, object, or string.
+ - `len(a)`: return the size (length) or an array, object, or string.
+ - `a in b`: return true if `b` contains `a`, false otherwise.
+ - `a not in b`: return true if `b` does not contains `a`, false otherwise.
 
 This list can be extended with your own functions, see below.
 

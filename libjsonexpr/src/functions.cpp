@@ -395,7 +395,7 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("round", safe_round(lhs));
     UNARY_FUNCTION("floor", safe_floor(lhs));
     UNARY_FUNCTION("ceil", safe_ceil(lhs));
-    UNARY_FUNCTION("size", lhs.size());
+    UNARY_FUNCTION("len", lhs.size());
     BINARY_FUNCTION("in", safe_contains(true, lhs, rhs));
     BINARY_FUNCTION("not in", safe_contains(false, lhs, rhs));
 
