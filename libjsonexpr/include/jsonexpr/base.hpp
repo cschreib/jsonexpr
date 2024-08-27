@@ -26,8 +26,8 @@ struct source_location {
 };
 
 struct error {
-    source_location location;
-    std::string     message;
+    source_location location = {};
+    std::string     message  = {};
 };
 
 JSONEXPR_EXPORT std::string format_error(std::string_view expression, const error& e);
