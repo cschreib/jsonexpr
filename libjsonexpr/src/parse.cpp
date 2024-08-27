@@ -106,25 +106,27 @@ std::optional<std::size_t> scan_string(
     return {};
 }
 
-constexpr std::string_view identifier_chars_start = "abcdefghijklmnopqrstuvwxyz_";
-constexpr std::string_view identifier_chars       = "abcdefghijklmnopqrstuvwxyz_0123456789";
-constexpr std::string_view number_chars_start     = "0123456789";
-constexpr std::string_view number_chars           = "0123456789.";
-constexpr std::string_view number_exponent_chars  = "eE";
-constexpr std::string_view number_sign_chars      = "+-";
-constexpr char             group_char_open        = '(';
-constexpr char             group_char_close       = ')';
-constexpr char             array_char_open        = '[';
-constexpr char             array_char_close       = ']';
-constexpr char             separator_char         = ',';
-constexpr char             access_char            = '.';
-constexpr char             object_char_open       = '{';
-constexpr char             object_char_close      = '}';
-constexpr char             declarator_char        = ':';
-constexpr std::string_view operators_chars        = "<>*/%+-=!";
-constexpr std::string_view string_chars           = "\"'";
-constexpr std::string_view whitespace_chars       = " \t\n\r";
-constexpr char             escape_char            = '\\';
+constexpr std::string_view identifier_chars_start =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+constexpr std::string_view identifier_chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
+constexpr std::string_view number_chars_start    = "0123456789";
+constexpr std::string_view number_chars          = "0123456789.";
+constexpr std::string_view number_exponent_chars = "eE";
+constexpr std::string_view number_sign_chars     = "+-";
+constexpr char             group_char_open       = '(';
+constexpr char             group_char_close      = ')';
+constexpr char             array_char_open       = '[';
+constexpr char             array_char_close      = ']';
+constexpr char             separator_char        = ',';
+constexpr char             access_char           = '.';
+constexpr char             object_char_open      = '{';
+constexpr char             object_char_close     = '}';
+constexpr char             declarator_char       = ':';
+constexpr std::string_view operators_chars       = "<>*/%+-=!";
+constexpr std::string_view string_chars          = "\"'";
+constexpr std::string_view whitespace_chars      = " \t\n\r";
+constexpr char             escape_char           = '\\';
 
 expected<std::vector<token>, error> tokenize(std::string_view expression) noexcept {
     std::vector<token> tokens;
