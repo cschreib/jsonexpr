@@ -9,12 +9,10 @@ expected<json, error> eval(
     const variable_registry& vreg,
     const function_registry&) {
 
-    auto dot_pos = v.name.find_first_of(".");
-    auto name    = v.name.substr(0, dot_pos);
-    auto iter    = vreg.find(name.substr(0, dot_pos));
+    auto iter = vreg.find(std::string{v.name});
     if (iter == vreg.end()) {
         return unexpected(error{
-            n.location.position, name.size(), "unknown variable '" + std::string(name) + "'"});
+            n.location.position, v.name.size(), "unknown variable '" + std::string(v.name) + "'"});
     }
 
     return iter->second;

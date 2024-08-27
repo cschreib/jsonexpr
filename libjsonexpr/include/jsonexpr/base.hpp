@@ -57,7 +57,7 @@ struct function;
 using function_registry =
     std::unordered_map<std::string_view, std::unordered_map<std::size_t, function>>;
 
-using variable_registry = std::unordered_map<std::string_view, json>;
+using variable_registry = std::unordered_map<std::string, json>;
 
 struct function {
     std::function<function_result(
