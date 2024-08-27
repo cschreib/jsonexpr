@@ -115,7 +115,7 @@ int main() {
     // Evaluate some expressions.
     jsonexpr::evaluate("bee.legs != cat.legs", vars).value();                // true
     jsonexpr::evaluate("bee.has_tail || cat.has_tail", vars).value();        // true
-    jsonexpr::evaluate("bee.legs + cat.legs", vars).value();                 // 6
+    jsonexpr::evaluate("bee.legs + cat.legs", vars).value();                 // 10
     jsonexpr::evaluate("bee.legs + cat.legs == 12", vars).value();           // false
     jsonexpr::evaluate("min(bee.legs, cat.legs)", vars).value();             // 4
     jsonexpr::evaluate("bee.sound == 'meow'", vars).value();                 // false
