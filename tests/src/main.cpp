@@ -618,6 +618,11 @@ TEST_CASE("null", "[general]") {
 }
 
 TEST_CASE("function", "[general]") {
+    function_registry funcs;
+    register_function(
+        funcs, "std_except", 0, [](const json&) -> json { throw std::runtime_error("bad"); });
+    register_function(funcs, "unk_except", 0, [](const json&) -> json { throw 1; });
+
     SECTION("bad") {
         CHECK(!evaluate("foo()").has_value());
         CHECK(!evaluate("abs(").has_value());
@@ -634,6 +639,8 @@ TEST_CASE("function", "[general]") {
         CHECK(!evaluate("abs([)").has_value());
         CHECK(!evaluate("abs(>)").has_value());
         CHECK(!evaluate("abs(#)").has_value());
+        CHECK(!evaluate("std_except()", {}, funcs).has_value());
+        CHECK(!evaluate("unk_except()", {}, funcs).has_value());
     }
 
     SECTION("unary") {
