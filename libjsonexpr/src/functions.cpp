@@ -278,6 +278,26 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
     }
 }
 
+template<typename T, std::same_as<json::array_t> U>
+basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
+    return (std::find(rhs.begin(), rhs.end(), lhs) != rhs.end()) == expected;
+}
+
+template<std::same_as<std::string> T, std::same_as<json> U>
+basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
+    if (!rhs.is_object()) {
+        return unexpected(std::string(
+            "incompatible type for 'in', got '" + std::string(get_type_name(rhs)) + "'"));
+    }
+
+    return rhs.contains(lhs) == expected;
+}
+
+template<std::same_as<std::string> T, std::same_as<std::string> U>
+basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
+    return (rhs.find(lhs) != rhs.npos) == expected;
+}
+
 expected<bool, error> evaluate_as_bool(
     const ast::node& node, const variable_registry& vars, const function_registry& funs) {
     const auto value_json = evaluate(node, vars, funs);
@@ -376,6 +396,8 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("floor", safe_floor(lhs));
     UNARY_FUNCTION("ceil", safe_ceil(lhs));
     UNARY_FUNCTION("size", lhs.size());
+    BINARY_FUNCTION("in", safe_contains(true, lhs, rhs));
+    BINARY_FUNCTION("not in", safe_contains(false, lhs, rhs));
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_function(freg, "!", 1, &safe_not);

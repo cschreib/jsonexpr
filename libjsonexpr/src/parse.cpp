@@ -193,14 +193,23 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             }
         } else if (is_any_of(current_char, identifier_chars_start)) {
             extract_as(scan_class(expression, 1, identifier_chars), token::IDENTIFIER);
-            if (tokens.back().location.content == "and" || tokens.back().location.content == "or" ||
-                tokens.back().location.content == "not") {
+
+            // Special words.
+            if (tokens.back().content == "and" || tokens.back().content == "or" ||
+                tokens.back().content == "not") {
                 tokens.back().type = token::OPERATOR;
             } else if (
-                tokens.back().location.content == "true" ||
-                tokens.back().location.content == "false" ||
-                tokens.back().location.content == "null") {
+                tokens.back().content == "true" || tokens.back().content == "false" ||
+                tokens.back().content == "null") {
                 tokens.back().type = token::LITERAL;
+            } else if (tokens.back().content == "in") {
+                tokens.back().type = token::OPERATOR;
+                if (tokens.size() > 1 && tokens[tokens.size() - 2].content == "not") {
+                    auto& prev    = tokens[tokens.size() - 2];
+                    prev.location = extend(prev.location, tokens.back().location);
+                    prev.content  = "not in";
+                    tokens.pop_back();
+                }
             }
         } else if (is_any_of(current_char, number_chars_start)) {
             std::size_t end = scan_class(expression, 1, number_chars);
@@ -617,8 +626,8 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
 
 // From least to highest precedence. Operators with the same precedence are evaluated left-to-right.
 const std::vector<std::vector<std::string_view>> operator_precedence = {
-    {"||", "or"}, {"&&", "and"},   {"==", "!="}, {"<", "<=", ">", ">="},
-    {"+", "-"},   {"*", "/", "%"}, {"^", "**"}};
+    {"||", "or"},           {"&&", "and"}, {"in", "not in"}, {"==", "!="},
+    {"<", "<=", ">", ">="}, {"+", "-"},    {"*", "/", "%"},  {"^", "**"}};
 
 std::size_t get_precedence(std::string_view op) noexcept {
     for (std::size_t p = 0; p < operator_precedence.size(); ++p) {

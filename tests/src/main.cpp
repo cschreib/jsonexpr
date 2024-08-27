@@ -949,6 +949,96 @@ TEST_CASE("size", "[functions]") {
     }
 }
 
+TEST_CASE("in", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("in").has_value());
+        CHECK(!evaluate("1 in").has_value());
+        CHECK(!evaluate("in []").has_value());
+
+        CHECK(!evaluate("1 in 1").has_value());
+        CHECK(!evaluate("1 in 'a'").has_value());
+        CHECK(!evaluate("1 in {}").has_value());
+
+        CHECK(!evaluate("'' in 1").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("1 in []") == "false"_json);
+        CHECK(evaluate("1 in [2,3,4]") == "false"_json);
+        CHECK(evaluate("1 in [1,2,3,4]") == "true"_json);
+        CHECK(evaluate("'a' in ['b','c','d']") == "false"_json);
+        CHECK(evaluate("'e' in ['b','c','d','e']") == "true"_json);
+        CHECK(evaluate("'a' in ''") == "false"_json);
+        CHECK(evaluate("'a' in 'bcd'") == "false"_json);
+        CHECK(evaluate("'e' in 'bec'") == "true"_json);
+        CHECK(evaluate("'a' in {}") == "false"_json);
+        CHECK(evaluate("'a' in {'b':1}") == "false"_json);
+        CHECK(evaluate("'c' in {'b':1,'c':2}") == "true"_json);
+    }
+
+    SECTION("precedence") {
+        CHECK(evaluate("2+3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2-3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2*3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2/3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2^3 in [1,2,3]") == "false"_json);
+        CHECK(evaluate("2%3 in [1,2,3]") == "true"_json);
+        CHECK(evaluate("1<2 in [true,false]") == "true"_json);
+        CHECK(evaluate("1<=2 in [true,false]") == "true"_json);
+        CHECK(evaluate("1>2 in [true,false]") == "true"_json);
+        CHECK(evaluate("1>=2 in [true,false]") == "true"_json);
+        CHECK(evaluate("1==2 in [true,false]") == "true"_json);
+        CHECK(evaluate("1!=2 in [true,false]") == "true"_json);
+        CHECK(evaluate("true and 1 in []") == "false"_json);
+        CHECK(evaluate("false or 1 in []") == "false"_json);
+    }
+}
+
+TEST_CASE("not in", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("not in").has_value());
+        CHECK(!evaluate("1 not in").has_value());
+        CHECK(!evaluate("not in []").has_value());
+
+        CHECK(!evaluate("1 not in 1").has_value());
+        CHECK(!evaluate("1 not in 'a'").has_value());
+        CHECK(!evaluate("1 not in {}").has_value());
+
+        CHECK(!evaluate("'' not in 1").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("1 not in []") == "true"_json);
+        CHECK(evaluate("1 not in [2,3,4]") == "true"_json);
+        CHECK(evaluate("1 not in [1,2,3,4]") == "false"_json);
+        CHECK(evaluate("'a' not in ['b','c','d']") == "true"_json);
+        CHECK(evaluate("'e' not in ['b','c','d','e']") == "false"_json);
+        CHECK(evaluate("'a' not in ''") == "true"_json);
+        CHECK(evaluate("'a' not in 'bcd'") == "true"_json);
+        CHECK(evaluate("'e' not in 'bec'") == "false"_json);
+        CHECK(evaluate("'a' not in {}") == "true"_json);
+        CHECK(evaluate("'a' not in {'b':1}") == "true"_json);
+        CHECK(evaluate("'c' not in {'b':1,'c':2}") == "false"_json);
+    }
+
+    SECTION("precedence") {
+        CHECK(evaluate("2+3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2-3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2*3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2/3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2^3 not in [1,2,3]") == "true"_json);
+        CHECK(evaluate("2%3 not in [1,2,3]") == "false"_json);
+        CHECK(evaluate("1<2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("1<=2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("1>2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("1>=2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("1==2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("1!=2 not in [true,false]") == "false"_json);
+        CHECK(evaluate("true and 1 not in []") == "true"_json);
+        CHECK(evaluate("false or 1 not in []") == "true"_json);
+    }
+}
+
 TEST_CASE("stress test", "[general]") {
     variable_registry vars;
     vars["arr"]    = "[1,2,3]"_json;
