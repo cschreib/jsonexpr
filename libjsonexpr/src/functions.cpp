@@ -251,14 +251,9 @@ template<typename T, typename U>
         (std::is_integral_v<U> || std::is_same_v<U, json::string_t>) &&
         requires(const T& lhs, U rhs) { lhs[rhs]; })
 basic_function_result safe_access(const T& lhs, U rhs) {
-    if constexpr (std::is_arithmetic_v<U>) {
-        const std::size_t unsigned_rhs = [&] {
-            if constexpr (std::is_signed_v<U>) {
-                return static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
-            } else {
-                return rhs;
-            }
-        }();
+    if constexpr (std::is_integral_v<U>) {
+        const std::size_t unsigned_rhs =
+            static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
 
         if (unsigned_rhs >= lhs.size()) {
             return unexpected(
