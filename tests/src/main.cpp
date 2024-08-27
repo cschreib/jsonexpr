@@ -770,3 +770,26 @@ TEST_CASE("stress test", "[general]") {
         CHECK(evaluate("str + str", vars).has_value());
     }
 }
+
+TEST_CASE("readme examples", "[general]") {
+    jsonexpr::variable_registry vars;
+
+    vars["cat"] = R"({
+        "legs": 4, "has_tail": true, "sound": "meow", "colors": ["orange", "black"]
+    })"_json;
+
+    vars["bee"] = R"({
+        "legs": 6, "has_tail": false, "sound": "bzzz", "colors": ["yellow"]
+    })"_json;
+
+    CHECK(evaluate("bee.legs != cat.legs", vars) == "true"_json);
+    CHECK(evaluate("bee.has_tail || cat.has_tail", vars) == "true"_json);
+    CHECK(evaluate("bee.legs + cat.legs", vars) == "10"_json);
+    CHECK(evaluate("bee.legs + cat.legs == 12", vars) == "false"_json);
+    CHECK(evaluate("min(bee.legs, cat.legs)", vars) == "4"_json);
+    CHECK(evaluate("bee.sound == 'meow'", vars) == "false"_json);
+    CHECK(evaluate("cat.sound == 'meow'", vars) == "true"_json);
+    CHECK(evaluate("cat.sound + bee.sound", vars) == R"("meowbzzz")"_json);
+    CHECK(evaluate("cat.colors[0]", vars) == R"("orange")"_json);
+    CHECK(evaluate("cat.colors[(bee.legs - cat.legs)/2]", vars) == R"("black")"_json);
+}

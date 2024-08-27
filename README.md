@@ -38,7 +38,7 @@ Examples (and their value after `->`):
 ```
 bee.legs != cat.legs                  -> true
 bee.has_tail || cat.has_tail          -> true
-bee.legs + cat.legs                   -> 6
+bee.legs + cat.legs                   -> 10
 bee.legs + cat.legs == 12             -> false
 min(bee.legs, cat.legs)               -> 4
 bee.sound == 'meow'                   -> false
