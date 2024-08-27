@@ -325,6 +325,7 @@ TEST_CASE("array literal", "[array]") {
         CHECK(!evaluate("[1+'a']").has_value());
         CHECK(!evaluate("[1,1+'a']").has_value());
         CHECK(!evaluate("[1+'a',1]").has_value());
+        CHECK(!evaluate("[#]").has_value());
     }
 
     SECTION("good") {
@@ -431,6 +432,8 @@ TEST_CASE("object literal", "[object]") {
         CHECK(!evaluate("{1:'a'}").has_value());
         CHECK(!evaluate("{1+'a':1}").has_value());
         CHECK(!evaluate("{'a':1+'a'}").has_value());
+        CHECK(!evaluate("{#:1}").has_value());
+        CHECK(!evaluate("{'a':#}").has_value());
     }
 
     SECTION("good") {
@@ -716,8 +719,10 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("()").has_value());
         CHECK(!evaluate("(").has_value());
         CHECK(!evaluate("(1").has_value());
+        CHECK(!evaluate("(1]").has_value());
         CHECK(!evaluate(")").has_value());
         CHECK(!evaluate("1)").has_value());
+        CHECK(!evaluate("[1)").has_value());
         CHECK(!evaluate(",").has_value());
         CHECK(!evaluate("1,").has_value());
         CHECK(!evaluate(",1").has_value());
