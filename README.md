@@ -95,6 +95,13 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
 This list can be extended with your own functions, see below.
 
 
+### Differences with Python
+
+ - Boolean constants are spelled `true` and `false`, not `True` and `False`.
+ - The return value of the modulo operation `%` has the same sign as the *left* operand (in Python, it takes the sign of the *right* operand).
+ - When the division operation `/` is used with two integers, this results in integer division (Python's `//`).
+
+
 ## C++ API
 
 ### Basic example usage

@@ -256,6 +256,53 @@ TEST_CASE("muldiv", "[maths]") {
     }
 }
 
+TEST_CASE("modulo", "[maths]") {
+    SECTION("bad") {
+        CHECK(!evaluate("1%").has_value());
+        CHECK(!evaluate("%1").has_value());
+        CHECK(!evaluate("%").has_value());
+        CHECK(!evaluate("1%0").has_value());
+        CHECK(!evaluate("0%0").has_value());
+        CHECK(!evaluate("'a'%1").has_value());
+        CHECK(!evaluate("1%'a'").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("4%2") == "0"_json);
+        CHECK(evaluate("5%2") == "1"_json);
+        CHECK(evaluate("6%2") == "0"_json);
+        CHECK(evaluate("7%2") == "1"_json);
+
+        CHECK(evaluate("-4%2") == "0"_json);
+        CHECK(evaluate("-5%2") == "-1"_json);
+        CHECK(evaluate("-6%2") == "0"_json);
+        CHECK(evaluate("-7%2") == "-1"_json);
+
+        CHECK(evaluate("4%-2") == "0"_json);
+        CHECK(evaluate("5%-2") == "1"_json);
+        CHECK(evaluate("6%-2") == "0"_json);
+        CHECK(evaluate("7%-2") == "1"_json);
+
+        CHECK(evaluate("4.0%2.0") == "0.0"_json);
+        CHECK(evaluate("5.0%2.0") == "1.0"_json);
+        CHECK(evaluate("6.0%2.0") == "0.0"_json);
+        CHECK(evaluate("7.0%2.0") == "1.0"_json);
+        CHECK(evaluate("7.25%2.0") == "1.25"_json);
+
+        CHECK(evaluate("-4.0%2.0") == "0.0"_json);
+        CHECK(evaluate("-5.0%2.0") == "-1.0"_json);
+        CHECK(evaluate("-6.0%2.0") == "0.0"_json);
+        CHECK(evaluate("-7.0%2.0") == "-1.0"_json);
+        CHECK(evaluate("-7.25%2.0") == "-1.25"_json);
+
+        CHECK(evaluate("4.0%-2.0") == "0.0"_json);
+        CHECK(evaluate("5.0%-2.0") == "1.0"_json);
+        CHECK(evaluate("6.0%-2.0") == "0.0"_json);
+        CHECK(evaluate("7.0%-2.0") == "1.0"_json);
+        CHECK(evaluate("7.25%-2.0") == "1.25"_json);
+    }
+}
+
 TEST_CASE("precedence", "[maths]") {
     SECTION("two") {
         CHECK(evaluate("1+2*3") == "7"_json);
