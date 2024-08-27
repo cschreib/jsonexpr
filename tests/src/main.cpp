@@ -704,6 +704,246 @@ TEST_CASE("function", "[general]") {
     }
 }
 
+TEST_CASE("min", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("min()").has_value());
+        CHECK(!evaluate("min(1)").has_value());
+        CHECK(!evaluate("min(1,2,3)").has_value());
+
+        CHECK(!evaluate("min(1,'a')").has_value());
+        CHECK(!evaluate("min('a',1)").has_value());
+        CHECK(!evaluate("min(1,true)").has_value());
+        CHECK(!evaluate("min(true,1)").has_value());
+        CHECK(!evaluate("min(1,[])").has_value());
+        CHECK(!evaluate("min([],1)").has_value());
+        CHECK(!evaluate("min(1,{})").has_value());
+        CHECK(!evaluate("min({},1)").has_value());
+
+        CHECK(!evaluate("min('a',true)").has_value());
+        CHECK(!evaluate("min(true,'a')").has_value());
+        CHECK(!evaluate("min('a',[])").has_value());
+        CHECK(!evaluate("min([],'a')").has_value());
+        CHECK(!evaluate("min('a',{})").has_value());
+        CHECK(!evaluate("min({},'a')").has_value());
+
+        CHECK(!evaluate("min(true,true)").has_value());
+        CHECK(!evaluate("min(true,[])").has_value());
+        CHECK(!evaluate("min([],true)").has_value());
+        CHECK(!evaluate("min(true,{})").has_value());
+        CHECK(!evaluate("min({},true)").has_value());
+
+        CHECK(!evaluate("min([],[])").has_value());
+        CHECK(!evaluate("min([],{})").has_value());
+        CHECK(!evaluate("min({},[])").has_value());
+
+        CHECK(!evaluate("min({},{})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("min(1,2)") == "1"_json);
+        CHECK(evaluate("min(2,1)") == "1"_json);
+        CHECK(evaluate("min(1.0,2.0)") == "1.0"_json);
+        CHECK(evaluate("min(2.0,1.0)") == "1.0"_json);
+        CHECK(evaluate("min(1.0,2)") == "1.0"_json);
+        CHECK(evaluate("min(2.0,1)") == "1.0"_json);
+        CHECK(evaluate("min('a','b')") == R"("a")"_json);
+        CHECK(evaluate("min('b','a')") == R"("a")"_json);
+    }
+}
+
+TEST_CASE("max", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("max()").has_value());
+        CHECK(!evaluate("max(1)").has_value());
+        CHECK(!evaluate("max(1,2,3)").has_value());
+
+        CHECK(!evaluate("max(1,'a')").has_value());
+        CHECK(!evaluate("max('a',1)").has_value());
+        CHECK(!evaluate("max(1,true)").has_value());
+        CHECK(!evaluate("max(true,1)").has_value());
+        CHECK(!evaluate("max(1,[])").has_value());
+        CHECK(!evaluate("max([],1)").has_value());
+        CHECK(!evaluate("max(1,{})").has_value());
+        CHECK(!evaluate("max({},1)").has_value());
+
+        CHECK(!evaluate("max('a',true)").has_value());
+        CHECK(!evaluate("max(true,'a')").has_value());
+        CHECK(!evaluate("max('a',[])").has_value());
+        CHECK(!evaluate("max([],'a')").has_value());
+        CHECK(!evaluate("max('a',{})").has_value());
+        CHECK(!evaluate("max({},'a')").has_value());
+
+        CHECK(!evaluate("max(true,true)").has_value());
+        CHECK(!evaluate("max(true,[])").has_value());
+        CHECK(!evaluate("max([],true)").has_value());
+        CHECK(!evaluate("max(true,{})").has_value());
+        CHECK(!evaluate("max({},true)").has_value());
+
+        CHECK(!evaluate("max([],[])").has_value());
+        CHECK(!evaluate("max([],{})").has_value());
+        CHECK(!evaluate("max({},[])").has_value());
+
+        CHECK(!evaluate("max({},{})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("max(1,2)") == "2"_json);
+        CHECK(evaluate("max(2,1)") == "2"_json);
+        CHECK(evaluate("max(1.0,2.0)") == "2.0"_json);
+        CHECK(evaluate("max(2.0,1.0)") == "2.0"_json);
+        CHECK(evaluate("max(1.0,2)") == "2.0"_json);
+        CHECK(evaluate("max(2.0,1)") == "2.0"_json);
+        CHECK(evaluate("max('a','b')") == R"("b")"_json);
+        CHECK(evaluate("max('b','a')") == R"("b")"_json);
+    }
+}
+
+TEST_CASE("abs", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("abs()").has_value());
+        CHECK(!evaluate("abs(1,2)").has_value());
+
+        CHECK(!evaluate("abs('a')").has_value());
+        CHECK(!evaluate("abs(true)").has_value());
+        CHECK(!evaluate("abs([])").has_value());
+        CHECK(!evaluate("abs({})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("abs(1)") == "1"_json);
+        CHECK(evaluate("abs(-1)") == "1"_json);
+        CHECK(evaluate("abs(0)") == "0"_json);
+        CHECK(evaluate("abs(1.0)") == "1.0"_json);
+        CHECK(evaluate("abs(-1.0)") == "1.0"_json);
+        CHECK(evaluate("abs(0.0)") == "0.0"_json);
+    }
+}
+
+TEST_CASE("sqrt", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("sqrt()").has_value());
+        CHECK(!evaluate("sqrt(1,2)").has_value());
+
+        CHECK(!evaluate("sqrt('a')").has_value());
+        CHECK(!evaluate("sqrt(true)").has_value());
+        CHECK(!evaluate("sqrt([])").has_value());
+        CHECK(!evaluate("sqrt({})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("sqrt(1.0)") == "1.0"_json);
+        CHECK(evaluate("sqrt(4.0)") == "2.0"_json);
+        CHECK(evaluate("sqrt(0.0)") == "0.0"_json);
+        CHECK(std::isnan(evaluate("sqrt(-1.0)").value().get<double>()));
+        CHECK(evaluate("sqrt(1)") == "1.0"_json);
+        CHECK(std::isnan(evaluate("sqrt(-1)").value().get<double>()));
+    }
+}
+
+TEST_CASE("round", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("round()").has_value());
+        CHECK(!evaluate("round(1,2)").has_value());
+
+        CHECK(!evaluate("round('a')").has_value());
+        CHECK(!evaluate("round(true)").has_value());
+        CHECK(!evaluate("round([])").has_value());
+        CHECK(!evaluate("round({})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("round(1.0)") == "1.0"_json);
+        CHECK(evaluate("round(1.4)") == "1.0"_json);
+        CHECK(evaluate("round(1.5)") == "2.0"_json);
+        CHECK(evaluate("round(1.6)") == "2.0"_json);
+        CHECK(evaluate("round(2.0)") == "2.0"_json);
+        CHECK(evaluate("round(0.0)") == "0.0"_json);
+        CHECK(evaluate("round(-1.0)") == "-1.0"_json);
+        CHECK(evaluate("round(-1.4)") == "-1.0"_json);
+        CHECK(evaluate("round(-1.5)") == "-2.0"_json);
+        CHECK(evaluate("round(-1.6)") == "-2.0"_json);
+        CHECK(evaluate("round(-2.0)") == "-2.0"_json);
+        CHECK(evaluate("round(1)") == "1.0"_json);
+        CHECK(evaluate("round(-1)") == "-1.0"_json);
+    }
+}
+
+TEST_CASE("floor", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("floor()").has_value());
+        CHECK(!evaluate("floor(1,2)").has_value());
+
+        CHECK(!evaluate("floor('a')").has_value());
+        CHECK(!evaluate("floor(true)").has_value());
+        CHECK(!evaluate("floor([])").has_value());
+        CHECK(!evaluate("floor({})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("floor(1.0)") == "1.0"_json);
+        CHECK(evaluate("floor(1.4)") == "1.0"_json);
+        CHECK(evaluate("floor(1.5)") == "1.0"_json);
+        CHECK(evaluate("floor(1.6)") == "1.0"_json);
+        CHECK(evaluate("floor(2.0)") == "2.0"_json);
+        CHECK(evaluate("floor(0.0)") == "0.0"_json);
+        CHECK(evaluate("floor(-1.0)") == "-1.0"_json);
+        CHECK(evaluate("floor(-1.4)") == "-2.0"_json);
+        CHECK(evaluate("floor(-1.5)") == "-2.0"_json);
+        CHECK(evaluate("floor(-1.6)") == "-2.0"_json);
+        CHECK(evaluate("floor(-2.0)") == "-2.0"_json);
+        CHECK(evaluate("floor(1)") == "1.0"_json);
+        CHECK(evaluate("floor(-1)") == "-1.0"_json);
+    }
+}
+
+TEST_CASE("ceil", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("ceil()").has_value());
+        CHECK(!evaluate("ceil(1,2)").has_value());
+
+        CHECK(!evaluate("ceil('a')").has_value());
+        CHECK(!evaluate("ceil(true)").has_value());
+        CHECK(!evaluate("ceil([])").has_value());
+        CHECK(!evaluate("ceil({})").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("ceil(1.0)") == "1.0"_json);
+        CHECK(evaluate("ceil(1.4)") == "2.0"_json);
+        CHECK(evaluate("ceil(1.5)") == "2.0"_json);
+        CHECK(evaluate("ceil(1.6)") == "2.0"_json);
+        CHECK(evaluate("ceil(2.0)") == "2.0"_json);
+        CHECK(evaluate("ceil(0.0)") == "0.0"_json);
+        CHECK(evaluate("ceil(-1.0)") == "-1.0"_json);
+        CHECK(evaluate("ceil(-1.4)") == "-1.0"_json);
+        CHECK(evaluate("ceil(-1.5)") == "-1.0"_json);
+        CHECK(evaluate("ceil(-1.6)") == "-1.0"_json);
+        CHECK(evaluate("ceil(-2.0)") == "-2.0"_json);
+        CHECK(evaluate("ceil(1)") == "1.0"_json);
+        CHECK(evaluate("ceil(-1)") == "-1.0"_json);
+    }
+}
+
+TEST_CASE("size", "[functions]") {
+    SECTION("bad") {
+        CHECK(!evaluate("size()").has_value());
+        CHECK(!evaluate("size('a','b')").has_value());
+
+        CHECK(!evaluate("size(true)").has_value());
+        CHECK(!evaluate("size(1)").has_value());
+        CHECK(!evaluate("size(1.0)").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("size('')") == "0"_json);
+        CHECK(evaluate("size('abc')") == "3"_json);
+        CHECK(evaluate("size([])") == "0"_json);
+        CHECK(evaluate("size([1,2,3])") == "3"_json);
+        CHECK(evaluate("size({})") == "0"_json);
+        CHECK(evaluate("size({'a':1, 'b':2, 'c':3})") == "3"_json);
+    }
+}
+
 TEST_CASE("stress test", "[general]") {
     variable_registry vars;
     vars["arr"]    = "[1,2,3]"_json;
