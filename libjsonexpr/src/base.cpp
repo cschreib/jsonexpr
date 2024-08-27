@@ -22,7 +22,7 @@ std::string_view jsonexpr::get_type_name(const json& j) noexcept {
     case json::value_t::array: return "array";
     case json::value_t::string: return "string";
     case json::value_t::boolean: return "bool";
-    case json::value_t::number_unsigned: return "unsigned int";
+    case json::value_t::number_unsigned: [[fallthrough]];
     case json::value_t::number_integer: return "int";
     case json::value_t::number_float: return "float";
     case json::value_t::null: return "null";
