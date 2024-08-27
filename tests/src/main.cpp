@@ -1,4 +1,5 @@
 #include <jsonexpr/jsonexpr.hpp>
+#include <jsonexpr/parse.hpp>
 #include <snitch/snitch_macros_check.hpp>
 #include <snitch/snitch_macros_misc.hpp>
 #include <snitch/snitch_macros_test_case.hpp>
@@ -838,4 +839,16 @@ TEST_CASE("readme examples", "[general]") {
     CHECK(evaluate("cat.sound + bee.sound", vars) == R"("meowbzzz")"_json);
     CHECK(evaluate("cat.colors[0]", vars) == R"("orange")"_json);
     CHECK(evaluate("cat.colors[(bee.legs - cat.legs)/2]", vars) == R"("black")"_json);
+}
+
+TEST_CASE("dump", "[debug]") {
+    // Testing for coverage only. This is just debug utilities, we don't care as much.
+    const auto expected = "object({\n"
+                          "  literal(\"a\") :\n"
+                          "  array({\n"
+                          "    function(min, args={\n"
+                          "      literal(1)\n"
+                          "      identifier(a)})})})";
+
+    CHECK(dump(parse("{'a': [min(1,a)]}").value()) == expected);
 }

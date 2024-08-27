@@ -25,7 +25,7 @@ std::string dump_content(const ast::array& a, std::size_t indent) {
 std::string dump_content(const ast::object& a, std::size_t indent) {
     std::string str = std::string(2 * indent, ' ') + "object({";
     for (const auto& e : a.data) {
-        str += "\n" + dump(e.first, indent + 1) + " : ";
+        str += "\n" + dump(e.first, indent + 1) + " :";
         str += "\n" + dump(e.second, indent + 1);
     }
     str += "})";
