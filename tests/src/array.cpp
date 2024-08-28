@@ -45,6 +45,7 @@ TEST_CASE("array access", "[array]") {
         CHECK(!evaluate("obj[]", vars).has_value());
         CHECK(!evaluate("obj[", vars).has_value());
         CHECK(!evaluate("obj]", vars).has_value());
+        CHECK(!evaluate("obj[1", vars).has_value());
         CHECK(!evaluate("obj[1)", vars).has_value());
         CHECK(!evaluate("obj[1,2]", vars).has_value());
         CHECK(!evaluate("obj[5]", vars).has_value());
@@ -111,8 +112,10 @@ TEST_CASE("array access", "[array]") {
 
 TEST_CASE("array range access", "[array]") {
     SECTION("bad") {
-        CHECK(!evaluate("[][+:]").has_value());
-        CHECK(!evaluate("[][:+]").has_value());
+        CHECK(!evaluate("[][:").has_value());
+        CHECK(!evaluate("[][1:").has_value());
+        CHECK(!evaluate("[][*:]").has_value());
+        CHECK(!evaluate("[][:*]").has_value());
         CHECK(!evaluate("[][::]").has_value());
         CHECK(!evaluate("foo[:]").has_value());
         CHECK(!evaluate("[][foo:]").has_value());
