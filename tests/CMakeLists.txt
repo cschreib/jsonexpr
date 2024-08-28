@@ -9,7 +9,16 @@ FetchContent_Declare(snitch
                      GIT_TAG        v1.2.5)
 FetchContent_MakeAvailable(snitch)
 
-add_executable(jsonexpr_tests src/main.cpp)
+add_executable(jsonexpr_tests
+    src/array.cpp
+    src/base.cpp
+    src/bool.cpp
+    src/functions.cpp
+    src/misc.cpp
+    src/number.cpp
+    src/object.cpp
+    src/string.cpp
+    src/variable.cpp)
 target_link_libraries(jsonexpr_tests PRIVATE jsonexpr::libjsonexpr)
 target_link_libraries(jsonexpr_tests PRIVATE snitch::snitch)
 
