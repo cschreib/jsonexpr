@@ -477,7 +477,6 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("-", safe_unary_minus(lhs));
     BINARY_FUNCTION("%", safe_mod(lhs, rhs));
     BINARY_FUNCTION("**", safe_pow(lhs, rhs));
-    BINARY_FUNCTION("^", safe_pow(lhs, rhs));
     BINARY_FUNCTION("[]", safe_access(lhs, rhs));
     BINARY_FUNCTION("min", safe_min(lhs, rhs));
     BINARY_FUNCTION("max", safe_max(lhs, rhs));
