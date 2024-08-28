@@ -30,6 +30,7 @@
 			"config": "Default",
 			"env":
 			{
+				"CMAKE_BUILD_PARALLEL_LEVEL": "12"
 			},
 			"generator": "Unix Makefiles",
 			"name": "Default",
