@@ -3,7 +3,6 @@
 #include "jsonexpr/eval.hpp"
 
 #include <cmath>
-#include <sstream>
 
 using namespace jsonexpr;
 
@@ -298,6 +297,98 @@ basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
     return (rhs.find(lhs) != rhs.npos) == expected;
 }
 
+template<typename T>
+    requires std::is_arithmetic_v<T>
+basic_function_result safe_cast_int(const T& lhs) {
+    if constexpr (std::is_floating_point_v<T>) {
+        if (!std::isfinite(lhs) ||
+            lhs < static_cast<json::number_float_t>(
+                      std::numeric_limits<json::number_integer_t>::min()) ||
+            lhs > static_cast<json::number_float_t>(
+                      std::numeric_limits<json::number_integer_t>::max())) {
+            return unexpected(
+                std::string("could not convert float '" + std::to_string(lhs) + "' to int"));
+        }
+    }
+
+    return static_cast<json::number_integer_t>(lhs);
+}
+
+template<std::same_as<json::string_t> T>
+basic_function_result safe_cast_int(const T& lhs) {
+    auto result = json::parse(lhs, nullptr, false);
+    if (result.type() != json::value_t::number_integer &&
+        result.type() != json::value_t::number_unsigned) {
+        return unexpected(std::string("could not convert string '" + lhs + "' to int"));
+    }
+
+    return result.template get<json::number_integer_t>();
+}
+
+template<typename T>
+    requires std::is_arithmetic_v<T>
+basic_function_result safe_cast_float(const T& lhs) {
+    return static_cast<json::number_float_t>(lhs);
+}
+
+template<std::same_as<json::string_t> T>
+basic_function_result safe_cast_float(const T& lhs) {
+    json::string_t lowered = lhs;
+    for (char& c : lowered) {
+        c = static_cast<char>(std::tolower(c));
+    }
+
+    if (lowered == "inf" || lowered == "+inf") {
+        return std::numeric_limits<json::number_float_t>::infinity();
+    } else if (lowered == "-inf") {
+        return -std::numeric_limits<json::number_float_t>::infinity();
+    } else if (lowered == "nan") {
+        return std::numeric_limits<json::number_float_t>::quiet_NaN();
+    }
+
+    auto result = json::parse(lhs, nullptr, false);
+    if (result.type() != json::value_t::number_float &&
+        result.type() != json::value_t::number_integer &&
+        result.type() != json::value_t::number_unsigned) {
+
+        return unexpected(std::string("could not convert string '" + lhs + "' to float"));
+    }
+
+    return result.template get<json::number_float_t>();
+}
+
+template<typename T>
+    requires std::is_arithmetic_v<T>
+basic_function_result safe_cast_bool(const T& lhs) {
+    if constexpr (std::is_floating_point_v<T>) {
+        if (!std::isfinite(lhs)) {
+            return unexpected(
+                std::string("could not convert float '" + std::to_string(lhs) + "' to bool"));
+        }
+    }
+
+    return static_cast<json::boolean_t>(lhs);
+}
+
+template<std::same_as<json::string_t> T>
+basic_function_result safe_cast_bool(const T& lhs) {
+    auto result = json::parse(lhs, nullptr, false);
+    if (result.type() != json::value_t::boolean) {
+        return unexpected(std::string("could not convert string '" + lhs + "' to bool"));
+    }
+
+    return result;
+}
+
+basic_function_result safe_cast_string(const json& args) {
+    const json& lhs = args[0];
+    if (lhs.is_string()) {
+        return lhs;
+    } else {
+        return lhs.dump();
+    }
+}
+
 expected<bool, error> evaluate_as_bool(
     const ast::node& node, const variable_registry& vars, const function_registry& funs) {
     const auto value_json = evaluate(node, vars, funs);
@@ -398,6 +489,10 @@ function_registry jsonexpr::default_functions() {
     UNARY_FUNCTION("len", lhs.size());
     BINARY_FUNCTION("in", safe_contains(true, lhs, rhs));
     BINARY_FUNCTION("not in", safe_contains(false, lhs, rhs));
+    UNARY_FUNCTION("int", safe_cast_int(lhs));
+    UNARY_FUNCTION("float", safe_cast_float(lhs));
+    UNARY_FUNCTION("bool", safe_cast_bool(lhs));
+    register_function(freg, "str", 1, &safe_cast_string);
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_function(freg, "not", 1, &safe_not);

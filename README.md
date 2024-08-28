@@ -81,6 +81,10 @@ White spaces are not significant and will be ignored (except inside strings).
 ### Default functions
 
 To keep the library lightweight, jsonexpr comes with only the most basic functions by default. This includes:
+ - `int(a)`: convert or parse `a` into an `int`.
+ - `float(a)`: convert or parse `a` into a `float`.
+ - `bool(a)`: convert or parse `a` into a `bool` (for strings: only `"true"` and `"false"` are accepted).
+ - `str(a)`: serialise `a` into a `string`.
  - `min(a,b)`: return the minimum of `a` and `b`.
  - `max(a,b)`: return the minimum of `a` and `b`.
  - `abs(a)`: return the absolute value of `a`.
