@@ -568,19 +568,17 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
         const bool array_access = tokens[0].type == token::ARRAY_OPEN;
         tokens                  = tokens.subspan(1);
 
-        expected<ast::node, parse_error> index;
-        if (array_access) {
-            index = try_parse_expr(tokens);
-        } else {
-            index = try_parse_identifier(tokens);
-        }
-
-        if (!index.has_value()) {
-            return unexpected(abort_parse(index.error()));
-        }
-
+        std::vector<ast::node> args         = {std::move(object.value())};
         const source_location* end_location = nullptr;
+        std::string_view       function     = "[]";
         if (array_access) {
+            auto index = try_parse_expr(tokens);
+            if (!index.has_value()) {
+                return unexpected(abort_parse(index.error()));
+            }
+
+            args.push_back(std::move(index.value()));
+
             if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
                 return unexpected(abort_parse("expected ']'"));
             }
@@ -589,13 +587,17 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
             tokens                 = tokens.subspan(1);
             end_location           = &end_token.location;
         } else {
-            index        = identifier_to_string(std::move(index.value()));
-            end_location = &index.value().location;
+            auto index = try_parse_identifier(tokens);
+            if (!index.has_value()) {
+                return unexpected(abort_parse(index.error()));
+            }
+
+            args.push_back(identifier_to_string(index.value()));
+            end_location = &args.back().location;
         }
 
         object = ast::node{
-            extend(object.value().location, *end_location),
-            ast::function{"[]", {std::move(object.value()), std::move(index.value())}}};
+            extend(args[0].location, *end_location), ast::function{function, std::move(args)}};
     }
 
     return object;
