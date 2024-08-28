@@ -247,34 +247,34 @@ auto safe_pow(T lhs, U rhs) {
 
 template<typename T, typename U>
     requires(
-        ((std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t>) ||
-         std::is_same_v<U, json::string_t>) &&
+        std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t> &&
         requires(const T& lhs, U rhs) { lhs[rhs]; })
 basic_function_result safe_access(const T& lhs, const U& rhs) {
-    if constexpr (std::is_integral_v<U>) {
-        const std::size_t unsigned_rhs =
-            static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
+    const std::size_t unsigned_rhs =
+        static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
 
-        if (unsigned_rhs >= lhs.size()) {
-            return unexpected(
-                std::string("out-of-bounds access at position ") + std::to_string(rhs) + " in " +
-                std::string(get_type_name(lhs)) + " of size " + std::to_string(lhs.size()));
-        }
-
-        if constexpr (std::is_same_v<T, json::string_t>) {
-            // If we just returned lhs[rhs], we would get the numerical value of the 'char'.
-            // Return a new string instead with just that character, which will be more practical.
-            return json::string_t(1, lhs[unsigned_rhs]);
-        } else {
-            return lhs[unsigned_rhs];
-        }
-    } else {
-        if (!lhs.contains(rhs)) {
-            return unexpected(std::string("unknown field '") + rhs + "'");
-        }
-
-        return lhs[rhs];
+    if (unsigned_rhs >= lhs.size()) {
+        return unexpected(
+            std::string("out-of-bounds access at position ") + std::to_string(rhs) + " in " +
+            std::string(get_type_name(lhs)) + " of size " + std::to_string(lhs.size()));
     }
+
+    if constexpr (std::is_same_v<T, json::string_t>) {
+        // If we just returned lhs[rhs], we would get the numerical value of the 'char'.
+        // Return a new string instead with just that character, which will be more practical.
+        return json::string_t(1, lhs[unsigned_rhs]);
+    } else {
+        return lhs[unsigned_rhs];
+    }
+}
+
+template<std::same_as<json> T, std::same_as<json::string_t> U>
+basic_function_result safe_access(const T& lhs, const U& rhs) {
+    if (!lhs.contains(rhs)) {
+        return unexpected(std::string("unknown field '") + rhs + "'");
+    }
+
+    return lhs[rhs];
 }
 
 template<typename T, std::same_as<json::array_t> U>
