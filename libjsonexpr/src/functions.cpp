@@ -91,6 +91,24 @@ constexpr bool is_safe_for_maths = is_arithmetic_not_bool<T> && is_arithmetic_no
             to_variant(args[0]), to_variant(args[1]));                                             \
     })
 
+#define TRINARY_FUNCTION(NAME, EXPR)                                                               \
+    register_function(freg, NAME, 3, [](const json& args) -> basic_function_result {               \
+        return std::visit(                                                                         \
+            [](const auto& first, const auto& second,                                              \
+               const auto& third) -> basic_function_result {                                       \
+                if constexpr (requires { EXPR; }) {                                                \
+                    return EXPR;                                                                   \
+                } else {                                                                           \
+                    return unexpected(                                                             \
+                        std::string("incompatible types for '" NAME "', got ") +                   \
+                        std::string(get_type_name(first)) + ", " +                                 \
+                        std::string(get_type_name(second)) + ", and " +                            \
+                        std::string(get_type_name(third)));                                        \
+                }                                                                                  \
+            },                                                                                     \
+            to_variant(args[0]), to_variant(args[1]), to_variant(args[2]));                        \
+    })
+
 #define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
         requires(is_safe_to_compare<T, U>) bool                                                    \
@@ -245,14 +263,16 @@ auto safe_pow(T lhs, U rhs) {
     return std::pow(static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
 }
 
+std::size_t normalize_index(json::number_integer_t i, std::size_t size) {
+    return static_cast<std::size_t>(i < 0 ? i + static_cast<json::number_integer_t>(size) : i);
+}
+
 template<typename T, typename U>
     requires(
         std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t> &&
         requires(const T& lhs, U rhs) { lhs[rhs]; })
 basic_function_result safe_access(const T& lhs, const U& rhs) {
-    const std::size_t unsigned_rhs =
-        static_cast<std::size_t>(rhs < 0 ? rhs + static_cast<U>(lhs.size()) : rhs);
-
+    const std::size_t unsigned_rhs = normalize_index(rhs, lhs.size());
     if (unsigned_rhs >= lhs.size()) {
         return unexpected(
             std::string("out-of-bounds access at position ") + std::to_string(rhs) + " in " +
@@ -275,6 +295,41 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
     }
 
     return lhs[rhs];
+}
+
+template<typename T, typename U>
+    requires(
+        (std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>) &&
+        std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t> &&
+        requires(const T& lhs, U rhs) { lhs[rhs]; })
+basic_function_result safe_range_access(const T& object, const U& begin, const U& end) {
+    const std::size_t unsigned_begin = normalize_index(begin, object.size());
+    const std::size_t unsigned_end   = end != std::numeric_limits<json::number_integer_t>::max()
+                                           ? normalize_index(end, object.size())
+                                           : object.size();
+
+    if (unsigned_end <= unsigned_begin) {
+        return T{};
+    }
+
+    if (unsigned_begin >= object.size()) {
+        return unexpected(
+            std::string("out-of-bounds access for start of range ") + std::to_string(begin) +
+            " in " + std::string(get_type_name(object)) + " of size " +
+            std::to_string(object.size()));
+    }
+
+    if (unsigned_end > object.size()) {
+        return unexpected(
+            std::string("out-of-bounds access for end of range ") + std::to_string(end) + " in " +
+            std::string(get_type_name(object)) + " of size " + std::to_string(object.size()));
+    }
+
+    if constexpr (std::is_same_v<T, json::string_t>) {
+        return object.substr(unsigned_begin, unsigned_end - unsigned_begin);
+    } else {
+        return T(object.begin() + unsigned_begin, object.begin() + unsigned_end);
+    }
 }
 
 template<typename T, std::same_as<json::array_t> U>
@@ -478,6 +533,7 @@ function_registry jsonexpr::default_functions() {
     BINARY_FUNCTION("%", safe_mod(lhs, rhs));
     BINARY_FUNCTION("**", safe_pow(lhs, rhs));
     BINARY_FUNCTION("[]", safe_access(lhs, rhs));
+    TRINARY_FUNCTION("[:]", safe_range_access(first, second, third));
     BINARY_FUNCTION("min", safe_min(lhs, rhs));
     BINARY_FUNCTION("max", safe_max(lhs, rhs));
     UNARY_FUNCTION("abs", safe_abs(lhs));

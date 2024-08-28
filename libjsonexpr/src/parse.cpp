@@ -553,6 +553,82 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
     return unexpected(match_failed(tokens.front(), "expected operand"));
 }
 
+expected<std::vector<ast::node>, parse_error>
+try_parse_array_access(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected array access"));
+    }
+
+    std::vector<ast::node> args;
+
+    if (tokens[0].type == token::DECLARATOR) {
+        const auto& separator_token = tokens[0];
+        tokens                      = tokens.subspan(1);
+
+        if (tokens.empty()) {
+            return unexpected(abort_parse("expected expression or ']'"));
+        }
+
+        args.push_back(ast::node{separator_token.location, ast::literal{json(0)}});
+
+        if (tokens[0].type == token::ARRAY_CLOSE) {
+            // [:]
+            args.push_back(ast::node{
+                tokens.back().location,
+                ast::literal{json(std::numeric_limits<json::number_integer_t>::max())}});
+        } else {
+            // [:a]
+            auto end_index = try_parse_expr(tokens);
+            if (!end_index.has_value()) {
+                return unexpected(abort_parse(end_index.error()));
+            }
+
+            args.push_back(std::move(end_index.value()));
+        }
+    } else {
+        auto begin_index = try_parse_expr(tokens);
+        if (!begin_index.has_value()) {
+            return unexpected(abort_parse(begin_index.error()));
+        }
+
+        args.push_back(std::move(begin_index.value()));
+
+        if (tokens.empty()) {
+            return unexpected(abort_parse("expected ':' or ']'"));
+        }
+
+        if (tokens[0].type == token::DECLARATOR) {
+            const auto& separator_token = tokens[0];
+            tokens                      = tokens.subspan(1);
+
+            if (tokens.empty()) {
+                return unexpected(abort_parse("expected expression or ']'"));
+            }
+
+            if (tokens[0].type == token::ARRAY_CLOSE) {
+                // [a:]
+                args.push_back(ast::node{
+                    separator_token.location,
+                    ast::literal{json(std::numeric_limits<json::number_integer_t>::max())}});
+            } else {
+                // [a:b]
+                auto index_end = try_parse_expr(tokens);
+                if (!index_end.has_value()) {
+                    return unexpected(abort_parse(index_end.error()));
+                }
+
+                args.push_back(std::move(index_end.value()));
+            }
+        }
+    }
+
+    if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
+        return unexpected(abort_parse("expected ']'"));
+    }
+
+    return args;
+}
+
 expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
         return unexpected(match_failed("expected array or object access"));
@@ -572,20 +648,19 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
         const source_location* end_location = nullptr;
         std::string_view       function     = "[]";
         if (array_access) {
-            auto index = try_parse_expr(tokens);
-            if (!index.has_value()) {
-                return unexpected(abort_parse(index.error()));
-            }
-
-            args.push_back(std::move(index.value()));
-
-            if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
-                return unexpected(abort_parse("expected ']'"));
+            auto indices = try_parse_array_access(tokens);
+            if (!indices.has_value()) {
+                return unexpected(abort_parse(indices.error()));
             }
 
             const token& end_token = tokens.front();
             tokens                 = tokens.subspan(1);
             end_location           = &end_token.location;
+
+            function = indices.value().size() == 1u ? "[]" : "[:]";
+            for (auto& index : indices.value()) {
+                args.push_back(std::move(index));
+            }
         } else {
             auto index = try_parse_identifier(tokens);
             if (!index.has_value()) {

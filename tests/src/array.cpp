@@ -48,6 +48,10 @@ TEST_CASE("array access", "[array]") {
         CHECK(!evaluate("obj[1)", vars).has_value());
         CHECK(!evaluate("obj[1,2]", vars).has_value());
         CHECK(!evaluate("obj[5]", vars).has_value());
+        CHECK(!evaluate("obj[15]", vars).has_value());
+        CHECK(!evaluate("obj[-15]", vars).has_value());
+        CHECK(!evaluate("obj[1106544]", vars).has_value());
+        CHECK(!evaluate("obj[-1106544]", vars).has_value());
         CHECK(!evaluate("obj[1.0]", vars).has_value());
         CHECK(!evaluate("obj[-6]", vars).has_value());
         CHECK(!evaluate("obj[[0]]", vars).has_value());
@@ -102,5 +106,61 @@ TEST_CASE("array access", "[array]") {
         CHECK(evaluate("2%obj[1]", vars) == "0"_json);
         CHECK(evaluate("obj[1]**3", vars) == "8"_json);
         CHECK(evaluate("3**obj[1]", vars) == "9"_json);
+    }
+}
+
+TEST_CASE("array range access", "[array]") {
+    SECTION("bad") {
+        CHECK(!evaluate("[][+:]").has_value());
+        CHECK(!evaluate("[][:+]").has_value());
+        CHECK(!evaluate("[][::]").has_value());
+        CHECK(!evaluate("foo[:]").has_value());
+        CHECK(!evaluate("[][foo:]").has_value());
+        CHECK(!evaluate("[][:foo]").has_value());
+
+        CHECK(!evaluate("1[:]").has_value());
+        CHECK(!evaluate("1.0[:]").has_value());
+        CHECK(!evaluate("true[:]").has_value());
+        CHECK(!evaluate("null[:]").has_value());
+        CHECK(!evaluate("{}[:]").has_value());
+        CHECK(!evaluate("{'abc':1}[:]").has_value());
+
+        CHECK(!evaluate("[1][0:5]").has_value());
+        CHECK(!evaluate("[1][5:6]").has_value());
+        CHECK(!evaluate("[1,2,3][0:1:2]").has_value());
+        CHECK(!evaluate("[1][0:15]").has_value());
+        CHECK(!evaluate("[1][-15:-14]").has_value());
+        CHECK(!evaluate("[1][0:1106544]").has_value());
+        CHECK(!evaluate("[1][-1106544:-1106543]").has_value());
+
+        CHECK(!evaluate("'a'[0:5]").has_value());
+        CHECK(!evaluate("'a'[5:6]").has_value());
+        CHECK(!evaluate("'abc'[0:1:2]").has_value());
+        CHECK(!evaluate("'a'[0:15]").has_value());
+        CHECK(!evaluate("'a'[-15:-14]").has_value());
+        CHECK(!evaluate("'a'[0:1106544]").has_value());
+        CHECK(!evaluate("'a'[-1106544:-1106543]").has_value());
+    }
+
+    SECTION("good") {
+        CHECK(evaluate("[][:]") == "[]"_json);
+        CHECK(evaluate("[1,2,3][:]") == "[1,2,3]"_json);
+        CHECK(evaluate("[1,2,3][1:]") == "[2,3]"_json);
+        CHECK(evaluate("[1,2,3][:2]") == "[1,2]"_json);
+        CHECK(evaluate("[1,2,3][1:2]") == "[2]"_json);
+        CHECK(evaluate("[1,2,3][3:2]") == "[]"_json);
+        CHECK(evaluate("[1,2,3][0:-1]") == "[1,2]"_json);
+        CHECK(evaluate("[1,2,3][-2:-1]") == "[2]"_json);
+        CHECK(evaluate("[1,2,3][-2:3]") == "[2,3]"_json);
+
+        CHECK(evaluate("''[:]") == R"("")"_json);
+        CHECK(evaluate("'abc'[:]") == R"("abc")"_json);
+        CHECK(evaluate("'abc'[1:]") == R"("bc")"_json);
+        CHECK(evaluate("'abc'[:2]") == R"("ab")"_json);
+        CHECK(evaluate("'abc'[1:2]") == R"("b")"_json);
+        CHECK(evaluate("'abc'[3:2]") == R"("")"_json);
+        CHECK(evaluate("'abc'[0:-1]") == R"("ab")"_json);
+        CHECK(evaluate("'abc'[-2:-1]") == R"("b")"_json);
+        CHECK(evaluate("'abc'[-2:3]") == R"("bc")"_json);
     }
 }
