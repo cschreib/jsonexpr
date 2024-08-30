@@ -12,7 +12,7 @@ void jsonexpr::register_function(
     std::string_view                                  name,
     std::size_t                                       arity,
     std::function<basic_function_result(const json&)> func) {
-    funcs[name][arity] = {
+    funcs[std::string{name}][arity] = {
         [func = std::move(func)](
             std::span<const ast::node> args, const variable_registry& vars,
             const function_registry& funs) -> function_result {
@@ -40,7 +40,7 @@ void jsonexpr::register_function(
     std::size_t                                                                          arity,
     std::function<function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)> func) {
-    funcs[name][arity] = {std::move(func)};
+    funcs[std::string{name}][arity] = {std::move(func)};
 }
 
 namespace {

@@ -31,9 +31,9 @@ expected<json, error> eval(
     const variable_registry& vreg,
     const function_registry& freg) {
 
-    auto iter = freg.find(f.name);
+    auto iter = freg.find(std::string{f.name});
     if (iter == freg.end()) {
-        return unexpected(node_error(n, "unknown function '" + std::string(f.name) + "'"));
+        return unexpected(node_error(n, "unknown function '" + std::string{f.name} + "'"));
     }
 
     auto overload = iter->second.find(f.args.size());

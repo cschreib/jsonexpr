@@ -56,7 +56,7 @@ using basic_function_result = expected<json, std::string>;
 
 struct function;
 using function_registry =
-    std::unordered_map<std::string_view, std::unordered_map<std::size_t, function>>;
+    std::unordered_map<std::string, std::unordered_map<std::size_t, function>>;
 
 using variable_registry = std::unordered_map<std::string, json>;
 
