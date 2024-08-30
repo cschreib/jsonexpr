@@ -75,7 +75,7 @@ White spaces are not significant and will be ignored (except inside strings).
  - Booleans can only be tested for equality, and combined with the boolean operators `and` and `or`. The boolean operators are "short-circuiting"; namely, when evaluating `a and b` and `a` evaluates to `false`, `b` will not be evaluated. This allows bypassing evaluation of operations that would otherwise be invalid (e.g. accessing elements beyond the length of an array). Finally, booleans can also be negated (`not a`). No other operation is possible.
  - Arrays can only be tested for equality. Individual elements can be accessed with angled brackets (`[1,2,3][0]`); the index must be an integer, and is zero-based (first character had index zero). Range access is also possible with `arr[a:b]` (`a` is the index of the first element to extract, and `b` is 1 plus the index of the last element to extract, so `[1,2,3][0:2]` is `[1,2]`; an empty array is returned if `a >= b`).
  - Object can only be tested for equality. Sub-objects (or fields, or values) can be accessed with angled brackets (`{'a':1}['a']`); the index must be a string. Equivalently, sub-objects can also be accessed with a single dot (`{'a':1}.a`).
- - Null values can only be tested for equality (and it is always true).
+ - Null values can only be tested for equality with null itself (always true) and values of other types (always false). No other operation is possible.
 
 
 ### Default functions
@@ -102,8 +102,11 @@ This list can be extended with your own functions, see below.
 ### Differences with Python
 
  - Boolean constants are spelled `true` and `false`, not `True` and `False`.
+ - The null/none value is spelled `null`, not `None`.
  - The return value of the modulo operation `%` has the same sign as the *left* operand (in Python, it takes the sign of the *right* operand).
  - When the division operation `/` is used with two integers, this results in integer division (Python's `//`).
+ - The following expressions are not implemented: `a is b`, `a if c else b`, `x for x in v`, `x for x in v if c`.
+ - Bitwise operators are not implemented.
 
 
 ## C++ API

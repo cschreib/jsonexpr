@@ -2,6 +2,17 @@
 
 TEST_CASE("null", "[general]") {
     CHECK(evaluate("null") == "null"_json);
+
+    CHECK(evaluate("null == null") == "true"_json);
+    CHECK(evaluate("null != null") == "false"_json);
+
+    using namespace std::literals;
+    for (const auto& val : {"1"s, "1.0"s, "''"s, "[]"s, "{}"s, "false"s}) {
+        CHECK(evaluate(val + " == null") == "false"_json);
+        CHECK(evaluate("null == " + val) == "false"_json);
+        CHECK(evaluate(val + " != null") == "true"_json);
+        CHECK(evaluate("null != " + val) == "true"_json);
+    }
 }
 
 TEST_CASE("readme examples", "[general]") {
@@ -113,9 +124,35 @@ TEST_CASE("stress test", "[general]") {
             CHECK(!evaluate("str " + op + " obj", vars).has_value());
             CHECK(!evaluate("str " + op + " arr", vars).has_value());
 
+            CHECK(!evaluate("int " + op + " str", vars).has_value());
+            CHECK(!evaluate("int " + op + " bool", vars).has_value());
+            CHECK(!evaluate("int " + op + " obj", vars).has_value());
+            CHECK(!evaluate("int " + op + " arr", vars).has_value());
+
+            CHECK(!evaluate("flt " + op + " str", vars).has_value());
+            CHECK(!evaluate("flt " + op + " bool", vars).has_value());
+            CHECK(!evaluate("flt " + op + " obj", vars).has_value());
+            CHECK(!evaluate("flt " + op + " arr", vars).has_value());
+
             if (op != "==" && op != "!=") {
                 CHECK(!evaluate("obj " + op + " obj", vars).has_value());
                 CHECK(!evaluate("arr " + op + " arr", vars).has_value());
+                CHECK(!evaluate("null " + op + " null", vars).has_value());
+
+                CHECK(!evaluate("null " + op + " int", vars).has_value());
+                CHECK(!evaluate("null " + op + " flt", vars).has_value());
+                CHECK(!evaluate("null " + op + " bool", vars).has_value());
+                CHECK(!evaluate("null " + op + " obj", vars).has_value());
+                CHECK(!evaluate("null " + op + " arr", vars).has_value());
+                CHECK(!evaluate("null " + op + " str", vars).has_value());
+
+                CHECK(!evaluate("int " + op + " null", vars).has_value());
+                CHECK(!evaluate("flt " + op + " null", vars).has_value());
+                CHECK(!evaluate("bool " + op + " null", vars).has_value());
+                CHECK(!evaluate("obj " + op + " null", vars).has_value());
+                CHECK(!evaluate("arr " + op + " null", vars).has_value());
+                CHECK(!evaluate("str " + op + " null", vars).has_value());
+
                 if (op != "and" && op != "or") {
                     CHECK(!evaluate("bool " + op + " bool", vars).has_value());
                 }
@@ -126,6 +163,7 @@ TEST_CASE("stress test", "[general]") {
                 CHECK(!evaluate(op + " arr", vars).has_value());
                 CHECK(!evaluate(op + " obj", vars).has_value());
                 CHECK(!evaluate(op + " bool", vars).has_value());
+                CHECK(!evaluate(op + " null", vars).has_value());
             }
         }
 
@@ -134,6 +172,7 @@ TEST_CASE("stress test", "[general]") {
         CHECK(!evaluate("not str", vars).has_value());
         CHECK(!evaluate("not arr", vars).has_value());
         CHECK(!evaluate("not obj", vars).has_value());
+        CHECK(!evaluate("not null", vars).has_value());
     }
 
     SECTION("good") {
@@ -160,6 +199,21 @@ TEST_CASE("stress test", "[general]") {
                 CHECK(evaluate("arr " + op + " arr", vars).has_value());
                 CHECK(evaluate("obj " + op + " obj", vars).has_value());
                 CHECK(evaluate("bool " + op + " bool", vars).has_value());
+                CHECK(evaluate("null " + op + " null", vars).has_value());
+
+                CHECK(evaluate("null " + op + " int", vars).has_value());
+                CHECK(evaluate("null " + op + " flt", vars).has_value());
+                CHECK(evaluate("null " + op + " bool", vars).has_value());
+                CHECK(evaluate("null " + op + " obj", vars).has_value());
+                CHECK(evaluate("null " + op + " arr", vars).has_value());
+                CHECK(evaluate("null " + op + " str", vars).has_value());
+
+                CHECK(evaluate("int " + op + " null", vars).has_value());
+                CHECK(evaluate("flt " + op + " null", vars).has_value());
+                CHECK(evaluate("bool " + op + " null", vars).has_value());
+                CHECK(evaluate("obj " + op + " null", vars).has_value());
+                CHECK(evaluate("arr " + op + " null", vars).has_value());
+                CHECK(evaluate("str " + op + " null", vars).has_value());
             }
 
             CHECK(evaluate("int " + op + " flt", vars).has_value());

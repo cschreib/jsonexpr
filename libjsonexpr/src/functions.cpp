@@ -53,7 +53,8 @@ constexpr bool is_arithmetic_not_bool =
 template<typename T, typename U>
 constexpr bool is_safe_to_compare =
     ((std::is_same_v<T, U> && !std::is_same_v<T, json::boolean_t> &&
-      !std::is_same_v<T, json::array_t> && !std::is_same_v<T, json>) ||
+      !std::is_same_v<T, json::array_t> && !std::is_same_v<T, json> &&
+      !std::is_same_v<T, std::nullptr_t>) ||
      (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>)) &&
     requires(T lhs, U rhs) { lhs <= rhs; };
 
@@ -156,6 +157,18 @@ bool safe_eq(const T& lhs, const T& rhs) {
 template<std::same_as<json> T>
 bool safe_ne(const T& lhs, const T& rhs) {
     return lhs != rhs;
+}
+
+template<typename T, typename U>
+    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
+safe_eq(const T& lhs, const U& rhs) {
+    return std::is_same_v<T, U>;
+}
+
+template<typename T, typename U>
+    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
+safe_ne(const T& lhs, const U& rhs) {
+    return !std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>

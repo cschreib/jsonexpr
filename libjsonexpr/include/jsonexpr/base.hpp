@@ -38,16 +38,18 @@ using json_variant = std::variant<
     json::string_t,
     json::array_t,
     json::boolean_t,
+    std::nullptr_t,
     json>;
 
 JSONEXPR_EXPORT json_variant to_variant(const json& j);
 
-JSONEXPR_EXPORT std::string_view get_type_name(const json& j) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::number_float_t& j) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::number_integer_t& j) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::string_t& j) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::array_t& j) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::boolean_t& j) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(const json&) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(json::number_float_t) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(json::number_integer_t) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(const json::string_t&) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(const json::array_t&) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(json::boolean_t) noexcept;
+JSONEXPR_EXPORT std::string_view get_type_name(std::nullptr_t) noexcept;
 
 using function_result       = expected<json, error>;
 using basic_function_result = expected<json, std::string>;
