@@ -16,7 +16,7 @@ std::string jsonexpr::format_error(std::string_view expression, const error& e) 
     return str.str();
 }
 
-std::string_view jsonexpr::get_type_name(const json& j) noexcept {
+std::string_view jsonexpr::get_dynamic_type_name(const json& j) noexcept {
     switch (j.type()) {
     case json::value_t::object: return "object";
     case json::value_t::array: return "array";
@@ -30,34 +30,45 @@ std::string_view jsonexpr::get_type_name(const json& j) noexcept {
     }
 }
 
-std::string_view jsonexpr::get_type_name(json::number_float_t) noexcept {
+template<>
+std::string_view jsonexpr::get_type_name<json::number_float_t>() noexcept {
     return "float";
 }
-std::string_view jsonexpr::get_type_name(json::number_integer_t) noexcept {
+
+template<>
+std::string_view jsonexpr::get_type_name<json::number_integer_t>() noexcept {
     return "int";
 }
-std::string_view jsonexpr::get_type_name(const json::string_t&) noexcept {
+
+template<>
+std::string_view jsonexpr::get_type_name<json::string_t>() noexcept {
     return "string";
 }
-std::string_view jsonexpr::get_type_name(const json::array_t&) noexcept {
+
+template<>
+std::string_view jsonexpr::get_type_name<json::array_t>() noexcept {
     return "array";
 }
-std::string_view jsonexpr::get_type_name(json::boolean_t) noexcept {
+
+template<>
+std::string_view jsonexpr::get_type_name<json::boolean_t>() noexcept {
     return "bool";
 }
-std::string_view jsonexpr::get_type_name(std::nullptr_t) noexcept {
+
+template<>
+std::string_view jsonexpr::get_type_name<std::nullptr_t>() noexcept {
     return "null";
 }
 
-json_variant jsonexpr::to_variant(const json& j) {
-    switch (j.type()) {
-    case json::value_t::array: return j.get<json::array_t>();
-    case json::value_t::string: return j.get<json::string_t>();
-    case json::value_t::boolean: return j.get<json::boolean_t>();
-    case json::value_t::number_unsigned: [[fallthrough]];
-    case json::value_t::number_integer: return j.get<json::number_integer_t>();
-    case json::value_t::number_float: return j.get<json::number_float_t>();
-    case json::value_t::null: return nullptr;
-    default: return j;
+template<>
+std::string_view jsonexpr::get_type_name<json>() noexcept {
+    return "object";
+}
+
+void function::add_overload(std::string key, basic_function_t func) {
+    if (!std::holds_alternative<overload_t>(overloads)) {
+        overloads.emplace<overload_t>();
     }
+
+    std::get<overload_t>(overloads)[key] = std::move(func);
 }

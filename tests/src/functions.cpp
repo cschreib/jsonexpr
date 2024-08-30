@@ -3,8 +3,9 @@
 TEST_CASE("function", "[general]") {
     function_registry funcs;
     register_function(
-        funcs, "std_except", 0, [](const json&) -> json { throw std::runtime_error("bad"); });
-    register_function(funcs, "unk_except", 0, [](const json&) -> json { throw 1; });
+        funcs, "std_except", +[]() -> basic_function_result { throw std::runtime_error("bad"); });
+    register_function(
+        funcs, "unk_except", +[]() -> basic_function_result { throw 1; });
 
     SECTION("bad") {
         CHECK(!evaluate("foo()").has_value());

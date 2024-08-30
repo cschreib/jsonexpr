@@ -7,9 +7,6 @@ TEST_CASE("variable", "[general]") {
     vars["A"] = "3"_json;
     vars["B"] = "4"_json;
 
-    function_registry funcs = default_functions();
-    register_function(funcs, "identity", 1, [](const json& j) { return j[0]; });
-
     SECTION("bad") {
         CHECK(!evaluate("d", vars).has_value());
         CHECK(!evaluate("ab", vars).has_value());

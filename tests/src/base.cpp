@@ -1,26 +1,27 @@
 #include "common.hpp"
 
 TEST_CASE("type name", "[general]") {
-    CHECK(get_type_name("true"_json) == "bool");
+    CHECK(get_dynamic_type_name("true"_json) == "bool");
     CHECK(get_type_name(true) == "bool");
 
-    CHECK(get_type_name("null"_json) == "null");
+    CHECK(get_dynamic_type_name("null"_json) == "null");
+    CHECK(get_type_name(nullptr) == "null");
 
-    CHECK(get_type_name("1"_json) == "int");
-    CHECK(get_type_name("-1"_json) == "int");
+    CHECK(get_dynamic_type_name("1"_json) == "int");
+    CHECK(get_dynamic_type_name("-1"_json) == "int");
     CHECK(get_type_name(std::int64_t{1}) == "int");
 
-    CHECK(get_type_name("1.0"_json) == "float");
+    CHECK(get_dynamic_type_name("1.0"_json) == "float");
     CHECK(get_type_name(1.0) == "float");
 
-    CHECK(get_type_name(R"("abc")"_json) == "string");
+    CHECK(get_dynamic_type_name(R"("abc")"_json) == "string");
     CHECK(get_type_name(std::string("abc")) == "string");
 
-    CHECK(get_type_name("[1,2,3]"_json) == "array");
+    CHECK(get_dynamic_type_name("[1,2,3]"_json) == "array");
     CHECK(get_type_name(std::vector<json>{}) == "array");
 
-    CHECK(get_type_name(R"({"a":1})"_json) == "object");
-    CHECK(get_type_name(std::unordered_map<std::string, json>{}) == "object");
+    CHECK(get_dynamic_type_name(R"({"a":1})"_json) == "object");
+    CHECK(get_type_name(json{}) == "object");
 }
 
 TEST_CASE("format error", "[general]") {

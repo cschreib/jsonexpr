@@ -36,16 +36,54 @@ expected<json, error> eval(
         return unexpected(node_error(n, "unknown function '" + std::string{f.name} + "'"));
     }
 
-    auto overload = iter->second.find(f.args.size());
-    if (overload == iter->second.end()) {
-        return unexpected(node_error(
-            n, "function does not take '" + std::to_string(f.args.size()) + "' arguments"));
-    }
-
-    const auto& func = overload->second.callable;
+    const auto& func = iter->second;
 
     try {
-        auto result = func(std::span<const ast::node>(f.args.begin(), f.args.end()), vreg, freg);
+        const auto args = std::span<const ast::node>(f.args.begin(), f.args.end());
+
+        auto result = [&]() -> function_result {
+            if (std::holds_alternative<function::ast_function_t>(func.overloads)) {
+                return std::get<function::ast_function_t>(func.overloads)(args, vreg, freg);
+            } else {
+                const auto& map = std::get<function::overload_t>(func.overloads);
+
+                std::vector<json> json_args;
+                std::string       key;
+                for (const auto& arg : args) {
+                    auto eval_arg = evaluate(arg, vreg, freg);
+                    if (!eval_arg.has_value()) {
+                        return unexpected(eval_arg.error());
+                    }
+                    json_args.push_back(std::move(eval_arg.value()));
+
+                    if (!key.empty()) {
+                        key += ",";
+                    }
+                    key += get_dynamic_type_name(json_args.back());
+                }
+
+                auto iter = map.find(key);
+                if (iter == map.end()) {
+                    std::string message = "no overload of '" + std::string{f.name} +
+                                          "' accepts the provided types (" + key + ")\n" +
+                                          "note: available overloads:";
+                    for (const auto& [key, value] : map) {
+                        message += "\n        " + std::string{f.name} + "(" + key + ")";
+                    }
+
+                    return unexpected(node_error(n, message));
+                }
+
+                auto result =
+                    iter->second(std::span<const json>(json_args.cbegin(), json_args.cend()));
+                if (result.has_value()) {
+                    return result.value();
+                } else {
+                    return unexpected(error{.message = result.error()});
+                }
+            }
+        }();
+
         if (result.has_value()) {
             return result.value();
         } else {
@@ -98,7 +136,7 @@ expected<json, error> eval(
         if (!key.value().is_string()) {
             return unexpected(node_error(
                 elem.first, "object key must be a string, got '" +
-                                std::string(get_type_name(key.value())) + "'"));
+                                std::string(get_dynamic_type_name(key.value())) + "'"));
         }
 
         auto value = eval(elem.second, vreg, freg);

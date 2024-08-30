@@ -32,38 +32,37 @@ struct error {
 
 JSONEXPR_EXPORT std::string format_error(std::string_view expression, const error& e);
 
-using json_variant = std::variant<
-    json::number_float_t,
-    json::number_integer_t,
-    json::string_t,
-    json::array_t,
-    json::boolean_t,
-    std::nullptr_t,
-    json>;
+JSONEXPR_EXPORT std::string_view get_dynamic_type_name(const json& j) noexcept;
 
-JSONEXPR_EXPORT json_variant to_variant(const json& j);
+template<typename T>
+JSONEXPR_EXPORT std::string_view get_type_name() noexcept;
 
-JSONEXPR_EXPORT std::string_view get_type_name(const json&) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(json::number_float_t) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(json::number_integer_t) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::string_t&) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(const json::array_t&) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(json::boolean_t) noexcept;
-JSONEXPR_EXPORT std::string_view get_type_name(std::nullptr_t) noexcept;
+template<typename T>
+std::string_view get_type_name(const T&) noexcept {
+    return get_type_name<T>();
+}
 
 using function_result       = expected<json, error>;
 using basic_function_result = expected<json, std::string>;
 
+template<typename... Args>
+using basic_function_ptr = basic_function_result (*)(const Args&...);
+
 struct function;
-using function_registry =
-    std::unordered_map<std::string, std::unordered_map<std::size_t, function>>;
+using function_registry = std::unordered_map<std::string, function>;
 
 using variable_registry = std::unordered_map<std::string, json>;
 
 struct function {
-    std::function<function_result(
-        std::span<const ast::node>, const variable_registry&, const function_registry&)>
-        callable;
+    using ast_function_t   = std::function<function_result(
+        std::span<const ast::node>, const variable_registry&, const function_registry&)>;
+    using basic_function_t = std::function<basic_function_result(std::span<const json>)>;
+
+    using overload_t = std::unordered_map<std::string, basic_function_t>;
+
+    std::variant<ast_function_t, overload_t> overloads;
+
+    void add_overload(std::string key, basic_function_t func);
 };
 } // namespace jsonexpr
 
