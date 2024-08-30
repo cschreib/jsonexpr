@@ -161,13 +161,13 @@ bool safe_ne(const T& lhs, const T& rhs) {
 
 template<typename T, typename U>
     requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
-safe_eq(const T& lhs, const U& rhs) {
+safe_eq(const T&, const U&) {
     return std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
     requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
-safe_ne(const T& lhs, const U& rhs) {
+safe_ne(const T&, const U&) {
     return !std::is_same_v<T, U>;
 }
 
