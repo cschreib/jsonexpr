@@ -2,7 +2,14 @@
 
 #include "jsonexpr/eval.hpp"
 
-#include <charconv>
+#if JSONEXPR_USE_STD_FROM_CHARS
+#    include <charconv>
+#else
+#    include <iomanip>
+#    include <locale>
+#    include <sstream>
+#endif
+
 #include <cmath>
 
 using namespace jsonexpr;
@@ -236,11 +243,6 @@ basic_function_result safe_contains(const T& lhs, const U& rhs) {
 
 template<bool Expected, std::same_as<std::string> T, std::same_as<json> U>
 basic_function_result safe_contains(const T& lhs, const U& rhs) {
-    if (!rhs.is_object()) {
-        return unexpected(
-            std::string("incompatible type for 'in', got " + std::string(get_type_name(rhs))));
-    }
-
     return rhs.contains(lhs) == Expected;
 }
 
@@ -273,18 +275,29 @@ basic_function_result safe_cast_int(const T& lhs) {
 
 template<std::same_as<json::string_t> T>
 basic_function_result safe_cast_int(const T& lhs) {
+    json::number_integer_t value = 0;
+
+#if JSONEXPR_USE_STD_FROM_CHARS
     const auto* begin = lhs.data();
     const auto* end   = lhs.data() + lhs.size();
+
+    // Ignore leading '+' sign, not supported by std::from_chars.
     if (begin != end && *begin == '+') {
-        // Ignore leading '+' sign, not supported by std::from_chars.
         ++begin;
     }
 
-    json::number_integer_t value = 0;
-    auto [last, error_code]      = std::from_chars(begin, end, value);
+    auto [last, error_code] = std::from_chars(begin, end, value);
     if (error_code != std::errc{} || last != end) {
         return unexpected(std::string("could not convert string '" + lhs + "' to int"));
     }
+#else
+    std::istringstream stream(lhs);
+    stream.imbue(std::locale::classic());
+
+    if (!(stream >> std::noskipws >> value) || !stream.eof()) {
+        return unexpected(std::string("could not convert string '" + lhs + "' to int"));
+    }
+#endif
 
     return value;
 }
@@ -297,18 +310,29 @@ basic_function_result safe_cast_float(const T& lhs) {
 
 template<std::same_as<json::string_t> T>
 basic_function_result safe_cast_float(const T& lhs) {
+    json::number_float_t value = 0;
+
+#if JSONEXPR_USE_STD_FROM_CHARS
     const auto* begin = lhs.data();
     const auto* end   = lhs.data() + lhs.size();
+
+    // Ignore leading '+' sign, not supported by std::from_chars.
     if (begin != end && *begin == '+') {
-        // Ignore leading '+' sign, not supported by std::from_chars.
         ++begin;
     }
 
-    json::number_float_t value = 0.0;
-    auto [last, error_code]    = std::from_chars(begin, end, value);
+    auto [last, error_code] = std::from_chars(begin, end, value);
     if (error_code != std::errc{} || last != end) {
         return unexpected(std::string("could not convert string '" + lhs + "' to float"));
     }
+#else
+    std::istringstream stream(lhs);
+    stream.imbue(std::locale::classic());
+
+    if (!(stream >> std::noskipws >> value) || !stream.eof()) {
+        return unexpected(std::string("could not convert string '" + lhs + "' to float"));
+    }
+#endif
 
     return value;
 }
@@ -328,12 +352,13 @@ basic_function_result safe_cast_bool(const T& lhs) {
 
 template<std::same_as<json::string_t> T>
 basic_function_result safe_cast_bool(const T& lhs) {
-    auto result = json::parse(lhs, nullptr, false);
-    if (result.type() != json::value_t::boolean) {
+    if (lhs == "true") {
+        return true;
+    } else if (lhs == "false") {
+        return false;
+    } else {
         return unexpected(std::string("could not convert string '" + lhs + "' to bool"));
     }
-
-    return result;
 }
 
 basic_function_result safe_cast_string(const json& args) {

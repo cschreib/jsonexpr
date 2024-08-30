@@ -18,7 +18,7 @@ jobs:
         platform:
         - { name: Ubuntu GCC,             os: ubuntu-latest,  publish: true,  compiler: g++,     arch: "64", build: "ubuntu64-libstdc++", cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS='--coverage'"}
         - { name: Ubuntu GCC shared,      os: ubuntu-latest,  publish: false, compiler: g++,     arch: "64", build: "ubuntu64-libstdc++", cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=g++ -DBUILD_SHARED_LIBS=1"}
-        - { name: Ubuntu Clang,           os: ubuntu-latest,  publish: true,  compiler: clang++, arch: "64", build: "ubuntu64-libc++",    cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS='-stdlib=libc++'"}
+        - { name: Ubuntu Clang,           os: ubuntu-latest,  publish: true,  compiler: clang++, arch: "64", build: "ubuntu64-libc++",    cmakepp: "",        flags: "-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS='-stdlib=libc++' -DJSONEXPR_USE_STD_FROM_CHARS=off"}
         - { name: Windows 32,             os: windows-latest, publish: true,  compiler: vs2019,  arch: "32", build: "win32-vs2019",       cmakepp: "",        flags: "-A Win32"}
         - { name: Windows 64,             os: windows-latest, publish: true,  compiler: vs2019,  arch: "64", build: "win64-vs2019",       cmakepp: "",        flags: "-A x64"}
         - { name: Windows 64 shared,      os: windows-latest, publish: false, compiler: vs2019,  arch: "64", build: "win64-vs2019",       cmakepp: "",        flags: "-A x64 -DBUILD_SHARED_LIBS=1"}

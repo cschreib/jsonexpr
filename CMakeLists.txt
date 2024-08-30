@@ -25,6 +25,7 @@ set(JSONEXPR_TEST  OFF  CACHE BOOL "Build tests.")
 set(JSONEXPR_USE_SYSTEM_JSON     OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
 set(JSONEXPR_USE_SYSTEM_EXPECTED OFF CACHE BOOL "Use a pre-installed version of tl::expected. Else, download.")
 set(JSONEXPR_USE_STD_EXPECTED    OFF CACHE BOOL "Use std::expected (requires C++23). Else, use tl::expected.")
+set(JSONEXPR_USE_STD_FROM_CHARS  ON  CACHE BOOL "Use std::from_chars (requires C++17). Else, use streams.")
 
 # Development options.
 set(JSONEXPR_DEV OFF CACHE BOOL "Enable warnings in compilation.")

@@ -403,6 +403,9 @@ TEST_CASE("int", "[functions]") {
         CHECK(!evaluate("int('abc')").has_value());
         CHECK(!evaluate("int('1a')").has_value());
         CHECK(!evaluate("int('1.0')").has_value());
+        CHECK(!evaluate("int(' 1')").has_value());
+        CHECK(!evaluate("int(' +1')").has_value());
+        CHECK(!evaluate("int(' -1')").has_value());
         CHECK(!evaluate("int('+ 1')").has_value());
         CHECK(!evaluate("int('- 1')").has_value());
     }
@@ -444,6 +447,9 @@ TEST_CASE("float", "[functions]") {
         CHECK(!evaluate("float('')").has_value());
         CHECK(!evaluate("float('abc')").has_value());
         CHECK(!evaluate("float('1a')").has_value());
+        CHECK(!evaluate("float(' 1')").has_value());
+        CHECK(!evaluate("float(' +1')").has_value());
+        CHECK(!evaluate("float(' -1')").has_value());
         CHECK(!evaluate("float('+ 1')").has_value());
         CHECK(!evaluate("float('- 1')").has_value());
     }
@@ -497,6 +503,8 @@ TEST_CASE("bool", "[functions]") {
 
         CHECK(!evaluate("bool('')").has_value());
         CHECK(!evaluate("bool('abc')").has_value());
+        CHECK(!evaluate("bool(' true')").has_value());
+        CHECK(!evaluate("bool(' false')").has_value());
     }
 
     SECTION("good") {
