@@ -44,77 +44,9 @@ void jsonexpr::register_function(
 }
 
 namespace {
-// We define our operators based on what is allowed in C++. However, C++ is not always sane,
-// for example when allowing mixed operations with booleans (true < 1.0).
-// Hence we define our own traits to identify acceptable types in operations.
-template<typename T>
-constexpr bool is_arithmetic_not_bool =
-    std::is_arithmetic_v<T> && !std::is_same_v<T, json::boolean_t>;
-
-template<typename T, typename U>
-constexpr bool is_safe_to_compare =
-    ((std::is_same_v<T, U> && !std::is_same_v<T, json::boolean_t> &&
-      !std::is_same_v<T, json::array_t> && !std::is_same_v<T, json> &&
-      !std::is_same_v<T, std::nullptr_t>) ||
-     (is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>)) &&
-    requires(T lhs, U rhs) { lhs <= rhs; };
-
-template<typename T, typename U>
-constexpr bool is_safe_for_maths = is_arithmetic_not_bool<T> && is_arithmetic_not_bool<U>;
-
-#define UNARY_FUNCTION(NAME, EXPR)                                                                 \
-    register_function(freg, NAME, 1, [](const json& args) -> basic_function_result {               \
-        return std::visit(                                                                         \
-            [](const auto& lhs) -> basic_function_result {                                         \
-                if constexpr (requires { EXPR; }) {                                                \
-                    return EXPR;                                                                   \
-                } else {                                                                           \
-                    return unexpected(                                                             \
-                        std::string("incompatible type for '" NAME "', got ") +                    \
-                        std::string(get_type_name(lhs)));                                          \
-                }                                                                                  \
-            },                                                                                     \
-            to_variant(args[0]));                                                                  \
-    })
-
-#define BINARY_FUNCTION(NAME, EXPR)                                                                \
-    register_function(freg, NAME, 2, [](const json& args) -> basic_function_result {               \
-        return std::visit(                                                                         \
-            [](const auto& lhs, const auto& rhs) -> basic_function_result {                        \
-                if constexpr (requires { EXPR; }) {                                                \
-                    return EXPR;                                                                   \
-                } else {                                                                           \
-                    return unexpected(                                                             \
-                        std::string("incompatible types for '" NAME "', got ") +                   \
-                        std::string(get_type_name(lhs)) + " and " +                                \
-                        std::string(get_type_name(rhs)));                                          \
-                }                                                                                  \
-            },                                                                                     \
-            to_variant(args[0]), to_variant(args[1]));                                             \
-    })
-
-#define TRINARY_FUNCTION(NAME, EXPR)                                                               \
-    register_function(freg, NAME, 3, [](const json& args) -> basic_function_result {               \
-        return std::visit(                                                                         \
-            [](const auto& first, const auto& second,                                              \
-               const auto& third) -> basic_function_result {                                       \
-                if constexpr (requires { EXPR; }) {                                                \
-                    return EXPR;                                                                   \
-                } else {                                                                           \
-                    return unexpected(                                                             \
-                        std::string("incompatible types for '" NAME "', got ") +                   \
-                        std::string(get_type_name(first)) + ", " +                                 \
-                        std::string(get_type_name(second)) + ", and " +                            \
-                        std::string(get_type_name(third)));                                        \
-                }                                                                                  \
-            },                                                                                     \
-            to_variant(args[0]), to_variant(args[1]), to_variant(args[2]));                        \
-    })
-
 #define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
-        requires(is_safe_to_compare<T, U>) bool                                                    \
-    safe_##NAME(const T& lhs, const U& rhs) {                                                      \
+    basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
                 OPERATOR static_cast<json::number_float_t>(rhs);                                   \
@@ -130,51 +62,20 @@ COMPARISON_OPERATOR(le, <=)
 COMPARISON_OPERATOR(gt, >)
 COMPARISON_OPERATOR(ge, >=)
 
-template<std::same_as<json::boolean_t> T>
-bool safe_eq(T lhs, T rhs) {
-    return lhs == rhs;
-}
-
-template<std::same_as<json::boolean_t> T>
-bool safe_ne(T lhs, T rhs) {
-    return lhs != rhs;
-}
-
-template<std::same_as<json::array_t> T>
-bool safe_eq(const T& lhs, const T& rhs) {
-    return lhs == rhs;
-}
-
-template<std::same_as<json::array_t> T>
-bool safe_ne(const T& lhs, const T& rhs) {
-    return lhs != rhs;
-}
-
-template<std::same_as<json> T>
-bool safe_eq(const T& lhs, const T& rhs) {
-    return lhs == rhs;
-}
-
-template<std::same_as<json> T>
-bool safe_ne(const T& lhs, const T& rhs) {
-    return lhs != rhs;
-}
-
 template<typename T, typename U>
-    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
-safe_eq(const T&, const U&) {
+    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>)
+basic_function_result safe_eq(const T&, const U&) {
     return std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
-    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>) bool
-safe_ne(const T&, const U&) {
+    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>)
+basic_function_result safe_ne(const T&, const U&) {
     return !std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
-    requires(is_safe_to_compare<T, U>)
-auto safe_min(const T& lhs, const U& rhs) {
+basic_function_result safe_min(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
         const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
@@ -185,8 +86,7 @@ auto safe_min(const T& lhs, const U& rhs) {
 }
 
 template<typename T, typename U>
-    requires(is_safe_to_compare<T, U>)
-auto safe_max(const T& lhs, const U& rhs) {
+basic_function_result safe_max(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
         const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
@@ -198,8 +98,7 @@ auto safe_max(const T& lhs, const U& rhs) {
 
 #define MATHS_OPERATOR(NAME, OPERATOR)                                                             \
     template<typename T, typename U>                                                               \
-        requires(is_safe_for_maths<T, U>)                                                          \
-    auto safe_##NAME(const T& lhs, const U& rhs) {                                                 \
+    basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
         if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
             return static_cast<json::number_float_t>(lhs)                                          \
                 OPERATOR static_cast<json::number_float_t>(rhs);                                   \
@@ -212,26 +111,18 @@ MATHS_OPERATOR(mul, *)
 MATHS_OPERATOR(add, +)
 MATHS_OPERATOR(sub, -)
 
-template<std::same_as<json::string_t> T>
-T safe_add(const T& lhs, const T& rhs) {
-    return lhs + rhs;
-}
-
 template<typename T>
-    requires(is_arithmetic_not_bool<T>)
-T safe_unary_plus(T lhs) {
+basic_function_result safe_unary_plus(const T& lhs) {
     return lhs;
 }
 
 template<typename T>
-    requires(is_arithmetic_not_bool<T>)
-T safe_unary_minus(T lhs) {
+basic_function_result safe_unary_minus(const T& lhs) {
     return -lhs;
 }
 
 template<typename T, typename U>
-    requires(is_safe_for_maths<T, U>)
-basic_function_result safe_div(T lhs, U rhs) {
+basic_function_result safe_div(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
         return static_cast<json::number_float_t>(lhs) / static_cast<json::number_float_t>(rhs);
     } else {
@@ -244,8 +135,7 @@ basic_function_result safe_div(T lhs, U rhs) {
 }
 
 template<typename T, typename U>
-    requires(is_safe_for_maths<T, U>)
-basic_function_result safe_mod(T lhs, U rhs) {
+basic_function_result safe_mod(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
         return std::fmod(
             static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
@@ -260,8 +150,7 @@ basic_function_result safe_mod(T lhs, U rhs) {
 
 #define UNARY_MATH_FUNCTION(NAME, FUNC, RETURN)                                                    \
     template<typename T>                                                                           \
-        requires(is_arithmetic_not_bool<T>)                                                        \
-    RETURN safe_##NAME(T lhs) {                                                                    \
+    basic_function_result safe_##NAME(const T& lhs) {                                              \
         return static_cast<RETURN>(FUNC(static_cast<json::number_float_t>(lhs)));                  \
     }
 
@@ -272,8 +161,7 @@ UNARY_MATH_FUNCTION(sqrt, std::sqrt, json::number_float_t)
 UNARY_MATH_FUNCTION(abs, std::abs, json::number_float_t)
 
 template<typename T, typename U>
-    requires(is_safe_for_maths<T, U>)
-auto safe_pow(T lhs, U rhs) {
+basic_function_result safe_pow(const T& lhs, const U& rhs) {
     return std::pow(static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
 }
 
@@ -282,9 +170,7 @@ std::size_t normalize_index(json::number_integer_t i, std::size_t size) {
 }
 
 template<typename T, typename U>
-    requires(
-        std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t> &&
-        requires(const T& lhs, U rhs) { lhs[rhs]; })
+    requires(std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>)
 basic_function_result safe_access(const T& lhs, const U& rhs) {
     const std::size_t unsigned_rhs = normalize_index(rhs, lhs.size());
     if (unsigned_rhs >= lhs.size()) {
@@ -312,10 +198,7 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
 }
 
 template<typename T, typename U>
-    requires(
-        (std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>) &&
-        std::is_integral_v<U> && !std::is_same_v<U, json::boolean_t> &&
-        requires(const T& lhs, U rhs) { lhs[rhs]; })
+    requires(std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>)
 basic_function_result safe_range_access(const T& object, const U& begin, const U& end) {
     const std::size_t unsigned_begin = normalize_index(begin, object.size());
     const std::size_t unsigned_end   = end != std::numeric_limits<json::number_integer_t>::max()
@@ -346,24 +229,29 @@ basic_function_result safe_range_access(const T& object, const U& begin, const U
     }
 }
 
-template<typename T, std::same_as<json::array_t> U>
-basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
-    return (std::find(rhs.begin(), rhs.end(), lhs) != rhs.end()) == expected;
+template<bool Expected, typename T, std::same_as<json::array_t> U>
+basic_function_result safe_contains(const T& lhs, const U& rhs) {
+    return (std::find(rhs.begin(), rhs.end(), lhs) != rhs.end()) == Expected;
 }
 
-template<std::same_as<std::string> T, std::same_as<json> U>
-basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
+template<bool Expected, std::same_as<std::string> T, std::same_as<json> U>
+basic_function_result safe_contains(const T& lhs, const U& rhs) {
     if (!rhs.is_object()) {
         return unexpected(
             std::string("incompatible type for 'in', got " + std::string(get_type_name(rhs))));
     }
 
-    return rhs.contains(lhs) == expected;
+    return rhs.contains(lhs) == Expected;
 }
 
-template<std::same_as<std::string> T, std::same_as<std::string> U>
-basic_function_result safe_contains(bool expected, const T& lhs, const U& rhs) {
-    return (rhs.find(lhs) != rhs.npos) == expected;
+template<bool Expected, std::same_as<std::string> T, std::same_as<std::string> U>
+basic_function_result safe_contains(const T& lhs, const U& rhs) {
+    return (rhs.find(lhs) != rhs.npos) == Expected;
+}
+
+template<typename T>
+basic_function_result safe_len(const T& lhs) {
+    return static_cast<json::number_integer_t>(lhs.size());
 }
 
 template<typename T>
@@ -529,43 +417,487 @@ function_result safe_or(
 }
 } // namespace
 
+template<typename... Args>
+using basic_function = basic_function_result (*)(const Args&...);
+
+template<typename T>
+struct type_arity : std::integral_constant<std::size_t, T::arity> {};
+
+template<typename... Args>
+struct type_arity<basic_function<Args...>> : std::integral_constant<std::size_t, 0u> {};
+
+template<template<typename...> typename NextOverloadSet, typename... Args>
+struct overload_set {
+    NextOverloadSet<Args..., json::number_integer_t> arg_int    = {};
+    NextOverloadSet<Args..., json::number_float_t>   arg_flt    = {};
+    NextOverloadSet<Args..., json::boolean_t>        arg_bool   = {};
+    NextOverloadSet<Args..., json::string_t>         arg_string = {};
+    NextOverloadSet<Args..., json::array_t>          arg_array  = {};
+    NextOverloadSet<Args..., std::nullptr_t>         arg_null   = {};
+    NextOverloadSet<Args..., json>                   arg_object = {};
+
+    static constexpr std::size_t arity = 1u + type_arity<NextOverloadSet<Args..., json>>::value;
+
+    auto operator<=>(const overload_set&) const noexcept = default;
+};
+
+template<typename... Args>
+using unary_overload_set_impl = overload_set<basic_function, Args...>;
+using unary_overload_set      = unary_overload_set_impl<>;
+
+template<typename... Args>
+using binary_overload_set_impl = overload_set<unary_overload_set_impl, Args...>;
+using binary_overload_set      = binary_overload_set_impl<>;
+
+template<typename... Args>
+using trinary_overload_set_impl = overload_set<binary_overload_set_impl, Args...>;
+using trinary_overload_set      = trinary_overload_set_impl<>;
+
+template<typename OverloadSet>
+bool has_function(const OverloadSet& set) {
+    return set != OverloadSet{};
+}
+
+template<typename OverloadSet, typename... Args>
+    requires(type_arity<OverloadSet>::value == 0u)
+function_result call(
+    const OverloadSet& func,
+    std::span<const ast::node>,
+    const variable_registry&,
+    const function_registry&,
+    const Args&... args) {
+
+    auto result = (*func)(args...);
+    if (result.has_value()) {
+        return std::move(result.value());
+    } else {
+        return unexpected(error{.message = result.error()});
+    }
+}
+
+template<typename OverloadSet, typename... Args>
+    requires(type_arity<OverloadSet>::value > 0u)
+function_result call(
+    const OverloadSet&         set,
+    std::span<const ast::node> next_args,
+    const variable_registry&   vars,
+    const function_registry&   funs,
+    const Args&... prev_args) {
+
+    const auto eval_result = evaluate(next_args[0], vars, funs);
+    if (!eval_result.has_value()) {
+        return unexpected(eval_result.error());
+    }
+
+    const auto& arg = eval_result.value();
+
+    switch (arg.type()) {
+    case json::value_t::array:
+        if (has_function(set.arg_array)) {
+            return call(
+                set.arg_array, next_args.subspan(1), vars, funs, prev_args...,
+                arg.get_ref<const json::array_t&>());
+        }
+        break;
+    case json::value_t::string: {
+        if (has_function(set.arg_string)) {
+            return call(
+                set.arg_string, next_args.subspan(1), vars, funs, prev_args...,
+                arg.get_ref<const json::string_t&>());
+        }
+        break;
+    }
+    case json::value_t::boolean: {
+        if (has_function(set.arg_bool)) {
+            return call(
+                set.arg_bool, next_args.subspan(1), vars, funs, prev_args...,
+                arg.get<json::boolean_t>());
+        }
+        break;
+    }
+    case json::value_t::number_unsigned: [[fallthrough]];
+    case json::value_t::number_integer: {
+        if (has_function(set.arg_int)) {
+            return call(
+                set.arg_int, next_args.subspan(1), vars, funs, prev_args...,
+                arg.get<json::number_integer_t>());
+        }
+        break;
+    }
+    case json::value_t::number_float: {
+        if (has_function(set.arg_flt)) {
+            return call(
+                set.arg_flt, next_args.subspan(1), vars, funs, prev_args...,
+                arg.get<json::number_float_t>());
+        }
+        break;
+    }
+    case json::value_t::null: {
+        if (has_function(set.arg_null)) {
+            return call(set.arg_null, next_args.subspan(1), vars, funs, prev_args..., nullptr);
+        }
+        break;
+    }
+    default: {
+        if (has_function(set.arg_object)) {
+            return call(set.arg_object, next_args.subspan(1), vars, funs, prev_args..., arg);
+        }
+        break;
+    }
+    }
+
+    return unexpected(node_error(
+        next_args[0], std::string("incompatible type, got ") + std::string(get_type_name(arg))));
+}
+
+void register_function(
+    function_registry& funcs, std::string_view name, unary_overload_set overload) {
+    register_function(
+        funcs, name, overload.arity,
+        [overload = std::move(overload)](
+            std::span<const ast::node> args, const variable_registry& vars,
+            const function_registry& funs) -> function_result {
+            return call(overload, args, vars, funs);
+        });
+}
+
+void register_function(
+    function_registry& funcs, std::string_view name, binary_overload_set overload) {
+    register_function(
+        funcs, name, overload.arity,
+        [overload = std::move(overload)](
+            std::span<const ast::node> args, const variable_registry& vars,
+            const function_registry& funs) -> function_result {
+            return call(overload, args, vars, funs);
+        });
+}
+
+void register_function(
+    function_registry& funcs, std::string_view name, trinary_overload_set overload) {
+    register_function(
+        funcs, name, overload.arity,
+        [overload = std::move(overload)](
+            std::span<const ast::node> args, const variable_registry& vars,
+            const function_registry& funs) -> function_result {
+            return call(overload, args, vars, funs);
+        });
+}
+
 function_registry jsonexpr::default_functions() {
     function_registry freg;
-    BINARY_FUNCTION("==", safe_eq(lhs, rhs));
-    BINARY_FUNCTION("!=", safe_ne(lhs, rhs));
-    BINARY_FUNCTION(">", safe_gt(lhs, rhs));
-    BINARY_FUNCTION(">=", safe_ge(lhs, rhs));
-    BINARY_FUNCTION("<", safe_lt(lhs, rhs));
-    BINARY_FUNCTION("<=", safe_le(lhs, rhs));
-    BINARY_FUNCTION("/", safe_div(lhs, rhs));
-    BINARY_FUNCTION("*", safe_mul(lhs, rhs));
-    BINARY_FUNCTION("+", safe_add(lhs, rhs));
-    UNARY_FUNCTION("+", safe_unary_plus(lhs));
-    BINARY_FUNCTION("-", safe_sub(lhs, rhs));
-    UNARY_FUNCTION("-", safe_unary_minus(lhs));
-    BINARY_FUNCTION("%", safe_mod(lhs, rhs));
-    BINARY_FUNCTION("**", safe_pow(lhs, rhs));
-    BINARY_FUNCTION("[]", safe_access(lhs, rhs));
-    TRINARY_FUNCTION("[:]", safe_range_access(first, second, third));
-    BINARY_FUNCTION("min", safe_min(lhs, rhs));
-    BINARY_FUNCTION("max", safe_max(lhs, rhs));
-    UNARY_FUNCTION("abs", safe_abs(lhs));
-    UNARY_FUNCTION("sqrt", safe_sqrt(lhs));
-    UNARY_FUNCTION("round", safe_round(lhs));
-    UNARY_FUNCTION("floor", safe_floor(lhs));
-    UNARY_FUNCTION("ceil", safe_ceil(lhs));
-    UNARY_FUNCTION("len", lhs.size());
-    BINARY_FUNCTION("in", safe_contains(true, lhs, rhs));
-    BINARY_FUNCTION("not in", safe_contains(false, lhs, rhs));
-    UNARY_FUNCTION("int", safe_cast_int(lhs));
-    UNARY_FUNCTION("float", safe_cast_float(lhs));
-    UNARY_FUNCTION("bool", safe_cast_bool(lhs));
     register_function(freg, "str", 1, &safe_cast_string);
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_function(freg, "not", 1, &safe_not);
     register_function(freg, "and", 2, &safe_and);
     register_function(freg, "or", 2, &safe_or);
+
+    register_function(
+        freg, "+",
+        unary_overload_set{
+            .arg_int = &safe_unary_plus<json::number_integer_t>,
+            .arg_flt = &safe_unary_plus<json::number_float_t>});
+
+    register_function(
+        freg, "-",
+        unary_overload_set{
+            .arg_int = &safe_unary_minus<json::number_integer_t>,
+            .arg_flt = &safe_unary_minus<json::number_float_t>});
+
+    register_function(
+        freg, "abs",
+        unary_overload_set{
+            .arg_int = &safe_abs<json::number_integer_t>,
+            .arg_flt = &safe_abs<json::number_float_t>});
+
+    register_function(
+        freg, "sqrt",
+        unary_overload_set{
+            .arg_int = &safe_sqrt<json::number_integer_t>,
+            .arg_flt = &safe_sqrt<json::number_float_t>});
+
+    register_function(
+        freg, "round",
+        unary_overload_set{
+            .arg_int = &safe_round<json::number_integer_t>,
+            .arg_flt = &safe_round<json::number_float_t>});
+
+    register_function(
+        freg, "floor",
+        unary_overload_set{
+            .arg_int = &safe_floor<json::number_integer_t>,
+            .arg_flt = &safe_floor<json::number_float_t>});
+
+    register_function(
+        freg, "ceil",
+        unary_overload_set{
+            .arg_int = &safe_ceil<json::number_integer_t>,
+            .arg_flt = &safe_ceil<json::number_float_t>});
+
+    register_function(
+        freg, "len",
+        unary_overload_set{
+            .arg_string = &safe_len<json::string_t>,
+            .arg_array  = &safe_len<json::array_t>,
+            .arg_object = &safe_len<json>});
+
+    register_function(
+        freg, "min",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_min<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_min<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_min<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_min<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_min<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "max",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_max<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_max<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_max<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_max<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_max<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "int",
+        unary_overload_set{
+            .arg_int    = &safe_cast_int<json::number_integer_t>,
+            .arg_flt    = &safe_cast_int<json::number_float_t>,
+            .arg_bool   = &safe_cast_int<json::boolean_t>,
+            .arg_string = &safe_cast_int<json::string_t>});
+
+    register_function(
+        freg, "float",
+        unary_overload_set{
+            .arg_int    = &safe_cast_float<json::number_integer_t>,
+            .arg_flt    = &safe_cast_float<json::number_float_t>,
+            .arg_bool   = &safe_cast_float<json::boolean_t>,
+            .arg_string = &safe_cast_float<json::string_t>});
+
+    register_function(
+        freg, "bool",
+        unary_overload_set{
+            .arg_int    = &safe_cast_bool<json::number_integer_t>,
+            .arg_flt    = &safe_cast_bool<json::number_float_t>,
+            .arg_bool   = &safe_cast_bool<json::boolean_t>,
+            .arg_string = &safe_cast_bool<json::string_t>});
+
+    register_function(
+        freg, "==",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int  = &safe_eq<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt  = &safe_eq<json::number_integer_t, json::number_float_t>,
+                 .arg_null = &safe_eq<json::number_integer_t, std::nullptr_t>},
+            .arg_flt =
+                {.arg_int  = &safe_eq<json::number_float_t, json::number_integer_t>,
+                 .arg_flt  = &safe_eq<json::number_float_t, json::number_float_t>,
+                 .arg_null = &safe_eq<json::number_float_t, std::nullptr_t>},
+            .arg_bool =
+                {.arg_bool = &safe_eq<json::boolean_t, json::boolean_t>,
+                 .arg_null = &safe_eq<json::boolean_t, std::nullptr_t>},
+            .arg_string =
+                {.arg_string = &safe_eq<json::string_t, json::string_t>,
+                 .arg_null   = &safe_eq<json::string_t, std::nullptr_t>},
+            .arg_array =
+                {.arg_array = &safe_eq<json::array_t, json::array_t>,
+                 .arg_null  = &safe_eq<json::array_t, std::nullptr_t>},
+            .arg_null =
+                {.arg_int    = &safe_eq<std::nullptr_t, json::number_integer_t>,
+                 .arg_flt    = &safe_eq<std::nullptr_t, json::number_float_t>,
+                 .arg_bool   = &safe_eq<std::nullptr_t, json::boolean_t>,
+                 .arg_string = &safe_eq<std::nullptr_t, json::string_t>,
+                 .arg_array  = &safe_eq<std::nullptr_t, json::array_t>,
+                 .arg_null   = &safe_eq<std::nullptr_t, std::nullptr_t>,
+                 .arg_object = &safe_eq<std::nullptr_t, json>},
+            .arg_object = {
+                .arg_null = &safe_eq<json, std::nullptr_t>, .arg_object = &safe_eq<json, json>}});
+
+    register_function(
+        freg, "!=",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int  = &safe_ne<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt  = &safe_ne<json::number_integer_t, json::number_float_t>,
+                 .arg_null = &safe_ne<json::number_integer_t, std::nullptr_t>},
+            .arg_flt =
+                {.arg_int  = &safe_ne<json::number_float_t, json::number_integer_t>,
+                 .arg_flt  = &safe_ne<json::number_float_t, json::number_float_t>,
+                 .arg_null = &safe_ne<json::number_float_t, std::nullptr_t>},
+            .arg_bool =
+                {.arg_bool = &safe_ne<json::boolean_t, json::boolean_t>,
+                 .arg_null = &safe_ne<json::boolean_t, std::nullptr_t>},
+            .arg_string =
+                {.arg_string = &safe_ne<json::string_t, json::string_t>,
+                 .arg_null   = &safe_ne<json::string_t, std::nullptr_t>},
+            .arg_array =
+                {.arg_array = &safe_ne<json::array_t, json::array_t>,
+                 .arg_null  = &safe_ne<json::array_t, std::nullptr_t>},
+            .arg_null =
+                {.arg_int    = &safe_ne<std::nullptr_t, json::number_integer_t>,
+                 .arg_flt    = &safe_ne<std::nullptr_t, json::number_float_t>,
+                 .arg_bool   = &safe_ne<std::nullptr_t, json::boolean_t>,
+                 .arg_string = &safe_ne<std::nullptr_t, json::string_t>,
+                 .arg_array  = &safe_ne<std::nullptr_t, json::array_t>,
+                 .arg_null   = &safe_ne<std::nullptr_t, std::nullptr_t>,
+                 .arg_object = &safe_ne<std::nullptr_t, json>},
+            .arg_object = {
+                .arg_null = &safe_ne<json, std::nullptr_t>, .arg_object = &safe_ne<json, json>}});
+
+    register_function(
+        freg, ">",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_gt<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_gt<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_gt<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_gt<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_gt<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, ">=",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_ge<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_ge<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_ge<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_ge<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_ge<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "<",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_lt<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_lt<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_lt<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_lt<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_lt<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "<=",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_le<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_le<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_le<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_le<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_le<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "+",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_add<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_add<json::number_integer_t, json::number_float_t>},
+            .arg_flt =
+                {.arg_int = &safe_add<json::number_float_t, json::number_integer_t>,
+                 .arg_flt = &safe_add<json::number_float_t, json::number_float_t>},
+            .arg_string = {.arg_string = &safe_add<json::string_t, json::string_t>}});
+
+    register_function(
+        freg, "-",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_sub<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_sub<json::number_integer_t, json::number_float_t>},
+            .arg_flt = {
+                .arg_int = &safe_sub<json::number_float_t, json::number_integer_t>,
+                .arg_flt = &safe_sub<json::number_float_t, json::number_float_t>}});
+
+    register_function(
+        freg, "*",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_mul<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_mul<json::number_integer_t, json::number_float_t>},
+            .arg_flt = {
+                .arg_int = &safe_mul<json::number_float_t, json::number_integer_t>,
+                .arg_flt = &safe_mul<json::number_float_t, json::number_float_t>}});
+
+    register_function(
+        freg, "/",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_div<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_div<json::number_integer_t, json::number_float_t>},
+            .arg_flt = {
+                .arg_int = &safe_div<json::number_float_t, json::number_integer_t>,
+                .arg_flt = &safe_div<json::number_float_t, json::number_float_t>}});
+
+    register_function(
+        freg, "%",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_mod<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_mod<json::number_integer_t, json::number_float_t>},
+            .arg_flt = {
+                .arg_int = &safe_mod<json::number_float_t, json::number_integer_t>,
+                .arg_flt = &safe_mod<json::number_float_t, json::number_float_t>}});
+
+    register_function(
+        freg, "**",
+        binary_overload_set{
+            .arg_int =
+                {.arg_int = &safe_pow<json::number_integer_t, json::number_integer_t>,
+                 .arg_flt = &safe_pow<json::number_integer_t, json::number_float_t>},
+            .arg_flt = {
+                .arg_int = &safe_pow<json::number_float_t, json::number_integer_t>,
+                .arg_flt = &safe_pow<json::number_float_t, json::number_float_t>}});
+
+    register_function(
+        freg, "[]",
+        binary_overload_set{
+            .arg_string = {.arg_int = &safe_access<json::string_t, json::number_integer_t>},
+            .arg_array  = {.arg_int = &safe_access<json::array_t, json::number_integer_t>},
+            .arg_object = {.arg_string = &safe_access<json, json::string_t>}});
+
+    register_function(
+        freg, "[:]",
+        trinary_overload_set{
+            .arg_string =
+                {.arg_int =
+                     {.arg_int = &safe_range_access<json::string_t, json::number_integer_t>}},
+            .arg_array =
+                {.arg_int = {.arg_int = &safe_range_access<json::array_t, json::number_integer_t>}},
+        });
+
+    register_function(
+        freg, "in",
+        binary_overload_set{
+            .arg_int  = {.arg_array = &safe_contains<true, json::number_integer_t, json::array_t>},
+            .arg_flt  = {.arg_array = &safe_contains<true, json::number_float_t, json::array_t>},
+            .arg_bool = {.arg_array = &safe_contains<true, json::boolean_t, json::array_t>},
+            .arg_string =
+                {.arg_string = &safe_contains<true, json::string_t, json::string_t>,
+                 .arg_array  = &safe_contains<true, json::string_t, json::array_t>,
+                 .arg_object = &safe_contains<true, json::string_t, json>},
+            .arg_array  = {.arg_array = &safe_contains<true, json::array_t, json::array_t>},
+            .arg_null   = {.arg_array = &safe_contains<true, std::nullptr_t, json::array_t>},
+            .arg_object = {.arg_array = &safe_contains<true, json, json::array_t>}});
+
+    register_function(
+        freg, "not in",
+        binary_overload_set{
+            .arg_int  = {.arg_array = &safe_contains<false, json::number_integer_t, json::array_t>},
+            .arg_flt  = {.arg_array = &safe_contains<false, json::number_float_t, json::array_t>},
+            .arg_bool = {.arg_array = &safe_contains<false, json::boolean_t, json::array_t>},
+            .arg_string =
+                {.arg_string = &safe_contains<false, json::string_t, json::string_t>,
+                 .arg_array  = &safe_contains<false, json::string_t, json::array_t>,
+                 .arg_object = &safe_contains<false, json::string_t, json>},
+            .arg_array  = {.arg_array = &safe_contains<false, json::array_t, json::array_t>},
+            .arg_null   = {.arg_array = &safe_contains<false, std::nullptr_t, json::array_t>},
+            .arg_object = {.arg_array = &safe_contains<false, json, json::array_t>}});
 
     return freg;
 }
