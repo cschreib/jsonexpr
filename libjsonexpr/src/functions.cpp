@@ -2,6 +2,7 @@
 
 #include "jsonexpr/eval.hpp"
 
+#include <charconv>
 #include <cmath>
 
 using namespace jsonexpr;
@@ -384,13 +385,20 @@ basic_function_result safe_cast_int(const T& lhs) {
 
 template<std::same_as<json::string_t> T>
 basic_function_result safe_cast_int(const T& lhs) {
-    auto result = json::parse(lhs, nullptr, false);
-    if (result.type() != json::value_t::number_integer &&
-        result.type() != json::value_t::number_unsigned) {
+    const auto* begin = lhs.data();
+    const auto* end   = lhs.data() + lhs.size();
+    if (begin != end && *begin == '+') {
+        // Ignore leading '+' sign, not supported by std::from_chars.
+        ++begin;
+    }
+
+    json::number_integer_t value = 0;
+    auto [last, error_code]      = std::from_chars(begin, end, value);
+    if (error_code != std::errc{} || last != end) {
         return unexpected(std::string("could not convert string '" + lhs + "' to int"));
     }
 
-    return result.template get<json::number_integer_t>();
+    return value;
 }
 
 template<typename T>
@@ -401,28 +409,20 @@ basic_function_result safe_cast_float(const T& lhs) {
 
 template<std::same_as<json::string_t> T>
 basic_function_result safe_cast_float(const T& lhs) {
-    json::string_t lowered = lhs;
-    for (char& c : lowered) {
-        c = static_cast<char>(std::tolower(c));
+    const auto* begin = lhs.data();
+    const auto* end   = lhs.data() + lhs.size();
+    if (begin != end && *begin == '+') {
+        // Ignore leading '+' sign, not supported by std::from_chars.
+        ++begin;
     }
 
-    if (lowered == "inf" || lowered == "+inf") {
-        return std::numeric_limits<json::number_float_t>::infinity();
-    } else if (lowered == "-inf") {
-        return -std::numeric_limits<json::number_float_t>::infinity();
-    } else if (lowered == "nan") {
-        return std::numeric_limits<json::number_float_t>::quiet_NaN();
-    }
-
-    auto result = json::parse(lhs, nullptr, false);
-    if (result.type() != json::value_t::number_float &&
-        result.type() != json::value_t::number_integer &&
-        result.type() != json::value_t::number_unsigned) {
-
+    json::number_float_t value = 0.0;
+    auto [last, error_code]    = std::from_chars(begin, end, value);
+    if (error_code != std::errc{} || last != end) {
         return unexpected(std::string("could not convert string '" + lhs + "' to float"));
     }
 
-    return result.template get<json::number_float_t>();
+    return value;
 }
 
 template<typename T>

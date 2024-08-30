@@ -403,6 +403,8 @@ TEST_CASE("int", "[functions]") {
         CHECK(!evaluate("int('abc')").has_value());
         CHECK(!evaluate("int('1a')").has_value());
         CHECK(!evaluate("int('1.0')").has_value());
+        CHECK(!evaluate("int('+ 1')").has_value());
+        CHECK(!evaluate("int('- 1')").has_value());
     }
 
     SECTION("good") {
@@ -418,7 +420,11 @@ TEST_CASE("int", "[functions]") {
 
         CHECK(evaluate("int('0')") == "0"_json);
         CHECK(evaluate("int('1')") == "1"_json);
+        CHECK(evaluate("int('01')") == "1"_json);
+        CHECK(evaluate("int('+1')") == "1"_json);
+        CHECK(evaluate("int('-1')") == "-1"_json);
         CHECK(evaluate("int('1024')") == "1024"_json);
+        CHECK(evaluate("int('+1024')") == "1024"_json);
         CHECK(evaluate("int('-1024')") == "-1024"_json);
 
         CHECK(evaluate("int(true)") == "1"_json);
@@ -438,21 +444,27 @@ TEST_CASE("float", "[functions]") {
         CHECK(!evaluate("float('')").has_value());
         CHECK(!evaluate("float('abc')").has_value());
         CHECK(!evaluate("float('1a')").has_value());
+        CHECK(!evaluate("float('+ 1')").has_value());
+        CHECK(!evaluate("float('- 1')").has_value());
     }
 
     SECTION("good") {
         CHECK(evaluate("float(1.0)") == "1.0"_json);
 
-        CHECK(evaluate("float(1)") == "1"_json);
-        CHECK(evaluate("float(0)") == "0"_json);
-        CHECK(evaluate("float(-1)") == "-1"_json);
+        CHECK(evaluate("float(1)") == "1.0"_json);
+        CHECK(evaluate("float(0)") == "0.0"_json);
+        CHECK(evaluate("float(-1)") == "-1.0"_json);
 
-        CHECK(evaluate("float('0')") == "0"_json);
-        CHECK(evaluate("float('1')") == "1"_json);
-        CHECK(evaluate("float('1024')") == "1024"_json);
-        CHECK(evaluate("float('-1024')") == "-1024"_json);
+        CHECK(evaluate("float('0')") == "0.0"_json);
+        CHECK(evaluate("float('1')") == "1.0"_json);
+        CHECK(evaluate("float('+1')") == "1.0"_json);
+        CHECK(evaluate("float('-1')") == "-1.0"_json);
+        CHECK(evaluate("float('1024')") == "1024.0"_json);
+        CHECK(evaluate("float('+1024')") == "1024.0"_json);
+        CHECK(evaluate("float('-1024')") == "-1024.0"_json);
         CHECK(evaluate("float('1e5')") == "1e5"_json);
         CHECK(evaluate("float('1e-5')") == "1e-5"_json);
+        CHECK(evaluate("float('+1e5')") == "1e5"_json);
         CHECK(evaluate("float('-1e5')") == "-1e5"_json);
         CHECK(
             evaluate("float('inf')").value().get<float>() ==
