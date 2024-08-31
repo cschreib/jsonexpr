@@ -170,7 +170,7 @@ Note: in the example above we simply call `jsonexpr::evaluate(expr, vars)` to im
 
 ### Error handling
 
-The `evaluate()` and `parse()` functions return an "expected" type:
+The `evaluate()` and `parse()` functions return an "[expected](https://en.cppreference.com/w/cpp/utility/expected)" object:
 ```c++
 const auto result = jsonexpr::evaluate(expression);
 if (result.has_value()) {
