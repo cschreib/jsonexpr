@@ -57,16 +57,19 @@ The example expressions below assume the following JSON values are registered as
 
 Examples (and their value after `->`):
 ```
-bee.legs != cat.legs                  -> true
-bee.has_tail or cat.has_tail          -> true
-bee.legs + cat.legs                   -> 10
-bee.legs + cat.legs == 12             -> false
-min(bee.legs, cat.legs)               -> 4
-bee.sound == 'meow'                   -> false
-cat.sound == 'meow'                   -> true
-cat.sound + bee.sound                 -> "meowbzzz"
-cat.colors[0]                         -> "orange"
-cat.colors[(bee.legs - cat.legs)/2]   -> "black"
+bee.legs != cat.legs                      -> true
+bee.has_tail or cat.has_tail              -> true
+bee.legs + cat.legs                       -> 10
+bee.legs + cat.legs == 12                 -> false
+min(bee.legs, cat.legs)                   -> 4
+bee.sound == 'meow'                       -> false
+cat.sound == 'meow'                       -> true
+cat.sound + bee.sound                     -> "meowbzzz"
+cat.sound[0:2] + bee.sound[2:4]           -> "mezz"
+cat.colors[0]                             -> "orange"
+cat.colors[(bee.legs - cat.legs)/2]       -> "black"
+cat.sound if cat.has_tail else bee.sound  -> "meow"
+bee.colors[0] in cat.colors               -> false
 ```
 
 
@@ -98,6 +101,11 @@ White spaces are not significant and will be ignored (except inside strings).
  - Object can only be tested for equality. Sub-objects (or fields, or values) can be accessed with angled brackets (`{'a':1}['a']`); the index must be a string. Equivalently, sub-objects can also be accessed with a single dot (`{'a':1}.a`).
  - Null values can only be tested for equality with null itself (always true) and values of other types (always false). No other operation is possible.
 
+In addition to the above, the following generic operators are also available:
+ - `a if c else b`: evaluate and return `a` if condition `c` evaluates to `true`, else evaluate and return `b` (NB: this short-circuits evaluation of the unused operand).
+ - `a in b`: return true if `b` (a string, array, or object) contains `a`, false otherwise.
+ - `a not in b`: return true if `b` (a string, array, or object) does not contains `a`, false otherwise.
+
 
 ### Default functions
 
@@ -114,9 +122,6 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
  - `floor(a)`: return the nearest integer value to `a` (rounding down).
  - `ceil(a)`: return nearest integer value to `a` (rounding up).
  - `len(a)`: return the size (length) or an array, object, or string.
- - `a in b`: return true if `b` (a string, array, or object) contains `a`, false otherwise.
- - `a not in b`: return true if `b` (a string, array, or object) does not contains `a`, false otherwise.
- - `a if c else b`: evaluate and return `a` if condition `c` evaluates to `true`, else evaluate and return `b` (NB: this short-circuits evaluation of the unused operand).
 
 This list can be extended with your own functions, see below.
 
@@ -151,16 +156,8 @@ int main() {
     })"_json;
 
     // Evaluate some expressions.
-    jsonexpr::evaluate("bee.legs != cat.legs", vars).value();                // true
-    jsonexpr::evaluate("bee.has_tail or cat.has_tail", vars).value();        // true
-    jsonexpr::evaluate("bee.legs + cat.legs", vars).value();                 // 10
-    jsonexpr::evaluate("bee.legs + cat.legs == 12", vars).value();           // false
-    jsonexpr::evaluate("min(bee.legs, cat.legs)", vars).value();             // 4
-    jsonexpr::evaluate("bee.sound == 'meow'", vars).value();                 // false
-    jsonexpr::evaluate("cat.sound == 'meow'", vars).value();                 // true
-    jsonexpr::evaluate("cat.sound + bee.sound", vars).value();               // "meowbzzz"
-    jsonexpr::evaluate("cat.colors[0]", vars).value();                       // "orange"
-    jsonexpr::evaluate("cat.colors[(bee.legs - cat.legs)/2]", vars).value(); // "black"
+    jsonexpr::json result = jsonexpr::evaluate("bee.legs != cat.legs", vars).value();
+    // etc.
 }
 ```
 

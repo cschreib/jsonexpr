@@ -34,8 +34,11 @@ TEST_CASE("readme examples", "[general]") {
     CHECK(evaluate("bee.sound == 'meow'", vars) == "false"_json);
     CHECK(evaluate("cat.sound == 'meow'", vars) == "true"_json);
     CHECK(evaluate("cat.sound + bee.sound", vars) == R"("meowbzzz")"_json);
+    CHECK(evaluate("cat.sound[0:2] + bee.sound[2:4]", vars) == R"("mezz")"_json);
     CHECK(evaluate("cat.colors[0]", vars) == R"("orange")"_json);
     CHECK(evaluate("cat.colors[(bee.legs - cat.legs)/2]", vars) == R"("black")"_json);
+    CHECK(evaluate("cat.sound if cat.has_tail else bee.sound", vars) == R"("meow")"_json);
+    CHECK(evaluate("bee.colors[0] in cat.colors", vars) == "false"_json);
 }
 
 TEST_CASE("stress test", "[general]") {
