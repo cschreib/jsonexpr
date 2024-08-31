@@ -25,7 +25,7 @@ template<typename... Args>
 struct type_list {};
 
 template<typename Function, typename... Args, std::size_t... Indices>
-basic_function_result call(
+function_result call(
     Function              func,
     std::span<const json> args,
     type_list<Args...>,
@@ -45,17 +45,15 @@ concept stateless_lambda = (!function_ptr<T>) && requires(const T& func) {
 } // namespace impl
 
 template<typename R, typename... Args>
-    requires std::is_convertible_v<R, basic_function_result>
+    requires std::is_convertible_v<R, function_result>
 void register_function(function_registry& funcs, std::string_view name, R (*func)(Args...)) {
     std::string key;
     (impl::add_type(key, get_type_name<std::decay_t<Args>>()), ...);
 
-    funcs[std::string{name}].add_overload(
-        key, [=](std::span<const json> args) -> basic_function_result {
-            return impl::call(
-                func, args, impl::type_list<Args...>{},
-                std::make_index_sequence<sizeof...(Args)>{});
-        });
+    funcs[std::string{name}].add_overload(key, [=](std::span<const json> args) -> function_result {
+        return impl::call(
+            func, args, impl::type_list<Args...>{}, std::make_index_sequence<sizeof...(Args)>{});
+    });
 }
 
 template<impl::stateless_lambda Func>
@@ -66,7 +64,7 @@ void register_function(function_registry& funcs, std::string_view name, const Fu
 JSONEXPR_EXPORT void register_ast_function(
     function_registry&                                                                   funcs,
     std::string_view                                                                     name,
-    std::function<function_result(
+    std::function<ast_function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)> func);
 
 JSONEXPR_EXPORT function_registry default_functions();

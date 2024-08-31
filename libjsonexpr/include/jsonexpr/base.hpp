@@ -70,11 +70,11 @@ std::string_view get_type_name(const T&) noexcept {
     return get_type_name<T>();
 }
 
-using function_result       = expected<json, error>;
-using basic_function_result = expected<json, std::string>;
+using ast_function_result = expected<json, error>;
+using function_result     = expected<json, std::string>;
 
 template<typename... Args>
-using basic_function_ptr = basic_function_result (*)(const Args&...);
+using basic_function_ptr = function_result (*)(const Args&...);
 
 struct function;
 using function_registry = std::unordered_map<std::string, function>;
@@ -82,9 +82,9 @@ using function_registry = std::unordered_map<std::string, function>;
 using variable_registry = std::unordered_map<std::string, json>;
 
 struct function {
-    using ast_function_t   = std::function<function_result(
+    using ast_function_t   = std::function<ast_function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)>;
-    using basic_function_t = std::function<basic_function_result(std::span<const json>)>;
+    using basic_function_t = std::function<function_result(std::span<const json>)>;
 
     using overload_t = std::unordered_map<std::string, basic_function_t>;
 

@@ -227,12 +227,12 @@ Supported types for the C++ function parameters:
  - `jsonexpr::null_t = std::nullptr_t`, for null.
  - `jsonexpr::json = nlohmann::json`, for "any of the above" (handle type checks yourself).
 
-The return value must be (convertible to) `jsonexpr::json`, or `jsonexpr::basic_function_result` if handling errors (see below for more information on error handling).
+The return value must be (convertible to) `jsonexpr::json`, or `jsonexpr::function_result` if handling errors (see below for more information on error handling).
 
 
 #### Error handling
 
-The library will automatically take care of validating the type of each argument passed to this function, and report appropriate errors in case of a mismatch. However, if the function has error states based on the *values* of the parameters (e.g., here: the length of the array, or the types of the elements within it), these errors need to be handled and reported explicitly. This is done by returning a `jsonexpr::basic_function_result`, which is an alias for `jsonexpr::expected<jsonexpr::json, std::string>` (either a JSON value, or an error message).
+The library will automatically take care of validating the type of each argument passed to this function, and report appropriate errors in case of a mismatch. However, if the function has error states based on the *values* of the parameters (e.g., here: the length of the array, or the types of the elements within it), these errors need to be handled and reported explicitly. This is done by returning a `jsonexpr::function_result`, which is an alias for `jsonexpr::expected<jsonexpr::json, std::string>` (either a JSON value, or an error message).
 
 In the example below, we check that each element in the array is a string:
 
@@ -244,7 +244,7 @@ int main() {
     jsonexpr::register_function(
         funcs, "join",
         [](const std::vector<jsonexpr::json>& array,
-           const std::string&                 separator) -> jsonexpr::basic_function_result {
+           const std::string&                 separator) -> jsonexpr::function_result {
             for (std::size_t i = 0; i < array.size(); ++i) {
                 if (!array[i].is_string()) {
                     return jsonexpr::unexpected(

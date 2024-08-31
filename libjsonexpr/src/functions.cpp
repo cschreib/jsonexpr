@@ -18,7 +18,7 @@ namespace {
 #define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
         requires(!std::is_same_v<T, null_t> && !std::is_same_v<U, null_t>)                         \
-    basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
+    function_result safe_##NAME(const T& lhs, const U& rhs) {                                      \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
         } else {                                                                                   \
@@ -35,18 +35,18 @@ COMPARISON_OPERATOR(ge, >=)
 
 template<typename T, typename U>
     requires(std::is_same_v<T, null_t> || std::is_same_v<U, null_t>)
-basic_function_result safe_eq(const T&, const U&) {
+function_result safe_eq(const T&, const U&) {
     return std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
     requires(std::is_same_v<T, null_t> || std::is_same_v<U, null_t>)
-basic_function_result safe_ne(const T&, const U&) {
+function_result safe_ne(const T&, const U&) {
     return !std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
-basic_function_result safe_min(const T& lhs, const U& rhs) {
+function_result safe_min(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         const number_float_t lhs_float = static_cast<number_float_t>(lhs);
         const number_float_t rhs_float = static_cast<number_float_t>(rhs);
@@ -57,7 +57,7 @@ basic_function_result safe_min(const T& lhs, const U& rhs) {
 }
 
 template<typename T, typename U>
-basic_function_result safe_max(const T& lhs, const U& rhs) {
+function_result safe_max(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
         const number_float_t lhs_float = static_cast<number_float_t>(lhs);
         const number_float_t rhs_float = static_cast<number_float_t>(rhs);
@@ -69,7 +69,7 @@ basic_function_result safe_max(const T& lhs, const U& rhs) {
 
 #define MATHS_OPERATOR(NAME, OPERATOR)                                                             \
     template<typename T, typename U>                                                               \
-    basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
+    function_result safe_##NAME(const T& lhs, const U& rhs) {                                      \
         if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
             return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
         } else {                                                                                   \
@@ -82,17 +82,17 @@ MATHS_OPERATOR(add, +)
 MATHS_OPERATOR(sub, -)
 
 template<typename T>
-basic_function_result safe_unary_plus(const T& lhs) {
+function_result safe_unary_plus(const T& lhs) {
     return lhs;
 }
 
 template<typename T>
-basic_function_result safe_unary_minus(const T& lhs) {
+function_result safe_unary_minus(const T& lhs) {
     return -lhs;
 }
 
 template<typename T, typename U>
-basic_function_result safe_div(const T& lhs, const U& rhs) {
+function_result safe_div(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
         return static_cast<number_float_t>(lhs) / static_cast<number_float_t>(rhs);
     } else {
@@ -105,7 +105,7 @@ basic_function_result safe_div(const T& lhs, const U& rhs) {
 }
 
 template<typename T, typename U>
-basic_function_result safe_mod(const T& lhs, const U& rhs) {
+function_result safe_mod(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
         return std::fmod(static_cast<number_float_t>(lhs), static_cast<number_float_t>(rhs));
     } else {
@@ -118,32 +118,32 @@ basic_function_result safe_mod(const T& lhs, const U& rhs) {
 }
 
 template<typename T>
-basic_function_result safe_floor(T lhs) {
+function_result safe_floor(T lhs) {
     return static_cast<number_integer_t>(std::floor(lhs));
 }
 
 template<typename T>
-basic_function_result safe_ceil(T lhs) {
+function_result safe_ceil(T lhs) {
     return static_cast<number_integer_t>(std::ceil(lhs));
 }
 
 template<typename T>
-basic_function_result safe_round(T lhs) {
+function_result safe_round(T lhs) {
     return static_cast<number_integer_t>(std::round(lhs));
 }
 
 template<typename T>
-basic_function_result safe_abs(T lhs) {
+function_result safe_abs(T lhs) {
     return std::abs(lhs);
 }
 
 template<typename T>
-basic_function_result safe_sqrt(T lhs) {
+function_result safe_sqrt(T lhs) {
     return std::sqrt(static_cast<number_float_t>(lhs));
 }
 
 template<typename T>
-basic_function_result identity(T lhs) {
+function_result identity(T lhs) {
     return lhs;
 }
 
@@ -158,7 +158,7 @@ std::size_t normalize_index(number_integer_t i, std::size_t size) {
 
 template<typename T, typename U>
     requires(std::is_same_v<T, string_t> || std::is_same_v<T, array_t>)
-basic_function_result safe_access(const T& lhs, const U& rhs) {
+function_result safe_access(const T& lhs, const U& rhs) {
     const std::size_t unsigned_rhs = normalize_index(rhs, lhs.size());
     if (unsigned_rhs >= lhs.size()) {
         return unexpected(
@@ -176,7 +176,7 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
 }
 
 template<std::same_as<object_t> T, std::same_as<string_t> U>
-basic_function_result safe_access(const T& lhs, const U& rhs) {
+function_result safe_access(const T& lhs, const U& rhs) {
     const auto iter = lhs.find(rhs);
     if (iter == lhs.end()) {
         return unexpected(std::string("unknown field '") + rhs + "'");
@@ -187,7 +187,7 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
 
 template<typename T, typename U>
     requires(std::is_same_v<T, string_t> || std::is_same_v<T, array_t>)
-basic_function_result safe_range_access(const T& object, const U& begin, const U& end) {
+function_result safe_range_access(const T& object, const U& begin, const U& end) {
     const std::size_t unsigned_begin = normalize_index(begin, object.size());
     const std::size_t unsigned_end   = end != std::numeric_limits<number_integer_t>::max()
                                            ? normalize_index(end, object.size())
@@ -218,28 +218,28 @@ basic_function_result safe_range_access(const T& object, const U& begin, const U
 }
 
 template<bool Expected, typename T, std::same_as<array_t> U>
-basic_function_result safe_contains(const T& lhs, const U& rhs) {
+function_result safe_contains(const T& lhs, const U& rhs) {
     return (std::find(rhs.begin(), rhs.end(), lhs) != rhs.end()) == Expected;
 }
 
 template<bool Expected, std::same_as<std::string> T, std::same_as<object_t> U>
-basic_function_result safe_contains(const T& lhs, const U& rhs) {
+function_result safe_contains(const T& lhs, const U& rhs) {
     return (rhs.find(lhs) != rhs.end()) == Expected;
 }
 
 template<bool Expected, std::same_as<std::string> T, std::same_as<std::string> U>
-basic_function_result safe_contains(const T& lhs, const U& rhs) {
+function_result safe_contains(const T& lhs, const U& rhs) {
     return (rhs.find(lhs) != rhs.npos) == Expected;
 }
 
 template<typename T>
-basic_function_result safe_len(const T& lhs) {
+function_result safe_len(const T& lhs) {
     return static_cast<number_integer_t>(lhs.size());
 }
 
 template<typename T>
     requires std::is_arithmetic_v<T>
-basic_function_result safe_cast_int(const T& lhs) {
+function_result safe_cast_int(const T& lhs) {
     if constexpr (std::is_floating_point_v<T>) {
         if (!std::isfinite(lhs) ||
             lhs < static_cast<number_float_t>(std::numeric_limits<number_integer_t>::min()) ||
@@ -253,7 +253,7 @@ basic_function_result safe_cast_int(const T& lhs) {
 }
 
 template<std::same_as<string_t> T>
-basic_function_result safe_cast_int(const T& lhs) {
+function_result safe_cast_int(const T& lhs) {
     number_integer_t value = 0;
 
 #if JSONEXPR_USE_STD_FROM_CHARS
@@ -283,12 +283,12 @@ basic_function_result safe_cast_int(const T& lhs) {
 
 template<typename T>
     requires std::is_arithmetic_v<T>
-basic_function_result safe_cast_float(const T& lhs) {
+function_result safe_cast_float(const T& lhs) {
     return static_cast<number_float_t>(lhs);
 }
 
 template<std::same_as<string_t> T>
-basic_function_result safe_cast_float(const T& lhs) {
+function_result safe_cast_float(const T& lhs) {
     number_float_t value = 0;
 
 #if JSONEXPR_USE_STD_FROM_CHARS
@@ -318,7 +318,7 @@ basic_function_result safe_cast_float(const T& lhs) {
 
 template<typename T>
     requires std::is_arithmetic_v<T>
-basic_function_result safe_cast_bool(const T& lhs) {
+function_result safe_cast_bool(const T& lhs) {
     if constexpr (std::is_floating_point_v<T>) {
         if (!std::isfinite(lhs)) {
             return unexpected(
@@ -330,7 +330,7 @@ basic_function_result safe_cast_bool(const T& lhs) {
 }
 
 template<std::same_as<string_t> T>
-basic_function_result safe_cast_bool(const T& lhs) {
+function_result safe_cast_bool(const T& lhs) {
     if (lhs == "true") {
         return true;
     } else if (lhs == "false") {
@@ -340,7 +340,7 @@ basic_function_result safe_cast_bool(const T& lhs) {
     }
 }
 
-basic_function_result safe_cast_string(const json& value) {
+function_result safe_cast_string(const json& value) {
     if (value.is_string()) {
         return value;
     } else {
@@ -364,7 +364,7 @@ expected<bool, error> evaluate_as_bool(
     }
 }
 
-function_result safe_not(
+ast_function_result safe_not(
     std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
     if (args.size() != 1u) {
         return unexpected(error{
@@ -380,7 +380,7 @@ function_result safe_not(
     return !lhs.value();
 }
 
-function_result safe_and(
+ast_function_result safe_and(
     std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
     if (args.size() != 2u) {
         return unexpected(error{
@@ -408,7 +408,7 @@ function_result safe_and(
     return rhs.value();
 }
 
-function_result safe_or(
+ast_function_result safe_or(
     std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
     if (args.size() != 2u) {
         return unexpected(error{
@@ -447,14 +447,13 @@ void jsonexpr::impl::add_type(std::string& key, std::string_view type) {
 void jsonexpr::register_ast_function(
     function_registry&                                                                   funcs,
     std::string_view                                                                     name,
-    std::function<function_result(
+    std::function<ast_function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)> func) {
     funcs[std::string{name}] = {std::move(func)};
 }
 
 function_registry jsonexpr::default_functions() {
     function_registry freg;
-    register_function(freg, "str", &safe_cast_string);
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_ast_function(freg, "not", &safe_not);
@@ -495,52 +494,6 @@ function_registry jsonexpr::default_functions() {
     register_function(freg, "**", &safe_pow<number_integer_t, number_float_t>);
     register_function(freg, "**", &safe_pow<number_float_t, number_integer_t>);
     register_function(freg, "**", &safe_pow<number_float_t, number_float_t>);
-
-    register_function(freg, "abs", &safe_abs<number_integer_t>);
-    register_function(freg, "abs", &safe_abs<number_float_t>);
-
-    register_function(freg, "sqrt", &safe_sqrt<number_integer_t>);
-    register_function(freg, "sqrt", &safe_sqrt<number_float_t>);
-
-    register_function(freg, "round", &identity<number_integer_t>);
-    register_function(freg, "round", &safe_round<number_float_t>);
-
-    register_function(freg, "floor", &identity<number_integer_t>);
-    register_function(freg, "floor", &safe_floor<number_float_t>);
-
-    register_function(freg, "ceil", &identity<number_integer_t>);
-    register_function(freg, "ceil", &safe_ceil<number_float_t>);
-
-    register_function(freg, "len", &safe_len<string_t>);
-    register_function(freg, "len", &safe_len<array_t>);
-    register_function(freg, "len", &safe_len<object_t>);
-
-    register_function(freg, "min", &safe_min<number_integer_t, number_integer_t>);
-    register_function(freg, "min", &safe_min<number_integer_t, number_float_t>);
-    register_function(freg, "min", &safe_min<number_float_t, number_integer_t>);
-    register_function(freg, "min", &safe_min<number_float_t, number_float_t>);
-    register_function(freg, "min", &safe_min<string_t, string_t>);
-
-    register_function(freg, "max", &safe_max<number_integer_t, number_integer_t>);
-    register_function(freg, "max", &safe_max<number_integer_t, number_float_t>);
-    register_function(freg, "max", &safe_max<number_float_t, number_integer_t>);
-    register_function(freg, "max", &safe_max<number_float_t, number_float_t>);
-    register_function(freg, "max", &safe_max<string_t, string_t>);
-
-    register_function(freg, "int", &safe_cast_int<number_integer_t>);
-    register_function(freg, "int", &safe_cast_int<number_float_t>);
-    register_function(freg, "int", &safe_cast_int<boolean_t>);
-    register_function(freg, "int", &safe_cast_int<string_t>);
-
-    register_function(freg, "float", &safe_cast_float<number_integer_t>);
-    register_function(freg, "float", &safe_cast_float<number_float_t>);
-    register_function(freg, "float", &safe_cast_float<boolean_t>);
-    register_function(freg, "float", &safe_cast_float<string_t>);
-
-    register_function(freg, "bool", &safe_cast_bool<number_integer_t>);
-    register_function(freg, "bool", &safe_cast_bool<number_float_t>);
-    register_function(freg, "bool", &safe_cast_bool<boolean_t>);
-    register_function(freg, "bool", &safe_cast_bool<string_t>);
 
     register_function(freg, "==", &safe_eq<number_integer_t, number_integer_t>);
     register_function(freg, "==", &safe_eq<number_integer_t, number_float_t>);
@@ -636,6 +589,54 @@ function_registry jsonexpr::default_functions() {
     register_function(freg, "not in", &safe_contains<false, array_t, array_t>);
     register_function(freg, "not in", &safe_contains<false, null_t, array_t>);
     register_function(freg, "not in", &safe_contains<false, object_t, array_t>);
+
+    register_function(freg, "int", &safe_cast_int<number_integer_t>);
+    register_function(freg, "int", &safe_cast_int<number_float_t>);
+    register_function(freg, "int", &safe_cast_int<boolean_t>);
+    register_function(freg, "int", &safe_cast_int<string_t>);
+
+    register_function(freg, "float", &safe_cast_float<number_integer_t>);
+    register_function(freg, "float", &safe_cast_float<number_float_t>);
+    register_function(freg, "float", &safe_cast_float<boolean_t>);
+    register_function(freg, "float", &safe_cast_float<string_t>);
+
+    register_function(freg, "bool", &safe_cast_bool<number_integer_t>);
+    register_function(freg, "bool", &safe_cast_bool<number_float_t>);
+    register_function(freg, "bool", &safe_cast_bool<boolean_t>);
+    register_function(freg, "bool", &safe_cast_bool<string_t>);
+
+    register_function(freg, "str", &safe_cast_string);
+
+    register_function(freg, "abs", &safe_abs<number_integer_t>);
+    register_function(freg, "abs", &safe_abs<number_float_t>);
+
+    register_function(freg, "sqrt", &safe_sqrt<number_integer_t>);
+    register_function(freg, "sqrt", &safe_sqrt<number_float_t>);
+
+    register_function(freg, "round", &identity<number_integer_t>);
+    register_function(freg, "round", &safe_round<number_float_t>);
+
+    register_function(freg, "floor", &identity<number_integer_t>);
+    register_function(freg, "floor", &safe_floor<number_float_t>);
+
+    register_function(freg, "ceil", &identity<number_integer_t>);
+    register_function(freg, "ceil", &safe_ceil<number_float_t>);
+
+    register_function(freg, "len", &safe_len<string_t>);
+    register_function(freg, "len", &safe_len<array_t>);
+    register_function(freg, "len", &safe_len<object_t>);
+
+    register_function(freg, "min", &safe_min<number_integer_t, number_integer_t>);
+    register_function(freg, "min", &safe_min<number_integer_t, number_float_t>);
+    register_function(freg, "min", &safe_min<number_float_t, number_integer_t>);
+    register_function(freg, "min", &safe_min<number_float_t, number_float_t>);
+    register_function(freg, "min", &safe_min<string_t, string_t>);
+
+    register_function(freg, "max", &safe_max<number_integer_t, number_integer_t>);
+    register_function(freg, "max", &safe_max<number_integer_t, number_float_t>);
+    register_function(freg, "max", &safe_max<number_float_t, number_integer_t>);
+    register_function(freg, "max", &safe_max<number_float_t, number_float_t>);
+    register_function(freg, "max", &safe_max<string_t, string_t>);
 
     return freg;
 }
