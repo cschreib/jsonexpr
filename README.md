@@ -2,6 +2,27 @@
 
 ![Build Status](https://github.com/cschreib/jsonexpr/actions/workflows/cmake.yml/badge.svg) [![codecov](https://codecov.io/gh/cschreib/jsonexpr/graph/badge.svg?token=9XE89TMDJ8)](https://codecov.io/gh/cschreib/jsonexpr)
 
+<!-- MarkdownTOC autolink="true" -->
+
+- [Introduction](#introduction)
+- [Example expressions](#example-expressions)
+- [Language specification](#language-specification)
+    - [General](#general)
+    - [Types](#types)
+    - [Operators](#operators)
+    - [Default functions](#default-functions)
+    - [Differences with Python](#differences-with-python)
+- [C++ API](#c-api)
+    - [Basic example usage](#basic-example-usage)
+    - [Error handling](#error-handling)
+    - [Custom functions](#custom-functions)
+        - [Basic example](#basic-example)
+        - [Error handling](#error-handling-1)
+        - [Overloading](#overloading)
+
+<!-- /MarkdownTOC -->
+
+
 ## Introduction
 
 Simple expression language with Python-like syntax, implemented in C++, and meant to operate on JSON values. It understands:
@@ -22,7 +43,7 @@ Limitations (on purpose):
  - Objects are just data (think JSON object), there is are no classes, inheritance etc.
 
 
-## Example expression
+## Example expressions
 
 The example expressions below assume the following JSON values are registered as variables:
  - `cat`:
@@ -142,12 +163,14 @@ int main() {
 }
 ```
 
+JSON values are managed by the [`nlohmann::json`](https://json.nlohmann.me/) library; `jsonexpr::json` is just a type alias for `nlohmann::json`.
+
 Note: in the example above we simply call `jsonexpr::evaluate(expr, vars)` to immediately get the value of the expression given the current variables. If the same expression needs to be evaluated  multiple times for different sets of variables, the following will be faster:
  - `ast = jsonexpr::parse(expr);` to compile the expression (parse and build the abstract syntax tree)
  - `result = jsonexpr::evaluate(ast, vars);` to evaluate the pre-compiled expression.
 
 
-## Error handling
+### Error handling
 
 The `evaluate()` and `parse()` functions return an "expected" type:
 ```c++
@@ -161,7 +184,10 @@ if (result.has_value()) {
 }
 ```
 
-## Custom functions
+
+### Custom functions
+
+#### Basic example
 
 Custom C++ functions can be registered for use in expressions:
 
@@ -171,57 +197,77 @@ Custom C++ functions can be registered for use in expressions:
 int main() {
     jsonexpr::function_registry funcs;
     // Define the function 'join' taking 2 arguments.
-    register_function(funcs, "join", 2, [](const jsonexpr::json& args) {
-        // Custom functions take a single JSON object as argument,
-        // with all actual arguments stored as a JSON array.
-        std::string result;
-        for (const auto& elem : args[0]) {
-            if (!result.empty()) { result += args[1].get<std::string>(); }
-            result += elem.get<std::string>();
-        }
+    jsonexpr::register_function(
+        funcs, "join", [](const std::vector<jsonexpr::json>& array, const std::string& separator) {
+            std::string result;
+            for (const auto& elem : array) {
+                if (!result.empty()) {
+                    result += separator;
+                }
+                result += elem.get<std::string>();
+            }
 
-        return result;
-    });
+            return result;
+        });
 
     // Use the function.
     jsonexpr::evaluate("join(['some', 'string', 'here'], ',')").value(); // "some,string,here"
+
+    return 0;
 }
 ```
 
-The above relies on automatic type checks from the JSON library, which is safe but will results in ugly error messages when the types are incorrect. If this is an issue, explicit type checks can be done and custom detailed error messages can be returned:
+Supported types for the C++ function parameters:
+ - `jsonexpr::number_integer_t = std::int64_t`, for integer numbers.
+ - `jsonexpr::number_float_t = double`, for floating-point numbers.
+ - `jsonexpr::boolean_t = bool`, for booleans.
+ - `jsonexpr::string_t = std::string`, for strings.
+ - `jsonexpr::array_t = std::array<jsonexpr::json>`, for arrays.
+ - `jsonexpr::object_t = std::unordered_map<std::string, jsonexpr::json>`, for objects.
+ - `jsonexpr::null_t = std::nullptr_t`, for null.
+
+The return value must be (convertible to) `jsonexpr::json`, or `jsonexpr::basic_function_result` if handling errors (see below for more information on error handling).
+
+
+#### Error handling
+
+The library will automatically take care of validating the type of each argument passed to this function, and report appropriate errors in case of a mismatch. However, if the function has error states based on the *values* of the parameters (e.g., here: the length of the array, or the types of the elements within it), these errors need to be handled and reported explicitly. This is done by returning a `jsonexpr::basic_function_result`, which is an alias for `jsonexpr::expected<jsonexpr::json, std::string>` (either a JSON value, or an error message).
+
+In the example below, we check that each element in the array is a string:
 
 ```c++
 #include <jsonexpr/jsonexpr.hpp>
 
 int main() {
     jsonexpr::function_registry funcs;
-    register_function(funcs, "join", 2,
-        [](const jsonexpr::json& args) -> jsonexpr::basic_function_result {
-            if (!args[0].is_array()) {
-                return jsonexpr::unexpected(
-                    std::string{"expected array as first argument of 'join', got "} +
-                    std::string{jsonexpr::get_type_name(args[0])});
-            }
-
-            for (std::size_t i = 0; i < args[0].size(); ++i) {
-                if (!args[0][i].is_string()) {
+    jsonexpr::register_function(
+        funcs, "join",
+        [](const std::vector<jsonexpr::json>& array,
+           const std::string&                 separator) -> jsonexpr::basic_function_result {
+            for (std::size_t i = 0; i < array.size(); ++i) {
+                if (!array[i].is_string()) {
                     return jsonexpr::unexpected(
                         std::string{"expected array of strings as first argument of 'join', got "} +
-                        std::string{jsonexpr::get_type_name(args[0][i])} + " for element " +
+                        std::string{jsonexpr::get_type_name(array[i])} + " for element " +
                         std::to_string(i));
                 }
             }
 
-            if (!args[1].is_string()) {
-                return jsonexpr::unexpected(
-                    std::string{"expected string as second argument of 'join', got "} +
-                    std::string{jsonexpr::get_type_name(args[1])});
-            }
-
-            // All types are now checked, continue with actual logic...
+            // All conditions are checked, we can proceed...
         });
 
     // ...
 }
+```
 
+
+#### Overloading
+
+It is possible to register more than one function with the same name, provided either the number of arguments or the type of each argument is different. This is done simply by calling `jsonexpr::register_function` multiple times with different function definitions:
+
+```c++
+jsonexpr::register_function(
+    funcs, "is_empty", [](const std::string& str) { return str.empty(); });
+jsonexpr::register_function(
+    funcs, "is_empty", [](const std::vector<jsonexpr::json>& array) { return array.empty(); });
 ```

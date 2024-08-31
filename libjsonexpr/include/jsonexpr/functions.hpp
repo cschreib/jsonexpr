@@ -3,53 +3,63 @@
 
 #include "jsonexpr/base.hpp"
 
+#include <iostream>
+
 namespace jsonexpr {
-template<typename... Args>
-struct type_list {};
-
-template<typename Function, typename... Args>
-basic_function_result call(Function func, std::span<const json>, type_list<>, const Args&... args) {
-    return func(args...);
-}
-
-template<typename Function, typename... Args, typename T, typename... NextArgs>
-basic_function_result call(
-    Function              func,
-    std::span<const json> next_args,
-    type_list<T, NextArgs...>,
-    const Args&... args) {
-
+namespace impl {
+template<typename T, std::size_t I>
+decltype(auto) get_value(std::span<const json>& args) {
     if constexpr (std::is_same_v<T, json>) {
-        return call(func, next_args.subspan(1), type_list<NextArgs...>{}, args..., next_args[0]);
+        return args[I];
     } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
-        return call(func, next_args.subspan(1), type_list<NextArgs...>{}, args..., nullptr);
+        return nullptr;
     } else if constexpr (std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>) {
-        return call(
-            func, next_args.subspan(1), type_list<NextArgs...>{}, args...,
-            next_args[0].get_ref<const T&>());
+        return args[I].get_ref<const T&>();
     } else {
-        return call(
-            func, next_args.subspan(1), type_list<NextArgs...>{}, args..., next_args[0].get<T>());
+        return args[I].get<T>();
     }
 }
 
 template<typename... Args>
-void register_function(
-    function_registry& funcs, std::string_view name, basic_function_ptr<Args...> func) {
-    std::string key;
-    auto        add_type = [&](std::string_view type) {
-        if (!key.empty()) {
-            key += ",";
-        }
-        key += std::string(type);
-    };
+struct type_list {};
 
-    (add_type(get_type_name<Args>()), ...);
+template<typename Function, typename... Args, std::size_t... Indices>
+basic_function_result call(
+    Function              func,
+    std::span<const json> args,
+    type_list<Args...>,
+    std::index_sequence<Indices...>) {
+    return func(get_value<Args, Indices>(args)...);
+}
+
+JSONEXPR_EXPORT void add_type(std::string& key, std::string_view type);
+
+template<typename T>
+concept function_ptr = std::is_function_v<std::remove_pointer_t<T>>;
+
+template<typename T>
+concept stateless_lambda = (!function_ptr<T>) && requires(const T& func) {
+                                                     { +func } -> function_ptr;
+                                                 };
+} // namespace impl
+
+template<typename R, typename... Args>
+    requires std::is_convertible_v<R, basic_function_result>
+void register_function(function_registry& funcs, std::string_view name, R (*func)(const Args&...)) {
+    std::string key;
+    (impl::add_type(key, get_type_name<Args>()), ...);
 
     funcs[std::string{name}].add_overload(
         key, [=](std::span<const json> args) -> basic_function_result {
-            return call(func, args, type_list<Args...>{});
+            return impl::call(
+                func, args, impl::type_list<Args...>{},
+                std::make_index_sequence<sizeof...(Args)>{});
         });
+}
+
+template<impl::stateless_lambda Func>
+void register_function(function_registry& funcs, std::string_view name, const Func& func) {
+    register_function(funcs, name, +func);
 }
 
 JSONEXPR_EXPORT void register_ast_function(

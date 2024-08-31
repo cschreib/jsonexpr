@@ -434,6 +434,13 @@ function_result safe_or(
 }
 } // namespace
 
+void jsonexpr::impl::add_type(std::string& key, std::string_view type) {
+    if (!key.empty()) {
+        key += ",";
+    }
+    key += std::string(type);
+}
+
 void jsonexpr::register_ast_function(
     function_registry&                                                                   funcs,
     std::string_view                                                                     name,

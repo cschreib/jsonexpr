@@ -38,8 +38,7 @@ TEST_CASE("array access", "[array]") {
     vars["nested_array"] = "[[1,2],[3,4]]"_json;
 
     function_registry funcs = default_functions();
-    register_function(
-        funcs, "identity", +[]() -> basic_function_result { return "[1,2,3,4,5]"_json; });
+    register_function(funcs, "make_array", []() { return "[1,2,3,4,5]"_json; });
 
     SECTION("bad") {
         CHECK(!evaluate("foo[1]", vars).has_value());
@@ -90,8 +89,8 @@ TEST_CASE("array access", "[array]") {
         CHECK(evaluate("nested_array[0][1]", vars) == "2"_json);
         CHECK(evaluate("nested_array[1][0]", vars) == "3"_json);
         CHECK(evaluate("nested_array[1][1]", vars) == "4"_json);
-        CHECK(evaluate("identity()", vars, funcs) == "[1,2,3,4,5]"_json);
-        CHECK(evaluate("identity()[0]", vars, funcs) == "1"_json);
+        CHECK(evaluate("make_array()", vars, funcs) == "[1,2,3,4,5]"_json);
+        CHECK(evaluate("make_array()[0]", vars, funcs) == "1"_json);
         CHECK(evaluate("[[1,2],[3,4]][1][1]", vars) == "4"_json);
     }
 

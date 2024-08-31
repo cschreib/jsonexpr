@@ -42,8 +42,7 @@ TEST_CASE("object access", "[object]") {
 
     function_registry funcs = default_functions();
     register_function(
-        funcs, "identity",
-        +[]() -> basic_function_result { return R"({"a":1, "b":2, "c":3, "de": 4})"_json; });
+        funcs, "make_object", []() { return R"({"a":1, "b":2, "c":3, "de": 4})"_json; });
 
     SECTION("bad") {
         CHECK(!evaluate("obj['d']", vars).has_value());
@@ -84,10 +83,10 @@ TEST_CASE("object access", "[object]") {
         CHECK(evaluate("nested.a.b", vars) == R"({"c":1, "d":2})"_json);
         CHECK(evaluate("nested.a.b.c", vars) == "1"_json);
         CHECK(evaluate("nested.a.b.d", vars) == "2"_json);
-        CHECK(evaluate("identity()", vars, funcs) == R"({"a":1, "b":2, "c":3, "de":
+        CHECK(evaluate("make_object()", vars, funcs) == R"({"a":1, "b":2, "c":3, "de":
         4})"_json);
-        CHECK(evaluate("identity()['a']", vars, funcs) == "1"_json);
-        CHECK(evaluate("identity().a", vars, funcs) == "1"_json);
+        CHECK(evaluate("make_object()['a']", vars, funcs) == "1"_json);
+        CHECK(evaluate("make_object().a", vars, funcs) == "1"_json);
         CHECK(evaluate("{'a1':{'b1':1},'a2':{'b1':3}}['a2']['b1']", vars) == "3"_json);
         CHECK(evaluate("{'a1':{'b1':1},'a2':{'b1':3}}.a2.b1", vars) == "3"_json);
     }
