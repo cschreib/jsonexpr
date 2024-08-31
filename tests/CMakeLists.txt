@@ -14,6 +14,7 @@ add_executable(jsonexpr_tests
     src/base.cpp
     src/bool.cpp
     src/functions.cpp
+    src/if.cpp
     src/misc.cpp
     src/number.cpp
     src/object.cpp

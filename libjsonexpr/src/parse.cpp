@@ -14,6 +14,7 @@ struct token {
     enum {
         IDENTIFIER,
         OPERATOR,
+        CONDITIONAL,
         NUMBER,
         STRING,
         LITERAL,
@@ -200,6 +201,8 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
             if (tokens.back().content == "and" || tokens.back().content == "or" ||
                 tokens.back().content == "not") {
                 tokens.back().type = token::OPERATOR;
+            } else if (tokens.back().content == "if" || tokens.back().content == "else") {
+                tokens.back().type = token::CONDITIONAL;
             } else if (
                 tokens.back().content == "true" || tokens.back().content == "false" ||
                 tokens.back().content == "null") {
@@ -732,9 +735,9 @@ struct tagged_operator {
     std::size_t      precedence = 0;
 };
 
-expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error> try_parse_operation(std::span<const token>& tokens) noexcept {
     if (tokens.empty()) {
-        return unexpected(match_failed("expected expression"));
+        return unexpected(match_failed("expected operation"));
     }
 
     std::vector<ast::node>       nodes;
@@ -798,6 +801,43 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
     }
 
     return nodes.front();
+}
+
+expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept {
+    if (tokens.empty()) {
+        return unexpected(match_failed("expected expression"));
+    }
+
+    auto first = try_parse_operation(tokens);
+    if (!first.has_value()) {
+        return unexpected(first.error());
+    }
+
+    if (tokens.empty() || tokens[0].type != token::CONDITIONAL || tokens[0].content != "if") {
+        return first;
+    }
+
+    tokens    = tokens.subspan(1);
+    auto cond = try_parse_operation(tokens);
+    if (!cond.has_value()) {
+        return unexpected(cond.error());
+    }
+
+    if (tokens.empty() || tokens[0].type != token::CONDITIONAL || tokens[0].content != "else") {
+        return unexpected(abort_parse("expected 'else'"));
+    }
+
+    tokens      = tokens.subspan(1);
+    auto second = try_parse_expr(tokens);
+    if (!second.has_value()) {
+        return unexpected(second.error());
+    }
+
+    return ast::node{
+        extend(first.value().location, second.value().location),
+        ast::function{
+            "if else",
+            {std::move(first.value()), std::move(cond.value()), std::move(second.value())}}};
 }
 } // namespace
 

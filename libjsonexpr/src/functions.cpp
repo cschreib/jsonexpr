@@ -435,6 +435,29 @@ ast_function_result safe_or(
 
     return rhs.value();
 }
+
+ast_function_result safe_if_else(
+    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
+    if (args.size() != 3u) {
+        return unexpected(error{
+            .message =
+                "function takes 3 arguments, but " + std::to_string(args.size()) + " provided"});
+    }
+
+    // Evaluate condition first.
+    const auto cond = evaluate_as_bool(args[1], vars, funs);
+    if (!cond.has_value()) {
+        return unexpected(cond.error());
+    }
+
+    if (cond.value()) {
+        // Value is truthy, evaluate and return first value.
+        return evaluate(args[0], vars, funs);
+    } else {
+        // Value is falsy, evaluate and return second value.
+        return evaluate(args[2], vars, funs);
+    }
+}
 } // namespace
 
 void jsonexpr::impl::add_type(std::string& key, std::string_view type) {
@@ -455,10 +478,11 @@ void jsonexpr::register_ast_function(
 function_registry jsonexpr::default_functions() {
     function_registry freg;
 
-    // Boolean operators are more complex since they short-circuit (avoid evaluation).
+    // Boolean operations are more complex since they short-circuit (avoid evaluation).
     register_ast_function(freg, "not", &safe_not);
     register_ast_function(freg, "and", &safe_and);
     register_ast_function(freg, "or", &safe_or);
+    register_ast_function(freg, "if else", &safe_if_else);
 
     register_function(freg, "+", &safe_unary_plus<number_integer_t>);
     register_function(freg, "+", &safe_unary_plus<number_float_t>);

@@ -32,15 +32,15 @@ Simple expression language with Python-like syntax, implemented in C++, and mean
  - The usual comparison operators (`>` `>=` `<` `<=` `!=` `==`).
  - Array literals (`[1,2,3]`) and array access (`a[1]`), with arbitrary nesting depth.
  - Object literals (`{'a':1, 'b':'c'}`) and sub-object access (`a.b` or `a['b']`).
- - Custom functions registered in C++ (with arbitrary number of arguments).
- - Immutable variables registered in C++ (as JSON values).
+ - Custom functions with arbitrary number of arguments (registered in C++).
+ - Immutable variables as JSON values (registered in C++, e.g., as read from a file or data set).
 
 The intended use is to evaluate constraints on a set of JSON values, or apply simple transformations to JSON values.
 
 Limitations (on purpose):
  - This is not a full blown programming language.
- - There is no assignment or control flow. Just one-liner expressions.
- - Objects are just data (think JSON object), there is are no classes, inheritance etc.
+ - There is no assignment or control flow (other than the `a if c else b` ternary expression); the code is just a one-liner expression.
+ - Objects are just data (think JSON object), there are no classes (member functions, inheritance, ...).
 
 
 ## Example expressions
@@ -116,6 +116,7 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
  - `len(a)`: return the size (length) or an array, object, or string.
  - `a in b`: return true if `b` (a string, array, or object) contains `a`, false otherwise.
  - `a not in b`: return true if `b` (a string, array, or object) does not contains `a`, false otherwise.
+ - `a if c else b`: evaluate and return `a` if condition `c` evaluates to `true`, else evaluate and return `b` (NB: this short-circuits evaluation of the unused operand).
 
 This list can be extended with your own functions, see below.
 
@@ -126,7 +127,7 @@ This list can be extended with your own functions, see below.
  - The null/none value is spelled `null`, not `None`.
  - The return value of the modulo operation `%` has the same sign as the *left* operand (in Python, it takes the sign of the *right* operand).
  - When the division operation `/` is used with two integers, this results in integer division (Python's `//`).
- - The following expressions are not implemented: `a is b`, `a if c else b`, `x for x in v`, `x for x in v if c`.
+ - The following expressions are not implemented: `a is b`, `x for x in v`, `x for x in v if c`.
  - Bitwise operators are not implemented.
 
 
