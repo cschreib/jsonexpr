@@ -17,6 +17,7 @@ using namespace jsonexpr;
 namespace {
 #define COMPARISON_OPERATOR(NAME, OPERATOR)                                                        \
     template<typename T, typename U>                                                               \
+        requires(!std::is_same_v<T, null_t> && !std::is_same_v<U, null_t>)                         \
     basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
             return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
