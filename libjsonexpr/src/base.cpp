@@ -12,7 +12,7 @@ std::string jsonexpr::format_error(std::string_view expression, const error& e) 
     str << expression << std::endl;
     str << std::string(e.location.position, ' ') << '^'
         << std::string(e.location.length > 0 ? e.location.length - 1 : 0, '~') << std::endl;
-    str << "error: " << e.message << std::endl;
+    str << "error: " << e.message;
     return str.str();
 }
 
