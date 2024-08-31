@@ -332,7 +332,7 @@ template<typename ElemType, typename ElemParser>
 expected<std::vector<ElemType>, parse_error> try_parse_list(
     std::span<const token>& tokens, auto end_token, ElemParser&& try_parse_elem) noexcept {
     if (tokens.empty()) {
-        return unexpected(match_failed("expected list"));
+        return unexpected(match_failed("expected ')'"));
     }
 
     std::vector<ElemType> args;
@@ -376,7 +376,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     if (tokens.empty()) {
         return unexpected(match_failed("expected function"));
     }
-    if (tokens.size() < 3) {
+    if (tokens.size() < 2) {
         return unexpected(match_failed(tokens.front(), "expected function"));
     }
     if (tokens[0].type != token::IDENTIFIER) {
@@ -391,7 +391,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     auto args_tokens = tokens.subspan(2);
     auto args        = try_parse_list<ast::node>(args_tokens, token::GROUP_CLOSE, &try_parse_expr);
     if (!args.has_value()) {
-        return unexpected(args.error());
+        return unexpected(abort_parse(args.error()));
     }
 
     if (args_tokens.empty()) {
@@ -412,7 +412,7 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     if (tokens.empty()) {
         return unexpected(match_failed("expected group"));
     }
-    if (tokens.size() < 2 || tokens.front().type != token::GROUP_OPEN) {
+    if (tokens.front().type != token::GROUP_OPEN) {
         return unexpected(match_failed(tokens.front(), "expected group"));
     }
 
@@ -443,7 +443,7 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
     if (tokens.empty()) {
         return unexpected(match_failed("expected array"));
     }
-    if (tokens.size() < 2 || tokens.front().type != token::ARRAY_OPEN) {
+    if (tokens.front().type != token::ARRAY_OPEN) {
         return unexpected(match_failed(tokens.front(), "expected array"));
     }
 
@@ -451,7 +451,7 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
     auto         elem_tokens = tokens.subspan(1);
     auto elems = try_parse_list<ast::node>(elem_tokens, token::ARRAY_CLOSE, &try_parse_expr);
     if (!elems.has_value()) {
-        return unexpected(elems.error());
+        return unexpected(abort_parse(elems.error()));
     }
 
     if (elem_tokens.empty()) {
@@ -500,7 +500,7 @@ expected<ast::node, parse_error> try_parse_object(std::span<const token>& tokens
     if (tokens.empty()) {
         return unexpected(match_failed("expected object"));
     }
-    if (tokens.size() < 2 || tokens.front().type != token::OBJECT_OPEN) {
+    if (tokens.front().type != token::OBJECT_OPEN) {
         return unexpected(match_failed(tokens.front(), "expected object"));
     }
 
@@ -625,8 +625,12 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
         }
     }
 
-    if (tokens.empty() || tokens[0].type != token::ARRAY_CLOSE) {
+    if (tokens.empty()) {
         return unexpected(abort_parse("expected ']'"));
+    }
+
+    if (tokens[0].type != token::ARRAY_CLOSE) {
+        return unexpected(abort_parse(tokens[0], "expected ']'"));
     }
 
     return args;
