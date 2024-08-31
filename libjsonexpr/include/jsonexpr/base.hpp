@@ -43,7 +43,27 @@ JSONEXPR_EXPORT std::string format_error(std::string_view expression, const erro
 JSONEXPR_EXPORT std::string_view get_dynamic_type_name(const json& j) noexcept;
 
 template<typename T>
-JSONEXPR_EXPORT std::string_view get_type_name() noexcept;
+std::string_view get_type_name() noexcept {
+    if constexpr (std::is_same_v<T, number_float_t>) {
+        return "float";
+    } else if constexpr (std::is_same_v<T, number_integer_t>) {
+        return "int";
+    } else if constexpr (std::is_same_v<T, string_t>) {
+        return "string";
+    } else if constexpr (std::is_same_v<T, array_t>) {
+        return "array";
+    } else if constexpr (std::is_same_v<T, boolean_t>) {
+        return "bool";
+    } else if constexpr (std::is_same_v<T, null_t>) {
+        return "null";
+    } else if constexpr (std::is_same_v<T, object_t>) {
+        return "object";
+    } else if constexpr (std::is_same_v<T, json>) {
+        return "json";
+    } else {
+        static_assert(!std::is_same_v<T, T>, "unsupported type");
+    }
+}
 
 template<typename T>
 std::string_view get_type_name(const T&) noexcept {
@@ -70,7 +90,7 @@ struct function {
 
     std::variant<ast_function_t, overload_t> overloads;
 
-    void add_overload(std::string key, basic_function_t func);
+    JSONEXPR_EXPORT void add_overload(std::string key, basic_function_t func);
 };
 } // namespace jsonexpr
 
