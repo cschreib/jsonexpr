@@ -49,6 +49,180 @@ TEST_CASE("function", "[general]") {
     }
 }
 
+TEST_CASE("function registration", "[general]") {
+    function_registry funcs;
+
+    SECTION("return type") {
+        register_function(funcs, "make_int", []() { return "1"_json; });
+        register_function(funcs, "make_float", []() { return "1.0"_json; });
+        register_function(funcs, "make_string", []() { return R"("")"_json; });
+        register_function(funcs, "make_array", []() { return "[]"_json; });
+        register_function(funcs, "make_object", []() { return "{}"_json; });
+        register_function(funcs, "make_null", []() { return "null"_json; });
+
+        CHECK(evaluate("make_int()", {}, funcs) == "1"_json);
+        CHECK(evaluate("make_float()", {}, funcs) == "1.0"_json);
+        CHECK(evaluate("make_string()", {}, funcs) == R"("")"_json);
+        CHECK(evaluate("make_array()", {}, funcs) == "[]"_json);
+        CHECK(evaluate("make_object()", {}, funcs) == "{}"_json);
+        CHECK(evaluate("make_null()", {}, funcs) == "null"_json);
+    }
+
+    SECTION("argument type deduction (unary)") {
+        register_function(funcs, "one_arg", [](number_integer_t) { return "int"; });
+        register_function(funcs, "one_arg", [](number_float_t) { return "float"; });
+        register_function(funcs, "one_arg", [](boolean_t) { return "bool"; });
+        register_function(funcs, "one_arg", [](const string_t&) { return "string"; });
+        register_function(funcs, "one_arg", [](const array_t&) { return "array"; });
+        register_function(funcs, "one_arg", [](const object_t&) { return "object"; });
+        register_function(funcs, "one_arg", [](null_t) { return "null"; });
+
+        CHECK(evaluate("one_arg(1)", {}, funcs) == "int");
+        CHECK(evaluate("one_arg(1.0)", {}, funcs) == "float");
+        CHECK(evaluate("one_arg(true)", {}, funcs) == "bool");
+        CHECK(evaluate("one_arg('')", {}, funcs) == "string");
+        CHECK(evaluate("one_arg([])", {}, funcs) == "array");
+        CHECK(evaluate("one_arg({})", {}, funcs) == "object");
+        CHECK(evaluate("one_arg(null)", {}, funcs) == "null");
+    }
+
+    SECTION("argument type deduction (binary)") {
+        // clang-format off
+        register_function(funcs, "two_args", [](number_integer_t, number_integer_t) { return "int,int"; });
+        register_function(funcs, "two_args", [](number_integer_t, number_float_t) { return "int,float"; });
+        register_function(funcs, "two_args", [](number_integer_t, boolean_t) { return "int,bool"; });
+        register_function(funcs, "two_args", [](number_integer_t, const string_t&) { return "int,string"; });
+        register_function(funcs, "two_args", [](number_integer_t, const array_t&) { return "int,array"; });
+        register_function(funcs, "two_args", [](number_integer_t, const object_t&) { return "int,object"; });
+        register_function(funcs, "two_args", [](number_integer_t, null_t) { return "int,null"; });
+        register_function(funcs, "two_args", [](number_float_t, number_integer_t) { return "float,int"; });
+        register_function(funcs, "two_args", [](number_float_t, number_float_t) { return "float,float"; });
+        register_function(funcs, "two_args", [](number_float_t, boolean_t) { return "float,bool"; });
+        register_function(funcs, "two_args", [](number_float_t, const string_t&) { return "float,string"; });
+        register_function(funcs, "two_args", [](number_float_t, const array_t&) { return "float,array"; });
+        register_function(funcs, "two_args", [](number_float_t, const object_t&) { return "float,object"; });
+        register_function(funcs, "two_args", [](number_float_t, null_t) { return "float,null"; });
+        register_function(funcs, "two_args", [](boolean_t, number_integer_t) { return "bool,int"; });
+        register_function(funcs, "two_args", [](boolean_t, number_float_t) { return "bool,float"; });
+        register_function(funcs, "two_args", [](boolean_t, boolean_t) { return "bool,bool"; });
+        register_function(funcs, "two_args", [](boolean_t, const string_t&) { return "bool,string"; });
+        register_function(funcs, "two_args", [](boolean_t, const array_t&) { return "bool,array"; });
+        register_function(funcs, "two_args", [](boolean_t, const object_t&) { return "bool,object"; });
+        register_function(funcs, "two_args", [](boolean_t, null_t) { return "bool,null"; });
+        register_function(funcs, "two_args", [](const string_t&, number_integer_t) { return "string,int"; });
+        register_function(funcs, "two_args", [](const string_t&, number_float_t) { return "string,float"; });
+        register_function(funcs, "two_args", [](const string_t&, boolean_t) { return "string,bool"; });
+        register_function(funcs, "two_args", [](const string_t&, const string_t&) { return "string,string"; });
+        register_function(funcs, "two_args", [](const string_t&, const array_t&) { return "string,array"; });
+        register_function(funcs, "two_args", [](const string_t&, const object_t&) { return "string,object"; });
+        register_function(funcs, "two_args", [](const string_t&, null_t) { return "string,null"; });
+        register_function(funcs, "two_args", [](const array_t&, number_integer_t) { return "array,int"; });
+        register_function(funcs, "two_args", [](const array_t&, number_float_t) { return "array,float"; });
+        register_function(funcs, "two_args", [](const array_t&, boolean_t) { return "array,bool"; });
+        register_function(funcs, "two_args", [](const array_t&, const string_t&) { return "array,string"; });
+        register_function(funcs, "two_args", [](const array_t&, const array_t&) { return "array,array"; });
+        register_function(funcs, "two_args", [](const array_t&, const object_t&) { return "array,object"; });
+        register_function(funcs, "two_args", [](const array_t&, null_t) { return "array,null"; });
+        register_function(funcs, "two_args", [](const object_t&, number_integer_t) { return "object,int"; });
+        register_function(funcs, "two_args", [](const object_t&, number_float_t) { return "object,float"; });
+        register_function(funcs, "two_args", [](const object_t&, boolean_t) { return "object,bool"; });
+        register_function(funcs, "two_args", [](const object_t&, const string_t&) { return "object,string"; });
+        register_function(funcs, "two_args", [](const object_t&, const array_t&) { return "object,array"; });
+        register_function(funcs, "two_args", [](const object_t&, const object_t&) { return "object,object"; });
+        register_function(funcs, "two_args", [](const object_t&, null_t) { return "object,null"; });
+        register_function(funcs, "two_args", [](const null_t&, number_integer_t) { return "null,int"; });
+        register_function(funcs, "two_args", [](const null_t&, number_float_t) { return "null,float"; });
+        register_function(funcs, "two_args", [](const null_t&, boolean_t) { return "null,bool"; });
+        register_function(funcs, "two_args", [](const null_t&, const string_t&) { return "null,string"; });
+        register_function(funcs, "two_args", [](const null_t&, const array_t&) { return "null,array"; });
+        register_function(funcs, "two_args", [](const null_t&, const object_t&) { return "null,object"; });
+        register_function(funcs, "two_args", [](const null_t&, null_t) { return "null,null"; });
+        // clang-format on
+
+        CHECK(evaluate("two_args(1,1)", {}, funcs) == "int,int");
+        CHECK(evaluate("two_args(1,1.0)", {}, funcs) == "int,float");
+        CHECK(evaluate("two_args(1,true)", {}, funcs) == "int,bool");
+        CHECK(evaluate("two_args(1,'')", {}, funcs) == "int,string");
+        CHECK(evaluate("two_args(1,[])", {}, funcs) == "int,array");
+        CHECK(evaluate("two_args(1,{})", {}, funcs) == "int,object");
+        CHECK(evaluate("two_args(1,null)", {}, funcs) == "int,null");
+        CHECK(evaluate("two_args(1.0,1)", {}, funcs) == "float,int");
+        CHECK(evaluate("two_args(1.0,1.0)", {}, funcs) == "float,float");
+        CHECK(evaluate("two_args(1.0,true)", {}, funcs) == "float,bool");
+        CHECK(evaluate("two_args(1.0,'')", {}, funcs) == "float,string");
+        CHECK(evaluate("two_args(1.0,[])", {}, funcs) == "float,array");
+        CHECK(evaluate("two_args(1.0,{})", {}, funcs) == "float,object");
+        CHECK(evaluate("two_args(1.0,null)", {}, funcs) == "float,null");
+        CHECK(evaluate("two_args(true,1)", {}, funcs) == "bool,int");
+        CHECK(evaluate("two_args(true,1.0)", {}, funcs) == "bool,float");
+        CHECK(evaluate("two_args(true,true)", {}, funcs) == "bool,bool");
+        CHECK(evaluate("two_args(true,'')", {}, funcs) == "bool,string");
+        CHECK(evaluate("two_args(true,[])", {}, funcs) == "bool,array");
+        CHECK(evaluate("two_args(true,{})", {}, funcs) == "bool,object");
+        CHECK(evaluate("two_args(true,null)", {}, funcs) == "bool,null");
+        CHECK(evaluate("two_args('',1)", {}, funcs) == "string,int");
+        CHECK(evaluate("two_args('',1.0)", {}, funcs) == "string,float");
+        CHECK(evaluate("two_args('',true)", {}, funcs) == "string,bool");
+        CHECK(evaluate("two_args('','')", {}, funcs) == "string,string");
+        CHECK(evaluate("two_args('',[])", {}, funcs) == "string,array");
+        CHECK(evaluate("two_args('',{})", {}, funcs) == "string,object");
+        CHECK(evaluate("two_args('',null)", {}, funcs) == "string,null");
+        CHECK(evaluate("two_args([],1)", {}, funcs) == "array,int");
+        CHECK(evaluate("two_args([],1.0)", {}, funcs) == "array,float");
+        CHECK(evaluate("two_args([],true)", {}, funcs) == "array,bool");
+        CHECK(evaluate("two_args([],'')", {}, funcs) == "array,string");
+        CHECK(evaluate("two_args([],[])", {}, funcs) == "array,array");
+        CHECK(evaluate("two_args([],{})", {}, funcs) == "array,object");
+        CHECK(evaluate("two_args([],null)", {}, funcs) == "array,null");
+        CHECK(evaluate("two_args({},1)", {}, funcs) == "object,int");
+        CHECK(evaluate("two_args({},1.0)", {}, funcs) == "object,float");
+        CHECK(evaluate("two_args({},true)", {}, funcs) == "object,bool");
+        CHECK(evaluate("two_args({},'')", {}, funcs) == "object,string");
+        CHECK(evaluate("two_args({},[])", {}, funcs) == "object,array");
+        CHECK(evaluate("two_args({},{})", {}, funcs) == "object,object");
+        CHECK(evaluate("two_args({},null)", {}, funcs) == "object,null");
+        CHECK(evaluate("two_args(null,1)", {}, funcs) == "null,int");
+        CHECK(evaluate("two_args(null,1.0)", {}, funcs) == "null,float");
+        CHECK(evaluate("two_args(null,true)", {}, funcs) == "null,bool");
+        CHECK(evaluate("two_args(null,'')", {}, funcs) == "null,string");
+        CHECK(evaluate("two_args(null,[])", {}, funcs) == "null,array");
+        CHECK(evaluate("two_args(null,{})", {}, funcs) == "null,object");
+        CHECK(evaluate("two_args(null,null)", {}, funcs) == "null,null");
+    }
+
+    SECTION("any") {
+        register_function(funcs, "any", [](const json&) { return "any"; });
+
+        CHECK(evaluate("any(1)", {}, funcs) == "any");
+        CHECK(evaluate("any(1.0)", {}, funcs) == "any");
+        CHECK(evaluate("any('')", {}, funcs) == "any");
+        CHECK(evaluate("any([])", {}, funcs) == "any");
+        CHECK(evaluate("any({})", {}, funcs) == "any");
+        CHECK(evaluate("any(null)", {}, funcs) == "any");
+    }
+
+    SECTION("any overloads") {
+        register_function(funcs, "any", [](const json&) { return "any"; });
+        register_function(funcs, "any", [](number_integer_t) { return "int"; });
+
+        CHECK(evaluate("any(1)", {}, funcs) == "int");
+        CHECK(evaluate("any(1.0)", {}, funcs) == "any");
+        CHECK(evaluate("any('')", {}, funcs) == "any");
+        CHECK(evaluate("any([])", {}, funcs) == "any");
+        CHECK(evaluate("any({})", {}, funcs) == "any");
+        CHECK(evaluate("any(null)", {}, funcs) == "any");
+    }
+
+    SECTION("any ambiguous") {
+        register_function(funcs, "any", [](const json&, number_integer_t) { return "any1"; });
+        register_function(funcs, "any", [](number_integer_t, const json&) { return "any2"; });
+
+        CHECK(evaluate("any(1,1.0)", {}, funcs) == "any2");
+        CHECK(evaluate("any(1.0,1)", {}, funcs) == "any1");
+        CHECK(!evaluate("any(1,1)", {}, funcs).has_value());
+    }
+}
+
 TEST_CASE("min", "[functions]") {
     SECTION("bad") {
         CHECK(!evaluate("min()").has_value());

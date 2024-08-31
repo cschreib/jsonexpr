@@ -9,12 +9,13 @@ namespace jsonexpr {
 namespace impl {
 template<typename T, std::size_t I>
 decltype(auto) get_value(std::span<const json>& args) {
-    if constexpr (std::is_same_v<T, json>) {
-        return args[I];
-    } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
+    if constexpr (std::is_same_v<T, std::nullptr_t>) {
         return nullptr;
-    } else if constexpr (std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>) {
+    } else if constexpr (
+        std::is_same_v<T, string_t> || std::is_same_v<T, array_t> || std::is_same_v<T, object_t>) {
         return args[I].get_ref<const T&>();
+    } else if constexpr (std::is_same_v<T, json>) {
+        return args[I];
     } else {
         return args[I].get<T>();
     }
@@ -29,7 +30,7 @@ basic_function_result call(
     std::span<const json> args,
     type_list<Args...>,
     std::index_sequence<Indices...>) {
-    return func(get_value<Args, Indices>(args)...);
+    return func(get_value<std::decay_t<Args>, Indices>(args)...);
 }
 
 JSONEXPR_EXPORT void add_type(std::string& key, std::string_view type);
@@ -45,9 +46,9 @@ concept stateless_lambda = (!function_ptr<T>) && requires(const T& func) {
 
 template<typename R, typename... Args>
     requires std::is_convertible_v<R, basic_function_result>
-void register_function(function_registry& funcs, std::string_view name, R (*func)(const Args&...)) {
+void register_function(function_registry& funcs, std::string_view name, R (*func)(Args...)) {
     std::string key;
-    (impl::add_type(key, get_type_name<Args>()), ...);
+    (impl::add_type(key, get_type_name<std::decay_t<Args>>()), ...);
 
     funcs[std::string{name}].add_overload(
         key, [=](std::span<const json> args) -> basic_function_result {

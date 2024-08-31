@@ -19,8 +19,7 @@ namespace {
     template<typename T, typename U>                                                               \
     basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
         if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {                \
-            return static_cast<json::number_float_t>(lhs)                                          \
-                OPERATOR static_cast<json::number_float_t>(rhs);                                   \
+            return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
         } else {                                                                                   \
             return lhs OPERATOR rhs;                                                               \
         }                                                                                          \
@@ -34,13 +33,13 @@ COMPARISON_OPERATOR(gt, >)
 COMPARISON_OPERATOR(ge, >=)
 
 template<typename T, typename U>
-    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>)
+    requires(std::is_same_v<T, null_t> || std::is_same_v<U, null_t>)
 basic_function_result safe_eq(const T&, const U&) {
     return std::is_same_v<T, U>;
 }
 
 template<typename T, typename U>
-    requires(std::is_same_v<T, std::nullptr_t> || std::is_same_v<U, std::nullptr_t>)
+    requires(std::is_same_v<T, null_t> || std::is_same_v<U, null_t>)
 basic_function_result safe_ne(const T&, const U&) {
     return !std::is_same_v<T, U>;
 }
@@ -48,8 +47,8 @@ basic_function_result safe_ne(const T&, const U&) {
 template<typename T, typename U>
 basic_function_result safe_min(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
-        const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
-        const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
+        const number_float_t lhs_float = static_cast<number_float_t>(lhs);
+        const number_float_t rhs_float = static_cast<number_float_t>(rhs);
         return lhs_float <= rhs_float ? lhs_float : rhs_float;
     } else {
         return lhs <= rhs ? lhs : rhs;
@@ -59,8 +58,8 @@ basic_function_result safe_min(const T& lhs, const U& rhs) {
 template<typename T, typename U>
 basic_function_result safe_max(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> != std::is_floating_point_v<U>) {
-        const json::number_float_t lhs_float = static_cast<json::number_float_t>(lhs);
-        const json::number_float_t rhs_float = static_cast<json::number_float_t>(rhs);
+        const number_float_t lhs_float = static_cast<number_float_t>(lhs);
+        const number_float_t rhs_float = static_cast<number_float_t>(rhs);
         return lhs_float >= rhs_float ? lhs_float : rhs_float;
     } else {
         return lhs >= rhs ? lhs : rhs;
@@ -71,8 +70,7 @@ basic_function_result safe_max(const T& lhs, const U& rhs) {
     template<typename T, typename U>                                                               \
     basic_function_result safe_##NAME(const T& lhs, const U& rhs) {                                \
         if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
-            return static_cast<json::number_float_t>(lhs)                                          \
-                OPERATOR static_cast<json::number_float_t>(rhs);                                   \
+            return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
         } else {                                                                                   \
             return lhs OPERATOR rhs;                                                               \
         }                                                                                          \
@@ -95,7 +93,7 @@ basic_function_result safe_unary_minus(const T& lhs) {
 template<typename T, typename U>
 basic_function_result safe_div(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
-        return static_cast<json::number_float_t>(lhs) / static_cast<json::number_float_t>(rhs);
+        return static_cast<number_float_t>(lhs) / static_cast<number_float_t>(rhs);
     } else {
         if (rhs == 0) {
             return unexpected(std::string("integer division by zero"));
@@ -108,8 +106,7 @@ basic_function_result safe_div(const T& lhs, const U& rhs) {
 template<typename T, typename U>
 basic_function_result safe_mod(const T& lhs, const U& rhs) {
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
-        return std::fmod(
-            static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+        return std::fmod(static_cast<number_float_t>(lhs), static_cast<number_float_t>(rhs));
     } else {
         if (rhs == 0) {
             return unexpected(std::string("integer modulo by zero"));
@@ -122,26 +119,26 @@ basic_function_result safe_mod(const T& lhs, const U& rhs) {
 #define UNARY_MATH_FUNCTION(NAME, FUNC, RETURN)                                                    \
     template<typename T>                                                                           \
     basic_function_result safe_##NAME(const T& lhs) {                                              \
-        return static_cast<RETURN>(FUNC(static_cast<json::number_float_t>(lhs)));                  \
+        return static_cast<RETURN>(FUNC(static_cast<number_float_t>(lhs)));                        \
     }
 
-UNARY_MATH_FUNCTION(floor, std::floor, json::number_integer_t)
-UNARY_MATH_FUNCTION(ceil, std::ceil, json::number_integer_t)
-UNARY_MATH_FUNCTION(round, std::round, json::number_integer_t)
-UNARY_MATH_FUNCTION(sqrt, std::sqrt, json::number_float_t)
-UNARY_MATH_FUNCTION(abs, std::abs, json::number_float_t)
+UNARY_MATH_FUNCTION(floor, std::floor, number_integer_t)
+UNARY_MATH_FUNCTION(ceil, std::ceil, number_integer_t)
+UNARY_MATH_FUNCTION(round, std::round, number_integer_t)
+UNARY_MATH_FUNCTION(sqrt, std::sqrt, number_float_t)
+UNARY_MATH_FUNCTION(abs, std::abs, number_float_t)
 
 template<typename T, typename U>
 basic_function_result safe_pow(const T& lhs, const U& rhs) {
-    return std::pow(static_cast<json::number_float_t>(lhs), static_cast<json::number_float_t>(rhs));
+    return std::pow(static_cast<number_float_t>(lhs), static_cast<number_float_t>(rhs));
 }
 
-std::size_t normalize_index(json::number_integer_t i, std::size_t size) {
-    return static_cast<std::size_t>(i < 0 ? i + static_cast<json::number_integer_t>(size) : i);
+std::size_t normalize_index(number_integer_t i, std::size_t size) {
+    return static_cast<std::size_t>(i < 0 ? i + static_cast<number_integer_t>(size) : i);
 }
 
 template<typename T, typename U>
-    requires(std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>)
+    requires(std::is_same_v<T, string_t> || std::is_same_v<T, array_t>)
 basic_function_result safe_access(const T& lhs, const U& rhs) {
     const std::size_t unsigned_rhs = normalize_index(rhs, lhs.size());
     if (unsigned_rhs >= lhs.size()) {
@@ -150,29 +147,30 @@ basic_function_result safe_access(const T& lhs, const U& rhs) {
             std::string(get_type_name(lhs)) + " of size " + std::to_string(lhs.size()));
     }
 
-    if constexpr (std::is_same_v<T, json::string_t>) {
+    if constexpr (std::is_same_v<T, string_t>) {
         // If we just returned lhs[rhs], we would get the numerical value of the 'char'.
         // Return a new string instead with just that character, which will be more practical.
-        return json::string_t(1, lhs[unsigned_rhs]);
+        return string_t(1, lhs[unsigned_rhs]);
     } else {
         return lhs[unsigned_rhs];
     }
 }
 
-template<std::same_as<json> T, std::same_as<json::string_t> U>
+template<std::same_as<object_t> T, std::same_as<string_t> U>
 basic_function_result safe_access(const T& lhs, const U& rhs) {
-    if (!lhs.contains(rhs)) {
+    const auto iter = lhs.find(rhs);
+    if (iter == lhs.end()) {
         return unexpected(std::string("unknown field '") + rhs + "'");
     }
 
-    return lhs[rhs];
+    return iter->second;
 }
 
 template<typename T, typename U>
-    requires(std::is_same_v<T, json::string_t> || std::is_same_v<T, json::array_t>)
+    requires(std::is_same_v<T, string_t> || std::is_same_v<T, array_t>)
 basic_function_result safe_range_access(const T& object, const U& begin, const U& end) {
     const std::size_t unsigned_begin = normalize_index(begin, object.size());
-    const std::size_t unsigned_end   = end != std::numeric_limits<json::number_integer_t>::max()
+    const std::size_t unsigned_end   = end != std::numeric_limits<number_integer_t>::max()
                                            ? normalize_index(end, object.size())
                                            : object.size();
 
@@ -193,21 +191,21 @@ basic_function_result safe_range_access(const T& object, const U& begin, const U
             std::string(get_type_name(object)) + " of size " + std::to_string(object.size()));
     }
 
-    if constexpr (std::is_same_v<T, json::string_t>) {
+    if constexpr (std::is_same_v<T, string_t>) {
         return object.substr(unsigned_begin, unsigned_end - unsigned_begin);
     } else {
         return T(object.begin() + unsigned_begin, object.begin() + unsigned_end);
     }
 }
 
-template<bool Expected, typename T, std::same_as<json::array_t> U>
+template<bool Expected, typename T, std::same_as<array_t> U>
 basic_function_result safe_contains(const T& lhs, const U& rhs) {
     return (std::find(rhs.begin(), rhs.end(), lhs) != rhs.end()) == Expected;
 }
 
-template<bool Expected, std::same_as<std::string> T, std::same_as<json> U>
+template<bool Expected, std::same_as<std::string> T, std::same_as<object_t> U>
 basic_function_result safe_contains(const T& lhs, const U& rhs) {
-    return rhs.contains(lhs) == Expected;
+    return (rhs.find(lhs) != rhs.end()) == Expected;
 }
 
 template<bool Expected, std::same_as<std::string> T, std::same_as<std::string> U>
@@ -217,7 +215,7 @@ basic_function_result safe_contains(const T& lhs, const U& rhs) {
 
 template<typename T>
 basic_function_result safe_len(const T& lhs) {
-    return static_cast<json::number_integer_t>(lhs.size());
+    return static_cast<number_integer_t>(lhs.size());
 }
 
 template<typename T>
@@ -225,21 +223,19 @@ template<typename T>
 basic_function_result safe_cast_int(const T& lhs) {
     if constexpr (std::is_floating_point_v<T>) {
         if (!std::isfinite(lhs) ||
-            lhs < static_cast<json::number_float_t>(
-                      std::numeric_limits<json::number_integer_t>::min()) ||
-            lhs > static_cast<json::number_float_t>(
-                      std::numeric_limits<json::number_integer_t>::max())) {
+            lhs < static_cast<number_float_t>(std::numeric_limits<number_integer_t>::min()) ||
+            lhs > static_cast<number_float_t>(std::numeric_limits<number_integer_t>::max())) {
             return unexpected(
                 std::string("could not convert float '" + std::to_string(lhs) + "' to int"));
         }
     }
 
-    return static_cast<json::number_integer_t>(lhs);
+    return static_cast<number_integer_t>(lhs);
 }
 
-template<std::same_as<json::string_t> T>
+template<std::same_as<string_t> T>
 basic_function_result safe_cast_int(const T& lhs) {
-    json::number_integer_t value = 0;
+    number_integer_t value = 0;
 
 #if JSONEXPR_USE_STD_FROM_CHARS
     const auto* begin = lhs.data();
@@ -269,12 +265,12 @@ basic_function_result safe_cast_int(const T& lhs) {
 template<typename T>
     requires std::is_arithmetic_v<T>
 basic_function_result safe_cast_float(const T& lhs) {
-    return static_cast<json::number_float_t>(lhs);
+    return static_cast<number_float_t>(lhs);
 }
 
-template<std::same_as<json::string_t> T>
+template<std::same_as<string_t> T>
 basic_function_result safe_cast_float(const T& lhs) {
-    json::number_float_t value = 0;
+    number_float_t value = 0;
 
 #if JSONEXPR_USE_STD_FROM_CHARS
     const auto* begin = lhs.data();
@@ -311,10 +307,10 @@ basic_function_result safe_cast_bool(const T& lhs) {
         }
     }
 
-    return static_cast<json::boolean_t>(lhs);
+    return static_cast<boolean_t>(lhs);
 }
 
-template<std::same_as<json::string_t> T>
+template<std::same_as<string_t> T>
 basic_function_result safe_cast_bool(const T& lhs) {
     if (lhs == "true") {
         return true;
@@ -353,7 +349,7 @@ expected<bool, error> evaluate_as_bool(
     }
 
     if (eval_result.value().is_boolean()) {
-        return eval_result.value().get<json::boolean_t>();
+        return eval_result.value().get<boolean_t>();
     } else {
         return unexpected(node_error(
             node, std::string("expected boolean, got ") +
@@ -458,181 +454,181 @@ function_registry jsonexpr::default_functions() {
     register_ast_function(freg, "and", &safe_and);
     register_ast_function(freg, "or", &safe_or);
 
-    register_function(freg, "+", &safe_unary_plus<json::number_integer_t>);
-    register_function(freg, "+", &safe_unary_plus<json::number_float_t>);
-    register_function(freg, "+", &safe_add<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "+", &safe_add<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "+", &safe_add<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "+", &safe_add<json::number_float_t, json::number_float_t>);
-    register_function(freg, "+", &safe_add<json::string_t, json::string_t>);
+    register_function(freg, "+", &safe_unary_plus<number_integer_t>);
+    register_function(freg, "+", &safe_unary_plus<number_float_t>);
+    register_function(freg, "+", &safe_add<number_integer_t, number_integer_t>);
+    register_function(freg, "+", &safe_add<number_integer_t, number_float_t>);
+    register_function(freg, "+", &safe_add<number_float_t, number_integer_t>);
+    register_function(freg, "+", &safe_add<number_float_t, number_float_t>);
+    register_function(freg, "+", &safe_add<string_t, string_t>);
 
-    register_function(freg, "-", &safe_unary_minus<json::number_integer_t>);
-    register_function(freg, "-", &safe_unary_minus<json::number_float_t>);
-    register_function(freg, "-", &safe_sub<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "-", &safe_sub<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "-", &safe_sub<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "-", &safe_sub<json::number_float_t, json::number_float_t>);
+    register_function(freg, "-", &safe_unary_minus<number_integer_t>);
+    register_function(freg, "-", &safe_unary_minus<number_float_t>);
+    register_function(freg, "-", &safe_sub<number_integer_t, number_integer_t>);
+    register_function(freg, "-", &safe_sub<number_integer_t, number_float_t>);
+    register_function(freg, "-", &safe_sub<number_float_t, number_integer_t>);
+    register_function(freg, "-", &safe_sub<number_float_t, number_float_t>);
 
-    register_function(freg, "*", &safe_mul<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "*", &safe_mul<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "*", &safe_mul<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "*", &safe_mul<json::number_float_t, json::number_float_t>);
+    register_function(freg, "*", &safe_mul<number_integer_t, number_integer_t>);
+    register_function(freg, "*", &safe_mul<number_integer_t, number_float_t>);
+    register_function(freg, "*", &safe_mul<number_float_t, number_integer_t>);
+    register_function(freg, "*", &safe_mul<number_float_t, number_float_t>);
 
-    register_function(freg, "/", &safe_div<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "/", &safe_div<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "/", &safe_div<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "/", &safe_div<json::number_float_t, json::number_float_t>);
+    register_function(freg, "/", &safe_div<number_integer_t, number_integer_t>);
+    register_function(freg, "/", &safe_div<number_integer_t, number_float_t>);
+    register_function(freg, "/", &safe_div<number_float_t, number_integer_t>);
+    register_function(freg, "/", &safe_div<number_float_t, number_float_t>);
 
-    register_function(freg, "%", &safe_mod<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "%", &safe_mod<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "%", &safe_mod<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "%", &safe_mod<json::number_float_t, json::number_float_t>);
+    register_function(freg, "%", &safe_mod<number_integer_t, number_integer_t>);
+    register_function(freg, "%", &safe_mod<number_integer_t, number_float_t>);
+    register_function(freg, "%", &safe_mod<number_float_t, number_integer_t>);
+    register_function(freg, "%", &safe_mod<number_float_t, number_float_t>);
 
-    register_function(freg, "**", &safe_pow<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "**", &safe_pow<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "**", &safe_pow<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "**", &safe_pow<json::number_float_t, json::number_float_t>);
+    register_function(freg, "**", &safe_pow<number_integer_t, number_integer_t>);
+    register_function(freg, "**", &safe_pow<number_integer_t, number_float_t>);
+    register_function(freg, "**", &safe_pow<number_float_t, number_integer_t>);
+    register_function(freg, "**", &safe_pow<number_float_t, number_float_t>);
 
-    register_function(freg, "abs", &safe_abs<json::number_integer_t>);
-    register_function(freg, "abs", &safe_abs<json::number_float_t>);
+    register_function(freg, "abs", &safe_abs<number_integer_t>);
+    register_function(freg, "abs", &safe_abs<number_float_t>);
 
-    register_function(freg, "sqrt", &safe_sqrt<json::number_integer_t>);
-    register_function(freg, "sqrt", &safe_sqrt<json::number_float_t>);
+    register_function(freg, "sqrt", &safe_sqrt<number_integer_t>);
+    register_function(freg, "sqrt", &safe_sqrt<number_float_t>);
 
-    register_function(freg, "round", &safe_round<json::number_integer_t>);
-    register_function(freg, "round", &safe_round<json::number_float_t>);
+    register_function(freg, "round", &safe_round<number_integer_t>);
+    register_function(freg, "round", &safe_round<number_float_t>);
 
-    register_function(freg, "floor", &safe_floor<json::number_integer_t>);
-    register_function(freg, "floor", &safe_floor<json::number_float_t>);
+    register_function(freg, "floor", &safe_floor<number_integer_t>);
+    register_function(freg, "floor", &safe_floor<number_float_t>);
 
-    register_function(freg, "ceil", &safe_ceil<json::number_integer_t>);
-    register_function(freg, "ceil", &safe_ceil<json::number_float_t>);
+    register_function(freg, "ceil", &safe_ceil<number_integer_t>);
+    register_function(freg, "ceil", &safe_ceil<number_float_t>);
 
-    register_function(freg, "len", &safe_len<json::string_t>);
-    register_function(freg, "len", &safe_len<json::array_t>);
-    register_function(freg, "len", &safe_len<json>);
+    register_function(freg, "len", &safe_len<string_t>);
+    register_function(freg, "len", &safe_len<array_t>);
+    register_function(freg, "len", &safe_len<object_t>);
 
-    register_function(freg, "min", &safe_min<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "min", &safe_min<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "min", &safe_min<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "min", &safe_min<json::number_float_t, json::number_float_t>);
-    register_function(freg, "min", &safe_min<json::string_t, json::string_t>);
+    register_function(freg, "min", &safe_min<number_integer_t, number_integer_t>);
+    register_function(freg, "min", &safe_min<number_integer_t, number_float_t>);
+    register_function(freg, "min", &safe_min<number_float_t, number_integer_t>);
+    register_function(freg, "min", &safe_min<number_float_t, number_float_t>);
+    register_function(freg, "min", &safe_min<string_t, string_t>);
 
-    register_function(freg, "max", &safe_max<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "max", &safe_max<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "max", &safe_max<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "max", &safe_max<json::number_float_t, json::number_float_t>);
-    register_function(freg, "max", &safe_max<json::string_t, json::string_t>);
+    register_function(freg, "max", &safe_max<number_integer_t, number_integer_t>);
+    register_function(freg, "max", &safe_max<number_integer_t, number_float_t>);
+    register_function(freg, "max", &safe_max<number_float_t, number_integer_t>);
+    register_function(freg, "max", &safe_max<number_float_t, number_float_t>);
+    register_function(freg, "max", &safe_max<string_t, string_t>);
 
-    register_function(freg, "int", &safe_cast_int<json::number_integer_t>);
-    register_function(freg, "int", &safe_cast_int<json::number_float_t>);
-    register_function(freg, "int", &safe_cast_int<json::boolean_t>);
-    register_function(freg, "int", &safe_cast_int<json::string_t>);
+    register_function(freg, "int", &safe_cast_int<number_integer_t>);
+    register_function(freg, "int", &safe_cast_int<number_float_t>);
+    register_function(freg, "int", &safe_cast_int<boolean_t>);
+    register_function(freg, "int", &safe_cast_int<string_t>);
 
-    register_function(freg, "float", &safe_cast_float<json::number_integer_t>);
-    register_function(freg, "float", &safe_cast_float<json::number_float_t>);
-    register_function(freg, "float", &safe_cast_float<json::boolean_t>);
-    register_function(freg, "float", &safe_cast_float<json::string_t>);
+    register_function(freg, "float", &safe_cast_float<number_integer_t>);
+    register_function(freg, "float", &safe_cast_float<number_float_t>);
+    register_function(freg, "float", &safe_cast_float<boolean_t>);
+    register_function(freg, "float", &safe_cast_float<string_t>);
 
-    register_function(freg, "bool", &safe_cast_bool<json::number_integer_t>);
-    register_function(freg, "bool", &safe_cast_bool<json::number_float_t>);
-    register_function(freg, "bool", &safe_cast_bool<json::boolean_t>);
-    register_function(freg, "bool", &safe_cast_bool<json::string_t>);
+    register_function(freg, "bool", &safe_cast_bool<number_integer_t>);
+    register_function(freg, "bool", &safe_cast_bool<number_float_t>);
+    register_function(freg, "bool", &safe_cast_bool<boolean_t>);
+    register_function(freg, "bool", &safe_cast_bool<string_t>);
 
-    register_function(freg, "==", &safe_eq<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "==", &safe_eq<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "==", &safe_eq<json::number_integer_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "==", &safe_eq<json::number_float_t, json::number_float_t>);
-    register_function(freg, "==", &safe_eq<json::number_float_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<json::boolean_t, json::boolean_t>);
-    register_function(freg, "==", &safe_eq<json::boolean_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<json::string_t, json::string_t>);
-    register_function(freg, "==", &safe_eq<json::string_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<json::array_t, json::array_t>);
-    register_function(freg, "==", &safe_eq<json::array_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json::number_integer_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json::number_float_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json::boolean_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json::string_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json::array_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<std::nullptr_t, json>);
-    register_function(freg, "==", &safe_eq<json, std::nullptr_t>);
-    register_function(freg, "==", &safe_eq<json, json>);
+    register_function(freg, "==", &safe_eq<number_integer_t, number_integer_t>);
+    register_function(freg, "==", &safe_eq<number_integer_t, number_float_t>);
+    register_function(freg, "==", &safe_eq<number_integer_t, null_t>);
+    register_function(freg, "==", &safe_eq<number_float_t, number_integer_t>);
+    register_function(freg, "==", &safe_eq<number_float_t, number_float_t>);
+    register_function(freg, "==", &safe_eq<number_float_t, null_t>);
+    register_function(freg, "==", &safe_eq<boolean_t, boolean_t>);
+    register_function(freg, "==", &safe_eq<boolean_t, null_t>);
+    register_function(freg, "==", &safe_eq<string_t, string_t>);
+    register_function(freg, "==", &safe_eq<string_t, null_t>);
+    register_function(freg, "==", &safe_eq<array_t, array_t>);
+    register_function(freg, "==", &safe_eq<array_t, null_t>);
+    register_function(freg, "==", &safe_eq<null_t, number_integer_t>);
+    register_function(freg, "==", &safe_eq<null_t, number_float_t>);
+    register_function(freg, "==", &safe_eq<null_t, boolean_t>);
+    register_function(freg, "==", &safe_eq<null_t, string_t>);
+    register_function(freg, "==", &safe_eq<null_t, array_t>);
+    register_function(freg, "==", &safe_eq<null_t, null_t>);
+    register_function(freg, "==", &safe_eq<null_t, object_t>);
+    register_function(freg, "==", &safe_eq<object_t, null_t>);
+    register_function(freg, "==", &safe_eq<object_t, object_t>);
 
-    register_function(freg, "!=", &safe_ne<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "!=", &safe_ne<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "!=", &safe_ne<json::number_integer_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "!=", &safe_ne<json::number_float_t, json::number_float_t>);
-    register_function(freg, "!=", &safe_ne<json::number_float_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<json::boolean_t, json::boolean_t>);
-    register_function(freg, "!=", &safe_ne<json::boolean_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<json::string_t, json::string_t>);
-    register_function(freg, "!=", &safe_ne<json::string_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<json::array_t, json::array_t>);
-    register_function(freg, "!=", &safe_ne<json::array_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json::number_integer_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json::number_float_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json::boolean_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json::string_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json::array_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<std::nullptr_t, json>);
-    register_function(freg, "!=", &safe_ne<json, std::nullptr_t>);
-    register_function(freg, "!=", &safe_ne<json, json>);
+    register_function(freg, "!=", &safe_ne<number_integer_t, number_integer_t>);
+    register_function(freg, "!=", &safe_ne<number_integer_t, number_float_t>);
+    register_function(freg, "!=", &safe_ne<number_integer_t, null_t>);
+    register_function(freg, "!=", &safe_ne<number_float_t, number_integer_t>);
+    register_function(freg, "!=", &safe_ne<number_float_t, number_float_t>);
+    register_function(freg, "!=", &safe_ne<number_float_t, null_t>);
+    register_function(freg, "!=", &safe_ne<boolean_t, boolean_t>);
+    register_function(freg, "!=", &safe_ne<boolean_t, null_t>);
+    register_function(freg, "!=", &safe_ne<string_t, string_t>);
+    register_function(freg, "!=", &safe_ne<string_t, null_t>);
+    register_function(freg, "!=", &safe_ne<array_t, array_t>);
+    register_function(freg, "!=", &safe_ne<array_t, null_t>);
+    register_function(freg, "!=", &safe_ne<null_t, number_integer_t>);
+    register_function(freg, "!=", &safe_ne<null_t, number_float_t>);
+    register_function(freg, "!=", &safe_ne<null_t, boolean_t>);
+    register_function(freg, "!=", &safe_ne<null_t, string_t>);
+    register_function(freg, "!=", &safe_ne<null_t, array_t>);
+    register_function(freg, "!=", &safe_ne<null_t, null_t>);
+    register_function(freg, "!=", &safe_ne<null_t, object_t>);
+    register_function(freg, "!=", &safe_ne<object_t, null_t>);
+    register_function(freg, "!=", &safe_ne<object_t, object_t>);
 
-    register_function(freg, ">", &safe_gt<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, ">", &safe_gt<json::number_integer_t, json::number_float_t>);
-    register_function(freg, ">", &safe_gt<json::number_float_t, json::number_integer_t>);
-    register_function(freg, ">", &safe_gt<json::number_float_t, json::number_float_t>);
-    register_function(freg, ">", &safe_gt<json::string_t, json::string_t>);
+    register_function(freg, ">", &safe_gt<number_integer_t, number_integer_t>);
+    register_function(freg, ">", &safe_gt<number_integer_t, number_float_t>);
+    register_function(freg, ">", &safe_gt<number_float_t, number_integer_t>);
+    register_function(freg, ">", &safe_gt<number_float_t, number_float_t>);
+    register_function(freg, ">", &safe_gt<string_t, string_t>);
 
-    register_function(freg, ">=", &safe_ge<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, ">=", &safe_ge<json::number_integer_t, json::number_float_t>);
-    register_function(freg, ">=", &safe_ge<json::number_float_t, json::number_integer_t>);
-    register_function(freg, ">=", &safe_ge<json::number_float_t, json::number_float_t>);
-    register_function(freg, ">=", &safe_ge<json::string_t, json::string_t>);
+    register_function(freg, ">=", &safe_ge<number_integer_t, number_integer_t>);
+    register_function(freg, ">=", &safe_ge<number_integer_t, number_float_t>);
+    register_function(freg, ">=", &safe_ge<number_float_t, number_integer_t>);
+    register_function(freg, ">=", &safe_ge<number_float_t, number_float_t>);
+    register_function(freg, ">=", &safe_ge<string_t, string_t>);
 
-    register_function(freg, "<", &safe_lt<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "<", &safe_lt<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "<", &safe_lt<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "<", &safe_lt<json::number_float_t, json::number_float_t>);
-    register_function(freg, "<", &safe_lt<json::string_t, json::string_t>);
+    register_function(freg, "<", &safe_lt<number_integer_t, number_integer_t>);
+    register_function(freg, "<", &safe_lt<number_integer_t, number_float_t>);
+    register_function(freg, "<", &safe_lt<number_float_t, number_integer_t>);
+    register_function(freg, "<", &safe_lt<number_float_t, number_float_t>);
+    register_function(freg, "<", &safe_lt<string_t, string_t>);
 
-    register_function(freg, "<=", &safe_le<json::number_integer_t, json::number_integer_t>);
-    register_function(freg, "<=", &safe_le<json::number_integer_t, json::number_float_t>);
-    register_function(freg, "<=", &safe_le<json::number_float_t, json::number_integer_t>);
-    register_function(freg, "<=", &safe_le<json::number_float_t, json::number_float_t>);
-    register_function(freg, "<=", &safe_le<json::string_t, json::string_t>);
+    register_function(freg, "<=", &safe_le<number_integer_t, number_integer_t>);
+    register_function(freg, "<=", &safe_le<number_integer_t, number_float_t>);
+    register_function(freg, "<=", &safe_le<number_float_t, number_integer_t>);
+    register_function(freg, "<=", &safe_le<number_float_t, number_float_t>);
+    register_function(freg, "<=", &safe_le<string_t, string_t>);
 
-    register_function(freg, "[]", &safe_access<json::string_t, json::number_integer_t>);
-    register_function(freg, "[]", &safe_access<json::array_t, json::number_integer_t>);
-    register_function(freg, "[]", &safe_access<json, json::string_t>);
+    register_function(freg, "[]", &safe_access<string_t, number_integer_t>);
+    register_function(freg, "[]", &safe_access<array_t, number_integer_t>);
+    register_function(freg, "[]", &safe_access<object_t, string_t>);
 
-    register_function(freg, "[:]", &safe_range_access<json::string_t, json::number_integer_t>);
-    register_function(freg, "[:]", &safe_range_access<json::array_t, json::number_integer_t>);
+    register_function(freg, "[:]", &safe_range_access<string_t, number_integer_t>);
+    register_function(freg, "[:]", &safe_range_access<array_t, number_integer_t>);
 
-    register_function(freg, "in", &safe_contains<true, json::number_integer_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, json::number_float_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, json::boolean_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, json::string_t, json::string_t>);
-    register_function(freg, "in", &safe_contains<true, json::string_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, json::string_t, json>);
-    register_function(freg, "in", &safe_contains<true, json::array_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, std::nullptr_t, json::array_t>);
-    register_function(freg, "in", &safe_contains<true, json, json::array_t>);
+    register_function(freg, "in", &safe_contains<true, number_integer_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, number_float_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, boolean_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, string_t, string_t>);
+    register_function(freg, "in", &safe_contains<true, string_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, string_t, object_t>);
+    register_function(freg, "in", &safe_contains<true, array_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, null_t, array_t>);
+    register_function(freg, "in", &safe_contains<true, object_t, array_t>);
 
-    register_function(freg, "not in", &safe_contains<false, json::number_integer_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, json::number_float_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, json::boolean_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, json::string_t, json::string_t>);
-    register_function(freg, "not in", &safe_contains<false, json::string_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, json::string_t, json>);
-    register_function(freg, "not in", &safe_contains<false, json::array_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, std::nullptr_t, json::array_t>);
-    register_function(freg, "not in", &safe_contains<false, json, json::array_t>);
+    register_function(freg, "not in", &safe_contains<false, number_integer_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, number_float_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, boolean_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, string_t, string_t>);
+    register_function(freg, "not in", &safe_contains<false, string_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, string_t, object_t>);
+    register_function(freg, "not in", &safe_contains<false, array_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, null_t, array_t>);
+    register_function(freg, "not in", &safe_contains<false, object_t, array_t>);
 
     return freg;
 }

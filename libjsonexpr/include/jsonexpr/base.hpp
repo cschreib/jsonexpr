@@ -16,6 +16,14 @@
 namespace jsonexpr {
 using json = nlohmann::json;
 
+using number_integer_t = json::number_integer_t;
+using number_float_t   = json::number_float_t;
+using boolean_t        = json::boolean_t;
+using string_t         = json::string_t;
+using array_t          = json::array_t;
+using object_t         = json::object_t;
+using null_t           = std::nullptr_t;
+
 namespace ast {
 struct node;
 }

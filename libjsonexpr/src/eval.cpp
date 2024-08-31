@@ -25,6 +25,33 @@ eval(const ast::node&, const ast::literal& v, const variable_registry&, const fu
 expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg);
 
+namespace {
+std::string_view pop_arg(std::string_view& list) noexcept {
+    const auto p = list.find_first_of(",");
+    if (p == list.npos) {
+        std::string_view arg = list;
+        list                 = {};
+        return arg;
+    }
+
+    std::string_view arg = list.substr(0, p);
+    list                 = list.substr(p + 1);
+    return arg;
+}
+
+bool is_match(std::string_view args, std::string_view signature) noexcept {
+    while (!args.empty() && !signature.empty()) {
+        std::string_view arg       = pop_arg(args);
+        std::string_view candidate = pop_arg(signature);
+        if (arg != candidate && candidate != "json") {
+            return false;
+        }
+    }
+
+    return args.empty() && signature.empty();
+}
+} // namespace
+
 expected<json, error> eval(
     const ast::node&         n,
     const ast::function&     f,
@@ -48,7 +75,7 @@ expected<json, error> eval(
                 const auto& map = std::get<function::overload_t>(func.overloads);
 
                 std::vector<json> json_args;
-                std::string       key;
+                std::string       arg_types;
                 for (const auto& arg : args) {
                     auto eval_arg = evaluate(arg, vreg, freg);
                     if (!eval_arg.has_value()) {
@@ -56,16 +83,39 @@ expected<json, error> eval(
                     }
                     json_args.push_back(std::move(eval_arg.value()));
 
-                    if (!key.empty()) {
-                        key += ",";
+                    if (!arg_types.empty()) {
+                        arg_types += ",";
                     }
-                    key += get_dynamic_type_name(json_args.back());
+                    arg_types += get_dynamic_type_name(json_args.back());
                 }
 
-                auto iter = map.find(key);
-                if (iter == map.end()) {
+                auto overload = map.find(arg_types);
+                if (overload == map.end()) {
+                    // Try to find a match with 'any'
+                    for (auto iter = map.begin(); iter != map.end(); ++iter) {
+                        if (is_match(arg_types, iter->first)) {
+                            if (overload != map.end()) {
+                                std::string message = "ambiguous overload of '" +
+                                                      std::string{f.name} + "' for types (" +
+                                                      arg_types + ")\n" + "note: candidates are:";
+                                for (const auto& [key, value] : map) {
+                                    if (is_match(arg_types, key)) {
+                                        message +=
+                                            "\n        " + std::string{f.name} + "(" + key + ")";
+                                    }
+                                }
+
+                                return unexpected(node_error(n, message));
+                            }
+
+                            overload = iter;
+                        }
+                    }
+                }
+
+                if (overload == map.end()) {
                     std::string message = "no overload of '" + std::string{f.name} +
-                                          "' accepts the provided types (" + key + ")\n" +
+                                          "' accepts the provided types (" + arg_types + ")\n" +
                                           "note: available overloads:";
                     for (const auto& [key, value] : map) {
                         message += "\n        " + std::string{f.name} + "(" + key + ")";
@@ -75,7 +125,7 @@ expected<json, error> eval(
                 }
 
                 auto result =
-                    iter->second(std::span<const json>(json_args.cbegin(), json_args.cend()));
+                    overload->second(std::span<const json>(json_args.cbegin(), json_args.cend()));
                 if (result.has_value()) {
                     return result.value();
                 } else {

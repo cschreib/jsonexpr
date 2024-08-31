@@ -31,38 +31,43 @@ std::string_view jsonexpr::get_dynamic_type_name(const json& j) noexcept {
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json::number_float_t>() noexcept {
+std::string_view jsonexpr::get_type_name<number_float_t>() noexcept {
     return "float";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json::number_integer_t>() noexcept {
+std::string_view jsonexpr::get_type_name<number_integer_t>() noexcept {
     return "int";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json::string_t>() noexcept {
+std::string_view jsonexpr::get_type_name<string_t>() noexcept {
     return "string";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json::array_t>() noexcept {
+std::string_view jsonexpr::get_type_name<array_t>() noexcept {
     return "array";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json::boolean_t>() noexcept {
+std::string_view jsonexpr::get_type_name<boolean_t>() noexcept {
     return "bool";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<std::nullptr_t>() noexcept {
+std::string_view jsonexpr::get_type_name<null_t>() noexcept {
     return "null";
 }
 
 template<>
-std::string_view jsonexpr::get_type_name<json>() noexcept {
+std::string_view jsonexpr::get_type_name<object_t>() noexcept {
     return "object";
+}
+
+template<>
+std::string_view jsonexpr::get_type_name<json>() noexcept {
+    return "json";
 }
 
 void function::add_overload(std::string key, basic_function_t func) {

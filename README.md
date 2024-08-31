@@ -225,6 +225,7 @@ Supported types for the C++ function parameters:
  - `jsonexpr::array_t = std::array<jsonexpr::json>`, for arrays.
  - `jsonexpr::object_t = std::unordered_map<std::string, jsonexpr::json>`, for objects.
  - `jsonexpr::null_t = std::nullptr_t`, for null.
+ - `jsonexpr::json = nlohmann::json`, for "any of the above" (handle type checks yourself).
 
 The return value must be (convertible to) `jsonexpr::json`, or `jsonexpr::basic_function_result` if handling errors (see below for more information on error handling).
 
@@ -271,3 +272,5 @@ jsonexpr::register_function(
 jsonexpr::register_function(
     funcs, "is_empty", [](const std::vector<jsonexpr::json>& array) { return array.empty(); });
 ```
+
+Note: It is possible to mix overloads with static (as above) and dynamic types (using one or more parameters of type `jsonexpr::json`). In such cases, functions with static types will always be preferred over functions with dynamic types.
