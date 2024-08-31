@@ -107,15 +107,15 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
  - `bool(a)`: convert or parse `a` into a `bool` (for strings: only `"true"` and `"false"` are accepted).
  - `str(a)`: serialise `a` into a `string`.
  - `min(a,b)`: return the minimum of `a` and `b`.
- - `max(a,b)`: return the minimum of `a` and `b`.
- - `abs(a)`: return the absolute value of `a`.
- - `sqrt(a)`: return the square root of `a`.
- - `round(a)`: return the nearest integer value to `a` (preserves the type of `a`).
- - `floor(a)`: return the nearest integer value to `a` (round down, preserves the type of `a`).
- - `ceil(a)`: return nearest integer value to `a` (round up, preserves the type of `a`).
+ - `max(a,b)`: return the maximum of `a` and `b`.
+ - `abs(a)`: return the absolute value of `a` (preserves the type of `a`).
+ - `sqrt(a)`: return the square root of `a` as a floating point value.
+ - `round(a)`: return the nearest integer value to `a` (rounding to nearest).
+ - `floor(a)`: return the nearest integer value to `a` (rounding down).
+ - `ceil(a)`: return nearest integer value to `a` (rounding up).
  - `len(a)`: return the size (length) or an array, object, or string.
- - `a in b`: return true if `b` contains `a`, false otherwise.
- - `a not in b`: return true if `b` does not contains `a`, false otherwise.
+ - `a in b`: return true if `b` (a string, array, or object) contains `a`, false otherwise.
+ - `a not in b`: return true if `b` (a string, array, or object) does not contains `a`, false otherwise.
 
 This list can be extended with your own functions, see below.
 

@@ -117,20 +117,38 @@ basic_function_result safe_mod(const T& lhs, const U& rhs) {
     }
 }
 
-#define UNARY_MATH_FUNCTION(NAME, FUNC, RETURN)                                                    \
-    template<typename T>                                                                           \
-    basic_function_result safe_##NAME(const T& lhs) {                                              \
-        return static_cast<RETURN>(FUNC(static_cast<number_float_t>(lhs)));                        \
-    }
+template<typename T>
+basic_function_result safe_floor(T lhs) {
+    return static_cast<number_integer_t>(std::floor(lhs));
+}
 
-UNARY_MATH_FUNCTION(floor, std::floor, number_integer_t)
-UNARY_MATH_FUNCTION(ceil, std::ceil, number_integer_t)
-UNARY_MATH_FUNCTION(round, std::round, number_integer_t)
-UNARY_MATH_FUNCTION(sqrt, std::sqrt, number_float_t)
-UNARY_MATH_FUNCTION(abs, std::abs, number_float_t)
+template<typename T>
+basic_function_result safe_ceil(T lhs) {
+    return static_cast<number_integer_t>(std::ceil(lhs));
+}
+
+template<typename T>
+basic_function_result safe_round(T lhs) {
+    return static_cast<number_integer_t>(std::round(lhs));
+}
+
+template<typename T>
+basic_function_result safe_abs(T lhs) {
+    return std::abs(lhs);
+}
+
+template<typename T>
+basic_function_result safe_sqrt(T lhs) {
+    return std::sqrt(static_cast<number_float_t>(lhs));
+}
+
+template<typename T>
+basic_function_result identity(T lhs) {
+    return lhs;
+}
 
 template<typename T, typename U>
-basic_function_result safe_pow(const T& lhs, const U& rhs) {
+function_result safe_pow(const T& lhs, const U& rhs) {
     return std::pow(static_cast<number_float_t>(lhs), static_cast<number_float_t>(rhs));
 }
 
@@ -496,13 +514,13 @@ function_registry jsonexpr::default_functions() {
     register_function(freg, "sqrt", &safe_sqrt<number_integer_t>);
     register_function(freg, "sqrt", &safe_sqrt<number_float_t>);
 
-    register_function(freg, "round", &safe_round<number_integer_t>);
+    register_function(freg, "round", &identity<number_integer_t>);
     register_function(freg, "round", &safe_round<number_float_t>);
 
-    register_function(freg, "floor", &safe_floor<number_integer_t>);
+    register_function(freg, "floor", &identity<number_integer_t>);
     register_function(freg, "floor", &safe_floor<number_float_t>);
 
-    register_function(freg, "ceil", &safe_ceil<number_integer_t>);
+    register_function(freg, "ceil", &identity<number_integer_t>);
     register_function(freg, "ceil", &safe_ceil<number_float_t>);
 
     register_function(freg, "len", &safe_len<string_t>);
