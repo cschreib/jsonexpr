@@ -340,23 +340,11 @@ basic_function_result safe_cast_bool(const T& lhs) {
     }
 }
 
-function_result safe_cast_string(
-    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
-    if (args.size() != 1u) {
-        return unexpected(error{
-            .message =
-                "function takes 1 arguments, but " + std::to_string(args.size()) + " provided"});
-    }
-
-    const auto eval_result = evaluate(args[0], vars, funs);
-    if (!eval_result.has_value()) {
-        return unexpected(eval_result.error());
-    }
-
-    if (eval_result.value().is_string()) {
-        return eval_result.value();
+basic_function_result safe_cast_string(const json& value) {
+    if (value.is_string()) {
+        return value;
     } else {
-        return eval_result.value().dump();
+        return value.dump();
     }
 }
 
@@ -466,7 +454,7 @@ void jsonexpr::register_ast_function(
 
 function_registry jsonexpr::default_functions() {
     function_registry freg;
-    register_ast_function(freg, "str", &safe_cast_string);
+    register_function(freg, "str", &safe_cast_string);
 
     // Boolean operators are more complex since they short-circuit (avoid evaluation).
     register_ast_function(freg, "not", &safe_not);
