@@ -2,16 +2,16 @@
 
 TEST_CASE("string literal", "[string]") {
     SECTION("bad") {
-        CHECK(!evaluate(R"('")").has_value());
-        CHECK(!evaluate(R"("'')").has_value());
-        CHECK(!evaluate(R"(")").has_value());
-        CHECK(!evaluate(R"(')").has_value());
-        CHECK(!evaluate(R"("abc"def")").has_value());
-        CHECK(!evaluate(R"('abc'def')").has_value());
+        CHECK_ERROR(R"('")");
+        CHECK_ERROR(R"("'')");
+        CHECK_ERROR(R"(")");
+        CHECK_ERROR(R"(')");
+        CHECK_ERROR(R"("abc"def")");
+        CHECK_ERROR(R"('abc'def')");
 #if !defined(_MSC_VER)
-        CHECK(!evaluate(R"('\')").has_value());
-        CHECK(!evaluate(R"("\")").has_value());
-        CHECK(!evaluate(R"("0\1")").has_value());
+        CHECK_ERROR(R"('\')");
+        CHECK_ERROR(R"("\")");
+        CHECK_ERROR(R"("0\1")");
 #endif
     }
 
@@ -41,22 +41,22 @@ TEST_CASE("string operations", "[string]") {
     vars["a"] = R"("abcdef")"_json;
 
     SECTION("bad") {
-        CHECK(!evaluate("'a'+").has_value());
-        CHECK(!evaluate("+'b'").has_value());
-        CHECK(!evaluate("-'b'").has_value());
-        CHECK(!evaluate("'a'*'b'").has_value());
-        CHECK(!evaluate("'a'/'b'").has_value());
-        CHECK(!evaluate("'a'%'b'").has_value());
-        CHECK(!evaluate("'a'**'b'").has_value());
-        CHECK(!evaluate("'a' and 'b'").has_value());
-        CHECK(!evaluate("'a' or 'b'").has_value());
-        CHECK(!evaluate("'a' < 1").has_value());
-        CHECK(!evaluate("'a' <= 1").has_value());
-        CHECK(!evaluate("'a' > 1").has_value());
-        CHECK(!evaluate("'a' >= 1").has_value());
-        CHECK(!evaluate("not 'a'").has_value());
-        CHECK(!evaluate("a[6]", vars).has_value());
-        CHECK(!evaluate("a[-7]", vars).has_value());
+        CHECK_ERROR("'a'+");
+        CHECK_ERROR("+'b'");
+        CHECK_ERROR("-'b'");
+        CHECK_ERROR("'a'*'b'");
+        CHECK_ERROR("'a'/'b'");
+        CHECK_ERROR("'a'%'b'");
+        CHECK_ERROR("'a'**'b'");
+        CHECK_ERROR("'a' and 'b'");
+        CHECK_ERROR("'a' or 'b'");
+        CHECK_ERROR("'a' < 1");
+        CHECK_ERROR("'a' <= 1");
+        CHECK_ERROR("'a' > 1");
+        CHECK_ERROR("'a' >= 1");
+        CHECK_ERROR("not 'a'");
+        CHECK_ERROR("a[6]", vars);
+        CHECK_ERROR("a[-7]", vars);
     }
 
     SECTION("good") {

@@ -2,22 +2,22 @@
 
 TEST_CASE("object literal", "[object]") {
     SECTION("bad") {
-        CHECK(!evaluate("{").has_value());
-        CHECK(!evaluate("{'a'").has_value());
-        CHECK(!evaluate("{'a':").has_value());
-        CHECK(!evaluate("{'a',").has_value());
-        CHECK(!evaluate("{'a':1").has_value());
-        CHECK(!evaluate("{'a':1,").has_value());
-        CHECK(!evaluate("{'a':1:'b'").has_value());
-        CHECK(!evaluate("1}").has_value());
-        CHECK(!evaluate(":1}").has_value());
-        CHECK(!evaluate("'a':1}").has_value());
-        CHECK(!evaluate(",'a':1}").has_value());
-        CHECK(!evaluate("{1:'a'}").has_value());
-        CHECK(!evaluate("{1+'a':1}").has_value());
-        CHECK(!evaluate("{'a':1+'a'}").has_value());
-        CHECK(!evaluate("{#:1}").has_value());
-        CHECK(!evaluate("{'a':#}").has_value());
+        CHECK_ERROR("{");
+        CHECK_ERROR("{'a'");
+        CHECK_ERROR("{'a':");
+        CHECK_ERROR("{'a',");
+        CHECK_ERROR("{'a':1");
+        CHECK_ERROR("{'a':1,");
+        CHECK_ERROR("{'a':1:'b'");
+        CHECK_ERROR("1}");
+        CHECK_ERROR(":1}");
+        CHECK_ERROR("'a':1}");
+        CHECK_ERROR(",'a':1}");
+        CHECK_ERROR("{1:'a'}");
+        CHECK_ERROR("{1+'a':1}");
+        CHECK_ERROR("{'a':1+'a'}");
+        CHECK_ERROR("{#:1}");
+        CHECK_ERROR("{'a':#}");
     }
 
     SECTION("good") {
@@ -45,23 +45,23 @@ TEST_CASE("object access", "[object]") {
         funcs, "make_object", []() { return R"({"a":1, "b":2, "c":3, "de": 4})"_json; });
 
     SECTION("bad") {
-        CHECK(!evaluate("obj['d']", vars).has_value());
-        CHECK(!evaluate("obj.d", vars).has_value());
-        CHECK(!evaluate("obj[]", vars).has_value());
-        CHECK(!evaluate("obj[", vars).has_value());
-        CHECK(!evaluate("obj]", vars).has_value());
-        CHECK(!evaluate("obj.", vars).has_value());
-        CHECK(!evaluate("obj['a')", vars).has_value());
-        CHECK(!evaluate("obj['a','b']", vars).has_value());
-        CHECK(!evaluate("obj[['a']]", vars).has_value());
-        CHECK(!evaluate("obj[false]", vars).has_value());
-        CHECK(!evaluate("obj[{}]", vars).has_value());
-        CHECK(!evaluate("obj..a", vars).has_value());
-        CHECK(!evaluate("obj[0]", vars).has_value());
-        CHECK(!evaluate("obj[+]", vars).has_value());
-        CHECK(!evaluate("obj[(]", vars).has_value());
-        CHECK(!evaluate("obj[>]", vars).has_value());
-        CHECK(!evaluate("obj[#]", vars).has_value());
+        CHECK_ERROR("obj['d']", vars);
+        CHECK_ERROR("obj.d", vars);
+        CHECK_ERROR("obj[]", vars);
+        CHECK_ERROR("obj[", vars);
+        CHECK_ERROR("obj]", vars);
+        CHECK_ERROR("obj.", vars);
+        CHECK_ERROR("obj['a')", vars);
+        CHECK_ERROR("obj['a','b']", vars);
+        CHECK_ERROR("obj[['a']]", vars);
+        CHECK_ERROR("obj[false]", vars);
+        CHECK_ERROR("obj[{}]", vars);
+        CHECK_ERROR("obj..a", vars);
+        CHECK_ERROR("obj[0]", vars);
+        CHECK_ERROR("obj[+]", vars);
+        CHECK_ERROR("obj[(]", vars);
+        CHECK_ERROR("obj[>]", vars);
+        CHECK_ERROR("obj[#]", vars);
     }
 
     SECTION("good") {

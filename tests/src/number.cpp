@@ -2,13 +2,13 @@
 
 TEST_CASE("number literal", "[maths]") {
     SECTION("bad") {
-        CHECK(!evaluate("01").has_value());
-        CHECK(!evaluate("1 0").has_value());
-        CHECK(!evaluate("1 e-2").has_value());
-        CHECK(!evaluate("1e -2").has_value());
-        CHECK(!evaluate("1e- 2").has_value());
-        CHECK(!evaluate("1d10").has_value());
-        CHECK(!evaluate("1.1.2").has_value());
+        CHECK_ERROR("01");
+        CHECK_ERROR("1 0");
+        CHECK_ERROR("1 e-2");
+        CHECK_ERROR("1e -2");
+        CHECK_ERROR("1e- 2");
+        CHECK_ERROR("1d10");
+        CHECK_ERROR("1.1.2");
     }
 
     SECTION("good") {
@@ -29,12 +29,12 @@ TEST_CASE("number literal", "[maths]") {
 
 TEST_CASE("adsub", "[maths]") {
     SECTION("bad") {
-        CHECK(!evaluate("1-").has_value());
-        CHECK(!evaluate("1+").has_value());
-        CHECK(!evaluate("+").has_value());
-        CHECK(!evaluate("++").has_value());
-        CHECK(!evaluate("-").has_value());
-        CHECK(!evaluate("--").has_value());
+        CHECK_ERROR("1-");
+        CHECK_ERROR("1+");
+        CHECK_ERROR("+");
+        CHECK_ERROR("++");
+        CHECK_ERROR("-");
+        CHECK_ERROR("--");
     }
 
     SECTION("unary") {
@@ -72,12 +72,12 @@ TEST_CASE("adsub", "[maths]") {
 
 TEST_CASE("muldiv", "[maths]") {
     SECTION("bad") {
-        CHECK(!evaluate("1*").has_value());
-        CHECK(!evaluate("1/").has_value());
-        CHECK(!evaluate("*1").has_value());
-        CHECK(!evaluate("/1").has_value());
-        CHECK(!evaluate("*").has_value());
-        CHECK(!evaluate("/").has_value());
+        CHECK_ERROR("1*");
+        CHECK_ERROR("1/");
+        CHECK_ERROR("*1");
+        CHECK_ERROR("/1");
+        CHECK_ERROR("*");
+        CHECK_ERROR("/");
     }
 
     SECTION("int") {
@@ -85,8 +85,8 @@ TEST_CASE("muldiv", "[maths]") {
         CHECK(evaluate("4/2") == "2"_json);
         CHECK(evaluate("2/4") == "0"_json);
         CHECK(evaluate("0/1") == "0"_json);
-        CHECK(!evaluate("1/0").has_value());
-        CHECK(!evaluate("0/0").has_value());
+        CHECK_ERROR("1/0");
+        CHECK_ERROR("0/0");
     }
 
     SECTION("float") {
@@ -113,13 +113,13 @@ TEST_CASE("muldiv", "[maths]") {
 
 TEST_CASE("modulo", "[maths]") {
     SECTION("bad") {
-        CHECK(!evaluate("1%").has_value());
-        CHECK(!evaluate("%1").has_value());
-        CHECK(!evaluate("%").has_value());
-        CHECK(!evaluate("1%0").has_value());
-        CHECK(!evaluate("0%0").has_value());
-        CHECK(!evaluate("'a'%1").has_value());
-        CHECK(!evaluate("1%'a'").has_value());
+        CHECK_ERROR("1%");
+        CHECK_ERROR("%1");
+        CHECK_ERROR("%");
+        CHECK_ERROR("1%0");
+        CHECK_ERROR("0%0");
+        CHECK_ERROR("'a'%1");
+        CHECK_ERROR("1%'a'");
     }
 
     SECTION("good") {

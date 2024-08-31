@@ -8,10 +8,10 @@ TEST_CASE("variable", "[general]") {
     vars["B"] = "4"_json;
 
     SECTION("bad") {
-        CHECK(!evaluate("d", vars).has_value());
-        CHECK(!evaluate("ab", vars).has_value());
-        CHECK(!evaluate("a b", vars).has_value());
-        CHECK(!evaluate("D", vars).has_value());
+        CHECK_ERROR("d", vars);
+        CHECK_ERROR("ab", vars);
+        CHECK_ERROR("a b", vars);
+        CHECK_ERROR("D", vars);
     }
 
     SECTION("good") {

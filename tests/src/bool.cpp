@@ -2,32 +2,32 @@
 
 TEST_CASE("boolean", "[maths]") {
     SECTION("bad") {
-        CHECK(!evaluate("&").has_value());
-        CHECK(!evaluate("&&").has_value());
-        CHECK(!evaluate("and").has_value());
-        CHECK(!evaluate("|").has_value());
-        CHECK(!evaluate("||").has_value());
-        CHECK(!evaluate("or").has_value());
-        CHECK(!evaluate("!").has_value());
-        CHECK(!evaluate("not").has_value());
-        CHECK(!evaluate("!=").has_value());
-        CHECK(!evaluate("==").has_value());
-        CHECK(!evaluate("=").has_value());
-        CHECK(!evaluate(">").has_value());
-        CHECK(!evaluate("<").has_value());
-        CHECK(!evaluate("<=").has_value());
-        CHECK(!evaluate(">=").has_value());
-        CHECK(!evaluate("=<").has_value());
-        CHECK(!evaluate("=>").has_value());
-        CHECK(!evaluate("and and").has_value());
-        CHECK(!evaluate("true and").has_value());
-        CHECK(!evaluate("and true").has_value());
-        CHECK(!evaluate("or or").has_value());
-        CHECK(!evaluate("true or").has_value());
-        CHECK(!evaluate("or true").has_value());
-        CHECK(!evaluate("> >").has_value());
-        CHECK(!evaluate("true >").has_value());
-        CHECK(!evaluate("> true").has_value());
+        CHECK_ERROR("&");
+        CHECK_ERROR("&&");
+        CHECK_ERROR("and");
+        CHECK_ERROR("|");
+        CHECK_ERROR("||");
+        CHECK_ERROR("or");
+        CHECK_ERROR("!");
+        CHECK_ERROR("not");
+        CHECK_ERROR("!=");
+        CHECK_ERROR("==");
+        CHECK_ERROR("=");
+        CHECK_ERROR(">");
+        CHECK_ERROR("<");
+        CHECK_ERROR("<=");
+        CHECK_ERROR(">=");
+        CHECK_ERROR("=<");
+        CHECK_ERROR("=>");
+        CHECK_ERROR("and and");
+        CHECK_ERROR("true and");
+        CHECK_ERROR("and true");
+        CHECK_ERROR("or or");
+        CHECK_ERROR("true or");
+        CHECK_ERROR("or true");
+        CHECK_ERROR("> >");
+        CHECK_ERROR("true >");
+        CHECK_ERROR("> true");
     }
 
     SECTION("good") {
@@ -84,26 +84,26 @@ TEST_CASE("boolean", "[maths]") {
     }
 
     SECTION("short-circuit") {
-        CHECK(!evaluate("error()").has_value());
+        CHECK_ERROR("error()");
 
         CHECK(evaluate("false and error()") == "false"_json);
-        CHECK(!evaluate("error() and false").has_value());
+        CHECK_ERROR("error() and false");
 
         CHECK(evaluate("true or error()") == "true"_json);
-        CHECK(!evaluate("error() or true").has_value());
+        CHECK_ERROR("error() or true");
 
         CHECK(evaluate("true and false and error()") == "false"_json);
         CHECK(evaluate("false and true and error()") == "false"_json);
         CHECK(evaluate("false and error() and true") == "false"_json);
-        CHECK(!evaluate("error() and false and true").has_value());
-        CHECK(!evaluate("error() and true and false").has_value());
-        CHECK(!evaluate("true and error() and false").has_value());
+        CHECK_ERROR("error() and false and true");
+        CHECK_ERROR("error() and true and false");
+        CHECK_ERROR("true and error() and false");
 
         CHECK(evaluate("true or false or error()") == "true"_json);
         CHECK(evaluate("false or true or error()") == "true"_json);
         CHECK(evaluate("true or error() or false") == "true"_json);
-        CHECK(!evaluate("error() or false or true").has_value());
-        CHECK(!evaluate("error() or true or false").has_value());
-        CHECK(!evaluate("false or error() or true").has_value());
+        CHECK_ERROR("error() or false or true");
+        CHECK_ERROR("error() or true or false");
+        CHECK_ERROR("false or error() or true");
     }
 }

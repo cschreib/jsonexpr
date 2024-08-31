@@ -4,6 +4,7 @@ project(jsonexpr_tests LANGUAGES CXX)
 
 include(FetchContent)
 
+set(SNITCH_DEFINE_MAIN OFF)
 FetchContent_Declare(snitch
                      GIT_REPOSITORY https://github.com/cschreib/snitch.git
                      GIT_TAG        v1.2.5)
@@ -15,6 +16,7 @@ add_executable(jsonexpr_tests
     src/bool.cpp
     src/functions.cpp
     src/if.cpp
+    src/main.cpp
     src/misc.cpp
     src/number.cpp
     src/object.cpp

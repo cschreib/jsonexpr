@@ -1,3 +1,4 @@
+#include <fstream>
 #include <jsonexpr/jsonexpr.hpp>
 #include <jsonexpr/parse.hpp>
 #include <snitch/snitch_macros_check.hpp>
@@ -26,3 +27,24 @@ bool append(snitch::small_string_span ss, const expected<T, E>& r) {
     }
 }
 } // namespace snitch
+
+inline void clear_errors() {
+    std::ofstream("tests/data/errors.txt");
+}
+
+inline void dump_error(std::string_view expr, const error& e) {
+    std::ofstream("tests/data/errors.txt", std::ios::app) << format_error(expr, e) << "\n";
+}
+
+template<typename... Args>
+void CHECK_ERROR(
+    std::string_view         expr,
+    const variable_registry& vars  = {},
+    const function_registry& funcs = default_functions()) {
+    const auto check_result = evaluate(expr, vars, funcs);
+    CAPTURE(expr);
+    CHECK(!check_result.has_value());
+    if (!check_result.has_value()) {
+        dump_error(expr, check_result.error());
+    }
+}

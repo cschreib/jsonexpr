@@ -6,23 +6,23 @@ TEST_CASE("function", "[general]") {
     register_function(funcs, "unk_except", []() -> json { throw 1; });
 
     SECTION("bad") {
-        CHECK(!evaluate("foo()").has_value());
-        CHECK(!evaluate("abs(").has_value());
-        CHECK(!evaluate("abs)").has_value());
-        CHECK(!evaluate("abs(1]").has_value());
-        CHECK(!evaluate("abs(-1").has_value());
-        CHECK(!evaluate("abs-1)").has_value());
-        CHECK(!evaluate("abs(-1]").has_value());
-        CHECK(!evaluate("abs(-1,2)").has_value());
-        CHECK(!evaluate("min(1)").has_value());
-        CHECK(!evaluate("abs(+)").has_value());
-        CHECK(!evaluate("abs(()").has_value());
-        CHECK(!evaluate("abs(())").has_value());
-        CHECK(!evaluate("abs([)").has_value());
-        CHECK(!evaluate("abs(>)").has_value());
-        CHECK(!evaluate("abs(#)").has_value());
-        CHECK(!evaluate("std_except()", {}, funcs).has_value());
-        CHECK(!evaluate("unk_except()", {}, funcs).has_value());
+        CHECK_ERROR("foo()");
+        CHECK_ERROR("abs(");
+        CHECK_ERROR("abs)");
+        CHECK_ERROR("abs(1]");
+        CHECK_ERROR("abs(-1");
+        CHECK_ERROR("abs-1)");
+        CHECK_ERROR("abs(-1]");
+        CHECK_ERROR("abs(-1,2)");
+        CHECK_ERROR("min(1)");
+        CHECK_ERROR("abs(+)");
+        CHECK_ERROR("abs(()");
+        CHECK_ERROR("abs(())");
+        CHECK_ERROR("abs([)");
+        CHECK_ERROR("abs(>)");
+        CHECK_ERROR("abs(#)");
+        CHECK_ERROR("std_except()", {}, funcs);
+        CHECK_ERROR("unk_except()", {}, funcs);
     }
 
     SECTION("unary") {
@@ -219,43 +219,43 @@ TEST_CASE("function registration", "[general]") {
 
         CHECK(evaluate("any(1,1.0)", {}, funcs) == "any2");
         CHECK(evaluate("any(1.0,1)", {}, funcs) == "any1");
-        CHECK(!evaluate("any(1,1)", {}, funcs).has_value());
+        CHECK_ERROR("any(1,1)", {}, funcs);
     }
 }
 
 TEST_CASE("min", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("min()").has_value());
-        CHECK(!evaluate("min(1)").has_value());
-        CHECK(!evaluate("min(1,2,3)").has_value());
+        CHECK_ERROR("min()");
+        CHECK_ERROR("min(1)");
+        CHECK_ERROR("min(1,2,3)");
 
-        CHECK(!evaluate("min(1,'a')").has_value());
-        CHECK(!evaluate("min('a',1)").has_value());
-        CHECK(!evaluate("min(1,true)").has_value());
-        CHECK(!evaluate("min(true,1)").has_value());
-        CHECK(!evaluate("min(1,[])").has_value());
-        CHECK(!evaluate("min([],1)").has_value());
-        CHECK(!evaluate("min(1,{})").has_value());
-        CHECK(!evaluate("min({},1)").has_value());
+        CHECK_ERROR("min(1,'a')");
+        CHECK_ERROR("min('a',1)");
+        CHECK_ERROR("min(1,true)");
+        CHECK_ERROR("min(true,1)");
+        CHECK_ERROR("min(1,[])");
+        CHECK_ERROR("min([],1)");
+        CHECK_ERROR("min(1,{})");
+        CHECK_ERROR("min({},1)");
 
-        CHECK(!evaluate("min('a',true)").has_value());
-        CHECK(!evaluate("min(true,'a')").has_value());
-        CHECK(!evaluate("min('a',[])").has_value());
-        CHECK(!evaluate("min([],'a')").has_value());
-        CHECK(!evaluate("min('a',{})").has_value());
-        CHECK(!evaluate("min({},'a')").has_value());
+        CHECK_ERROR("min('a',true)");
+        CHECK_ERROR("min(true,'a')");
+        CHECK_ERROR("min('a',[])");
+        CHECK_ERROR("min([],'a')");
+        CHECK_ERROR("min('a',{})");
+        CHECK_ERROR("min({},'a')");
 
-        CHECK(!evaluate("min(true,true)").has_value());
-        CHECK(!evaluate("min(true,[])").has_value());
-        CHECK(!evaluate("min([],true)").has_value());
-        CHECK(!evaluate("min(true,{})").has_value());
-        CHECK(!evaluate("min({},true)").has_value());
+        CHECK_ERROR("min(true,true)");
+        CHECK_ERROR("min(true,[])");
+        CHECK_ERROR("min([],true)");
+        CHECK_ERROR("min(true,{})");
+        CHECK_ERROR("min({},true)");
 
-        CHECK(!evaluate("min([],[])").has_value());
-        CHECK(!evaluate("min([],{})").has_value());
-        CHECK(!evaluate("min({},[])").has_value());
+        CHECK_ERROR("min([],[])");
+        CHECK_ERROR("min([],{})");
+        CHECK_ERROR("min({},[])");
 
-        CHECK(!evaluate("min({},{})").has_value());
+        CHECK_ERROR("min({},{})");
     }
 
     SECTION("good") {
@@ -272,37 +272,37 @@ TEST_CASE("min", "[functions]") {
 
 TEST_CASE("max", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("max()").has_value());
-        CHECK(!evaluate("max(1)").has_value());
-        CHECK(!evaluate("max(1,2,3)").has_value());
+        CHECK_ERROR("max()");
+        CHECK_ERROR("max(1)");
+        CHECK_ERROR("max(1,2,3)");
 
-        CHECK(!evaluate("max(1,'a')").has_value());
-        CHECK(!evaluate("max('a',1)").has_value());
-        CHECK(!evaluate("max(1,true)").has_value());
-        CHECK(!evaluate("max(true,1)").has_value());
-        CHECK(!evaluate("max(1,[])").has_value());
-        CHECK(!evaluate("max([],1)").has_value());
-        CHECK(!evaluate("max(1,{})").has_value());
-        CHECK(!evaluate("max({},1)").has_value());
+        CHECK_ERROR("max(1,'a')");
+        CHECK_ERROR("max('a',1)");
+        CHECK_ERROR("max(1,true)");
+        CHECK_ERROR("max(true,1)");
+        CHECK_ERROR("max(1,[])");
+        CHECK_ERROR("max([],1)");
+        CHECK_ERROR("max(1,{})");
+        CHECK_ERROR("max({},1)");
 
-        CHECK(!evaluate("max('a',true)").has_value());
-        CHECK(!evaluate("max(true,'a')").has_value());
-        CHECK(!evaluate("max('a',[])").has_value());
-        CHECK(!evaluate("max([],'a')").has_value());
-        CHECK(!evaluate("max('a',{})").has_value());
-        CHECK(!evaluate("max({},'a')").has_value());
+        CHECK_ERROR("max('a',true)");
+        CHECK_ERROR("max(true,'a')");
+        CHECK_ERROR("max('a',[])");
+        CHECK_ERROR("max([],'a')");
+        CHECK_ERROR("max('a',{})");
+        CHECK_ERROR("max({},'a')");
 
-        CHECK(!evaluate("max(true,true)").has_value());
-        CHECK(!evaluate("max(true,[])").has_value());
-        CHECK(!evaluate("max([],true)").has_value());
-        CHECK(!evaluate("max(true,{})").has_value());
-        CHECK(!evaluate("max({},true)").has_value());
+        CHECK_ERROR("max(true,true)");
+        CHECK_ERROR("max(true,[])");
+        CHECK_ERROR("max([],true)");
+        CHECK_ERROR("max(true,{})");
+        CHECK_ERROR("max({},true)");
 
-        CHECK(!evaluate("max([],[])").has_value());
-        CHECK(!evaluate("max([],{})").has_value());
-        CHECK(!evaluate("max({},[])").has_value());
+        CHECK_ERROR("max([],[])");
+        CHECK_ERROR("max([],{})");
+        CHECK_ERROR("max({},[])");
 
-        CHECK(!evaluate("max({},{})").has_value());
+        CHECK_ERROR("max({},{})");
     }
 
     SECTION("good") {
@@ -319,13 +319,13 @@ TEST_CASE("max", "[functions]") {
 
 TEST_CASE("abs", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("abs()").has_value());
-        CHECK(!evaluate("abs(1,2)").has_value());
+        CHECK_ERROR("abs()");
+        CHECK_ERROR("abs(1,2)");
 
-        CHECK(!evaluate("abs('a')").has_value());
-        CHECK(!evaluate("abs(true)").has_value());
-        CHECK(!evaluate("abs([])").has_value());
-        CHECK(!evaluate("abs({})").has_value());
+        CHECK_ERROR("abs('a')");
+        CHECK_ERROR("abs(true)");
+        CHECK_ERROR("abs([])");
+        CHECK_ERROR("abs({})");
     }
 
     SECTION("good") {
@@ -340,13 +340,13 @@ TEST_CASE("abs", "[functions]") {
 
 TEST_CASE("sqrt", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("sqrt()").has_value());
-        CHECK(!evaluate("sqrt(1,2)").has_value());
+        CHECK_ERROR("sqrt()");
+        CHECK_ERROR("sqrt(1,2)");
 
-        CHECK(!evaluate("sqrt('a')").has_value());
-        CHECK(!evaluate("sqrt(true)").has_value());
-        CHECK(!evaluate("sqrt([])").has_value());
-        CHECK(!evaluate("sqrt({})").has_value());
+        CHECK_ERROR("sqrt('a')");
+        CHECK_ERROR("sqrt(true)");
+        CHECK_ERROR("sqrt([])");
+        CHECK_ERROR("sqrt({})");
     }
 
     SECTION("good") {
@@ -361,13 +361,13 @@ TEST_CASE("sqrt", "[functions]") {
 
 TEST_CASE("round", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("round()").has_value());
-        CHECK(!evaluate("round(1,2)").has_value());
+        CHECK_ERROR("round()");
+        CHECK_ERROR("round(1,2)");
 
-        CHECK(!evaluate("round('a')").has_value());
-        CHECK(!evaluate("round(true)").has_value());
-        CHECK(!evaluate("round([])").has_value());
-        CHECK(!evaluate("round({})").has_value());
+        CHECK_ERROR("round('a')");
+        CHECK_ERROR("round(true)");
+        CHECK_ERROR("round([])");
+        CHECK_ERROR("round({})");
     }
 
     SECTION("good") {
@@ -389,13 +389,13 @@ TEST_CASE("round", "[functions]") {
 
 TEST_CASE("floor", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("floor()").has_value());
-        CHECK(!evaluate("floor(1,2)").has_value());
+        CHECK_ERROR("floor()");
+        CHECK_ERROR("floor(1,2)");
 
-        CHECK(!evaluate("floor('a')").has_value());
-        CHECK(!evaluate("floor(true)").has_value());
-        CHECK(!evaluate("floor([])").has_value());
-        CHECK(!evaluate("floor({})").has_value());
+        CHECK_ERROR("floor('a')");
+        CHECK_ERROR("floor(true)");
+        CHECK_ERROR("floor([])");
+        CHECK_ERROR("floor({})");
     }
 
     SECTION("good") {
@@ -417,13 +417,13 @@ TEST_CASE("floor", "[functions]") {
 
 TEST_CASE("ceil", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("ceil()").has_value());
-        CHECK(!evaluate("ceil(1,2)").has_value());
+        CHECK_ERROR("ceil()");
+        CHECK_ERROR("ceil(1,2)");
 
-        CHECK(!evaluate("ceil('a')").has_value());
-        CHECK(!evaluate("ceil(true)").has_value());
-        CHECK(!evaluate("ceil([])").has_value());
-        CHECK(!evaluate("ceil({})").has_value());
+        CHECK_ERROR("ceil('a')");
+        CHECK_ERROR("ceil(true)");
+        CHECK_ERROR("ceil([])");
+        CHECK_ERROR("ceil({})");
     }
 
     SECTION("good") {
@@ -445,12 +445,12 @@ TEST_CASE("ceil", "[functions]") {
 
 TEST_CASE("len", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("len()").has_value());
-        CHECK(!evaluate("len('a','b')").has_value());
+        CHECK_ERROR("len()");
+        CHECK_ERROR("len('a','b')");
 
-        CHECK(!evaluate("len(true)").has_value());
-        CHECK(!evaluate("len(1)").has_value());
-        CHECK(!evaluate("len(1.0)").has_value());
+        CHECK_ERROR("len(true)");
+        CHECK_ERROR("len(1)");
+        CHECK_ERROR("len(1.0)");
     }
 
     SECTION("good") {
@@ -465,19 +465,19 @@ TEST_CASE("len", "[functions]") {
 
 TEST_CASE("in", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("in").has_value());
-        CHECK(!evaluate("1 in").has_value());
-        CHECK(!evaluate("in []").has_value());
+        CHECK_ERROR("in");
+        CHECK_ERROR("1 in");
+        CHECK_ERROR("in []");
 
-        CHECK(!evaluate("1 in 1").has_value());
-        CHECK(!evaluate("1 in 'a'").has_value());
-        CHECK(!evaluate("1 in {}").has_value());
-        CHECK(!evaluate("1 in null").has_value());
-        CHECK(!evaluate("1 in true").has_value());
+        CHECK_ERROR("1 in 1");
+        CHECK_ERROR("1 in 'a'");
+        CHECK_ERROR("1 in {}");
+        CHECK_ERROR("1 in null");
+        CHECK_ERROR("1 in true");
 
-        CHECK(!evaluate("'' in 1").has_value());
-        CHECK(!evaluate("'' in null").has_value());
-        CHECK(!evaluate("'' in true").has_value());
+        CHECK_ERROR("'' in 1");
+        CHECK_ERROR("'' in null");
+        CHECK_ERROR("'' in true");
     }
 
     SECTION("good") {
@@ -514,15 +514,15 @@ TEST_CASE("in", "[functions]") {
 
 TEST_CASE("not in", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("not in").has_value());
-        CHECK(!evaluate("1 not in").has_value());
-        CHECK(!evaluate("not in []").has_value());
+        CHECK_ERROR("not in");
+        CHECK_ERROR("1 not in");
+        CHECK_ERROR("not in []");
 
-        CHECK(!evaluate("1 not in 1").has_value());
-        CHECK(!evaluate("1 not in 'a'").has_value());
-        CHECK(!evaluate("1 not in {}").has_value());
+        CHECK_ERROR("1 not in 1");
+        CHECK_ERROR("1 not in 'a'");
+        CHECK_ERROR("1 not in {}");
 
-        CHECK(!evaluate("'' not in 1").has_value());
+        CHECK_ERROR("'' not in 1");
     }
 
     SECTION("good") {
@@ -559,28 +559,28 @@ TEST_CASE("not in", "[functions]") {
 
 TEST_CASE("int", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("int()").has_value());
-        CHECK(!evaluate("int(1,2)").has_value());
+        CHECK_ERROR("int()");
+        CHECK_ERROR("int(1,2)");
 
-        CHECK(!evaluate("int(0.0/0.0)").has_value());
-        CHECK(!evaluate("int(1.0/0.0)").has_value());
-        CHECK(!evaluate("int(-1.0/0.0)").has_value());
-        CHECK(!evaluate("int(1e40)").has_value());
-        CHECK(!evaluate("int(-1e40)").has_value());
+        CHECK_ERROR("int(0.0/0.0)");
+        CHECK_ERROR("int(1.0/0.0)");
+        CHECK_ERROR("int(-1.0/0.0)");
+        CHECK_ERROR("int(1e40)");
+        CHECK_ERROR("int(-1e40)");
 
-        CHECK(!evaluate("int([])").has_value());
-        CHECK(!evaluate("int({})").has_value());
-        CHECK(!evaluate("int(null)").has_value());
+        CHECK_ERROR("int([])");
+        CHECK_ERROR("int({})");
+        CHECK_ERROR("int(null)");
 
-        CHECK(!evaluate("int('')").has_value());
-        CHECK(!evaluate("int('abc')").has_value());
-        CHECK(!evaluate("int('1a')").has_value());
-        CHECK(!evaluate("int('1.0')").has_value());
-        CHECK(!evaluate("int(' 1')").has_value());
-        CHECK(!evaluate("int(' +1')").has_value());
-        CHECK(!evaluate("int(' -1')").has_value());
-        CHECK(!evaluate("int('+ 1')").has_value());
-        CHECK(!evaluate("int('- 1')").has_value());
+        CHECK_ERROR("int('')");
+        CHECK_ERROR("int('abc')");
+        CHECK_ERROR("int('1a')");
+        CHECK_ERROR("int('1.0')");
+        CHECK_ERROR("int(' 1')");
+        CHECK_ERROR("int(' +1')");
+        CHECK_ERROR("int(' -1')");
+        CHECK_ERROR("int('+ 1')");
+        CHECK_ERROR("int('- 1')");
     }
 
     SECTION("good") {
@@ -610,21 +610,21 @@ TEST_CASE("int", "[functions]") {
 
 TEST_CASE("float", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("float()").has_value());
-        CHECK(!evaluate("float(1,2)").has_value());
+        CHECK_ERROR("float()");
+        CHECK_ERROR("float(1,2)");
 
-        CHECK(!evaluate("float([])").has_value());
-        CHECK(!evaluate("float({})").has_value());
-        CHECK(!evaluate("float(null)").has_value());
+        CHECK_ERROR("float([])");
+        CHECK_ERROR("float({})");
+        CHECK_ERROR("float(null)");
 
-        CHECK(!evaluate("float('')").has_value());
-        CHECK(!evaluate("float('abc')").has_value());
-        CHECK(!evaluate("float('1a')").has_value());
-        CHECK(!evaluate("float(' 1')").has_value());
-        CHECK(!evaluate("float(' +1')").has_value());
-        CHECK(!evaluate("float(' -1')").has_value());
-        CHECK(!evaluate("float('+ 1')").has_value());
-        CHECK(!evaluate("float('- 1')").has_value());
+        CHECK_ERROR("float('')");
+        CHECK_ERROR("float('abc')");
+        CHECK_ERROR("float('1a')");
+        CHECK_ERROR("float(' 1')");
+        CHECK_ERROR("float(' +1')");
+        CHECK_ERROR("float(' -1')");
+        CHECK_ERROR("float('+ 1')");
+        CHECK_ERROR("float('- 1')");
     }
 
     SECTION("good") {
@@ -663,21 +663,21 @@ TEST_CASE("float", "[functions]") {
 
 TEST_CASE("bool", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("bool()").has_value());
-        CHECK(!evaluate("bool(1,2)").has_value());
+        CHECK_ERROR("bool()");
+        CHECK_ERROR("bool(1,2)");
 
-        CHECK(!evaluate("bool(0.0/0.0)").has_value());
-        CHECK(!evaluate("bool(1.0/0.0)").has_value());
-        CHECK(!evaluate("bool(-1.0/0.0)").has_value());
+        CHECK_ERROR("bool(0.0/0.0)");
+        CHECK_ERROR("bool(1.0/0.0)");
+        CHECK_ERROR("bool(-1.0/0.0)");
 
-        CHECK(!evaluate("bool([])").has_value());
-        CHECK(!evaluate("bool({})").has_value());
-        CHECK(!evaluate("bool(null)").has_value());
+        CHECK_ERROR("bool([])");
+        CHECK_ERROR("bool({})");
+        CHECK_ERROR("bool(null)");
 
-        CHECK(!evaluate("bool('')").has_value());
-        CHECK(!evaluate("bool('abc')").has_value());
-        CHECK(!evaluate("bool(' true')").has_value());
-        CHECK(!evaluate("bool(' false')").has_value());
+        CHECK_ERROR("bool('')");
+        CHECK_ERROR("bool('abc')");
+        CHECK_ERROR("bool(' true')");
+        CHECK_ERROR("bool(' false')");
     }
 
     SECTION("good") {
@@ -699,8 +699,8 @@ TEST_CASE("bool", "[functions]") {
 
 TEST_CASE("str", "[functions]") {
     SECTION("bad") {
-        CHECK(!evaluate("str()").has_value());
-        CHECK(!evaluate("str(1,2)").has_value());
+        CHECK_ERROR("str()");
+        CHECK_ERROR("str(1,2)");
     }
 
     SECTION("good") {

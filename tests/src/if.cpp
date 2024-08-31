@@ -2,20 +2,20 @@
 
 TEST_CASE("if else", "[general]") {
     SECTION("bad") {
-        CHECK(!evaluate("if").has_value());
-        CHECK(!evaluate("else").has_value());
-        CHECK(!evaluate("if true").has_value());
-        CHECK(!evaluate("if true else").has_value());
-        CHECK(!evaluate("if true else 0").has_value());
-        CHECK(!evaluate("1 if").has_value());
-        CHECK(!evaluate("1 if true").has_value());
-        CHECK(!evaluate("1 if true else").has_value());
-        CHECK(!evaluate("1 if else").has_value());
-        CHECK(!evaluate("1 else").has_value());
-        CHECK(!evaluate("1 else if").has_value());
+        CHECK_ERROR("if");
+        CHECK_ERROR("else");
+        CHECK_ERROR("if true");
+        CHECK_ERROR("if true else");
+        CHECK_ERROR("if true else 0");
+        CHECK_ERROR("1 if");
+        CHECK_ERROR("1 if true");
+        CHECK_ERROR("1 if true else");
+        CHECK_ERROR("1 if else");
+        CHECK_ERROR("1 else");
+        CHECK_ERROR("1 else if");
 
-        CHECK(!evaluate("1 if *1 else 2").has_value());
-        CHECK(!evaluate("1 if true else *2").has_value());
+        CHECK_ERROR("1 if *1 else 2");
+        CHECK_ERROR("1 if true else *2");
     }
 
     SECTION("good") {
@@ -36,7 +36,7 @@ TEST_CASE("if else", "[general]") {
     }
 
     SECTION("short-circuit") {
-        CHECK(!evaluate("error()").has_value());
+        CHECK_ERROR("error()");
 
         CHECK(evaluate("error() if false else 1") == "1"_json);
         CHECK(evaluate("1 if true else error()") == "1"_json);

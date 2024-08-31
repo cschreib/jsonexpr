@@ -52,46 +52,46 @@ TEST_CASE("stress test", "[general]") {
     vars["objarr"] = R"([{"a": 1}, {"a": 2}, {"d": [3, 4]}])"_json;
 
     SECTION("bad") {
-        CHECK(!evaluate("").has_value());
-        CHECK(!evaluate("()").has_value());
-        CHECK(!evaluate("(").has_value());
-        CHECK(!evaluate("(1").has_value());
-        CHECK(!evaluate("(1]").has_value());
-        CHECK(!evaluate(")").has_value());
-        CHECK(!evaluate("1)").has_value());
-        CHECK(!evaluate("[1)").has_value());
-        CHECK(!evaluate(",").has_value());
-        CHECK(!evaluate("1,").has_value());
-        CHECK(!evaluate(",1").has_value());
+        CHECK_ERROR("");
+        CHECK_ERROR("()");
+        CHECK_ERROR("(");
+        CHECK_ERROR("(1");
+        CHECK_ERROR("(1]");
+        CHECK_ERROR(")");
+        CHECK_ERROR("1)");
+        CHECK_ERROR("[1)");
+        CHECK_ERROR(",");
+        CHECK_ERROR("1,");
+        CHECK_ERROR(",1");
 
-        CHECK(!evaluate("            ").has_value());
-        CHECK(!evaluate("\n\n\n\n\n\n").has_value());
-        CHECK(!evaluate("((((((((((((").has_value());
-        CHECK(!evaluate("))))))))))))").has_value());
-        CHECK(!evaluate("++++++++++++").has_value());
-        CHECK(!evaluate("------------").has_value());
-        CHECK(!evaluate("************").has_value());
-        CHECK(!evaluate("////////////").has_value());
-        CHECK(!evaluate(">>>>>>>>>>>>").has_value());
-        CHECK(!evaluate("<<<<<<<<<<<<").has_value());
-        CHECK(!evaluate("============").has_value());
-        CHECK(!evaluate("||||||||||||").has_value());
-        CHECK(!evaluate("~~~~~~~~~~~~").has_value());
-        CHECK(!evaluate("%%%%%%%%%%%%").has_value());
+        CHECK_ERROR("            ");
+        CHECK_ERROR("\n\n\n\n\n\n");
+        CHECK_ERROR("((((((((((((");
+        CHECK_ERROR("))))))))))))");
+        CHECK_ERROR("++++++++++++");
+        CHECK_ERROR("------------");
+        CHECK_ERROR("************");
+        CHECK_ERROR("////////////");
+        CHECK_ERROR(">>>>>>>>>>>>");
+        CHECK_ERROR("<<<<<<<<<<<<");
+        CHECK_ERROR("============");
+        CHECK_ERROR("||||||||||||");
+        CHECK_ERROR("~~~~~~~~~~~~");
+        CHECK_ERROR("%%%%%%%%%%%%");
 
-        CHECK(!evaluate("1 << 2").has_value());
-        CHECK(!evaluate("1 >> 2").has_value());
-        CHECK(!evaluate("1 <> 2").has_value());
-        CHECK(!evaluate("1 >< 2").has_value());
-        CHECK(!evaluate("1 => 2").has_value());
-        CHECK(!evaluate("1 =< 2").has_value());
-        CHECK(!evaluate("1 =! 2").has_value());
-        CHECK(!evaluate("1 = 2").has_value());
-        CHECK(!evaluate("1 += 2").has_value());
-        CHECK(!evaluate("1 -= 2").has_value());
-        CHECK(!evaluate("1 *= 2").has_value());
-        CHECK(!evaluate("1 /= 2").has_value());
-        CHECK(!evaluate("1 %= 2").has_value());
+        CHECK_ERROR("1 << 2");
+        CHECK_ERROR("1 >> 2");
+        CHECK_ERROR("1 <> 2");
+        CHECK_ERROR("1 >< 2");
+        CHECK_ERROR("1 => 2");
+        CHECK_ERROR("1 =< 2");
+        CHECK_ERROR("1 =! 2");
+        CHECK_ERROR("1 = 2");
+        CHECK_ERROR("1 += 2");
+        CHECK_ERROR("1 -= 2");
+        CHECK_ERROR("1 *= 2");
+        CHECK_ERROR("1 /= 2");
+        CHECK_ERROR("1 %= 2");
 
         using namespace std::literals;
         for (const auto& op :
@@ -99,83 +99,83 @@ TEST_CASE("stress test", "[general]") {
               "or"s}) {
             CAPTURE(op);
 
-            CHECK(!evaluate("arr " + op + " int", vars).has_value());
-            CHECK(!evaluate("arr " + op + " flt", vars).has_value());
-            CHECK(!evaluate("arr " + op + " str", vars).has_value());
-            CHECK(!evaluate("arr " + op + " obj", vars).has_value());
-            CHECK(!evaluate("arr " + op + " bool", vars).has_value());
+            CHECK_ERROR("arr " + op + " int", vars);
+            CHECK_ERROR("arr " + op + " flt", vars);
+            CHECK_ERROR("arr " + op + " str", vars);
+            CHECK_ERROR("arr " + op + " obj", vars);
+            CHECK_ERROR("arr " + op + " bool", vars);
 
-            CHECK(!evaluate("obj " + op + " int", vars).has_value());
-            CHECK(!evaluate("obj " + op + " flt", vars).has_value());
-            CHECK(!evaluate("obj " + op + " str", vars).has_value());
-            CHECK(!evaluate("obj " + op + " arr", vars).has_value());
-            CHECK(!evaluate("obj " + op + " bool", vars).has_value());
+            CHECK_ERROR("obj " + op + " int", vars);
+            CHECK_ERROR("obj " + op + " flt", vars);
+            CHECK_ERROR("obj " + op + " str", vars);
+            CHECK_ERROR("obj " + op + " arr", vars);
+            CHECK_ERROR("obj " + op + " bool", vars);
 
             if (op == "or") {
                 vars["bool"] = false; // to avoid short-circuiting.
             }
 
-            CHECK(!evaluate("bool " + op + " int", vars).has_value());
-            CHECK(!evaluate("bool " + op + " flt", vars).has_value());
-            CHECK(!evaluate("bool " + op + " str", vars).has_value());
-            CHECK(!evaluate("bool " + op + " obj", vars).has_value());
-            CHECK(!evaluate("bool " + op + " arr", vars).has_value());
+            CHECK_ERROR("bool " + op + " int", vars);
+            CHECK_ERROR("bool " + op + " flt", vars);
+            CHECK_ERROR("bool " + op + " str", vars);
+            CHECK_ERROR("bool " + op + " obj", vars);
+            CHECK_ERROR("bool " + op + " arr", vars);
 
-            CHECK(!evaluate("str " + op + " int", vars).has_value());
-            CHECK(!evaluate("str " + op + " flt", vars).has_value());
-            CHECK(!evaluate("str " + op + " bool", vars).has_value());
-            CHECK(!evaluate("str " + op + " obj", vars).has_value());
-            CHECK(!evaluate("str " + op + " arr", vars).has_value());
+            CHECK_ERROR("str " + op + " int", vars);
+            CHECK_ERROR("str " + op + " flt", vars);
+            CHECK_ERROR("str " + op + " bool", vars);
+            CHECK_ERROR("str " + op + " obj", vars);
+            CHECK_ERROR("str " + op + " arr", vars);
 
-            CHECK(!evaluate("int " + op + " str", vars).has_value());
-            CHECK(!evaluate("int " + op + " bool", vars).has_value());
-            CHECK(!evaluate("int " + op + " obj", vars).has_value());
-            CHECK(!evaluate("int " + op + " arr", vars).has_value());
+            CHECK_ERROR("int " + op + " str", vars);
+            CHECK_ERROR("int " + op + " bool", vars);
+            CHECK_ERROR("int " + op + " obj", vars);
+            CHECK_ERROR("int " + op + " arr", vars);
 
-            CHECK(!evaluate("flt " + op + " str", vars).has_value());
-            CHECK(!evaluate("flt " + op + " bool", vars).has_value());
-            CHECK(!evaluate("flt " + op + " obj", vars).has_value());
-            CHECK(!evaluate("flt " + op + " arr", vars).has_value());
+            CHECK_ERROR("flt " + op + " str", vars);
+            CHECK_ERROR("flt " + op + " bool", vars);
+            CHECK_ERROR("flt " + op + " obj", vars);
+            CHECK_ERROR("flt " + op + " arr", vars);
 
             if (op != "==" && op != "!=") {
-                CHECK(!evaluate("obj " + op + " obj", vars).has_value());
-                CHECK(!evaluate("arr " + op + " arr", vars).has_value());
-                CHECK(!evaluate("null " + op + " null", vars).has_value());
+                CHECK_ERROR("obj " + op + " obj", vars);
+                CHECK_ERROR("arr " + op + " arr", vars);
+                CHECK_ERROR("null " + op + " null", vars);
 
-                CHECK(!evaluate("null " + op + " int", vars).has_value());
-                CHECK(!evaluate("null " + op + " flt", vars).has_value());
-                CHECK(!evaluate("null " + op + " bool", vars).has_value());
-                CHECK(!evaluate("null " + op + " obj", vars).has_value());
-                CHECK(!evaluate("null " + op + " arr", vars).has_value());
-                CHECK(!evaluate("null " + op + " str", vars).has_value());
+                CHECK_ERROR("null " + op + " int", vars);
+                CHECK_ERROR("null " + op + " flt", vars);
+                CHECK_ERROR("null " + op + " bool", vars);
+                CHECK_ERROR("null " + op + " obj", vars);
+                CHECK_ERROR("null " + op + " arr", vars);
+                CHECK_ERROR("null " + op + " str", vars);
 
-                CHECK(!evaluate("int " + op + " null", vars).has_value());
-                CHECK(!evaluate("flt " + op + " null", vars).has_value());
-                CHECK(!evaluate("bool " + op + " null", vars).has_value());
-                CHECK(!evaluate("obj " + op + " null", vars).has_value());
-                CHECK(!evaluate("arr " + op + " null", vars).has_value());
-                CHECK(!evaluate("str " + op + " null", vars).has_value());
+                CHECK_ERROR("int " + op + " null", vars);
+                CHECK_ERROR("flt " + op + " null", vars);
+                CHECK_ERROR("bool " + op + " null", vars);
+                CHECK_ERROR("obj " + op + " null", vars);
+                CHECK_ERROR("arr " + op + " null", vars);
+                CHECK_ERROR("str " + op + " null", vars);
 
                 if (op != "and" && op != "or") {
-                    CHECK(!evaluate("bool " + op + " bool", vars).has_value());
+                    CHECK_ERROR("bool " + op + " bool", vars);
                 }
             }
 
             if (op == "+" || op == "-") {
-                CHECK(!evaluate(op + " str", vars).has_value());
-                CHECK(!evaluate(op + " arr", vars).has_value());
-                CHECK(!evaluate(op + " obj", vars).has_value());
-                CHECK(!evaluate(op + " bool", vars).has_value());
-                CHECK(!evaluate(op + " null", vars).has_value());
+                CHECK_ERROR(op + " str", vars);
+                CHECK_ERROR(op + " arr", vars);
+                CHECK_ERROR(op + " obj", vars);
+                CHECK_ERROR(op + " bool", vars);
+                CHECK_ERROR(op + " null", vars);
             }
         }
 
-        CHECK(!evaluate("not int", vars).has_value());
-        CHECK(!evaluate("not flt", vars).has_value());
-        CHECK(!evaluate("not str", vars).has_value());
-        CHECK(!evaluate("not arr", vars).has_value());
-        CHECK(!evaluate("not obj", vars).has_value());
-        CHECK(!evaluate("not null", vars).has_value());
+        CHECK_ERROR("not int", vars);
+        CHECK_ERROR("not flt", vars);
+        CHECK_ERROR("not str", vars);
+        CHECK_ERROR("not arr", vars);
+        CHECK_ERROR("not obj", vars);
+        CHECK_ERROR("not null", vars);
     }
 
     SECTION("good") {
