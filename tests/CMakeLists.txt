@@ -7,8 +7,7 @@ set(FETCHCONTENT_QUIET FALSE)
 
 set(SNITCH_DEFINE_MAIN OFF)
 FetchContent_Declare(snitch
-                     GIT_REPOSITORY https://github.com/cschreib/snitch.git
-                     GIT_TAG        v1.2.5)
+                     URL https://github.com/snitch-org/snitch/archive/refs/tags/v1.2.5.zip)
 FetchContent_MakeAvailable(snitch)
 
 add_executable(jsonexpr_tests

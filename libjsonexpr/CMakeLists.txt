@@ -7,16 +7,14 @@ set(FETCHCONTENT_QUIET FALSE)
 
 if (NOT JSONEXPR_USE_SYSTEM_JSON)
     FetchContent_Declare(json
-                         GIT_REPOSITORY https://github.com/nlohmann/json.git
-                         GIT_TAG        v3.11.3)
+                         URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.zip)
     FetchContent_MakeAvailable(json)
 endif()
 if (NOT JSONEXPR_USE_STD_EXPECTED AND NOT JSONEXPR_USE_SYSTEM_EXPECTED)
     set(EXPECTED_BUILD_TESTS OFF)
     set(EXPECTED_BUILD_PACKAGE_DEB OFF)
     FetchContent_Declare(expected
-                         GIT_REPOSITORY https://github.com/TartanLlama/expected.git
-                         GIT_TAG        v1.1.0)
+                         URL https://github.com/TartanLlama/expected/archive/refs/tags/v1.1.0.zip)
     FetchContent_MakeAvailable(expected)
 endif()
 
