@@ -69,10 +69,10 @@ expected<json, error> eval(
         const auto args = std::span<const ast::node>(f.args.begin(), f.args.end());
 
         auto result = [&]() -> ast_function_result {
-            if (std::holds_alternative<function::ast_function_t>(func.overloads)) {
-                return std::get<function::ast_function_t>(func.overloads)(args, vreg, freg);
+            if (std::holds_alternative<impl::function::ast_function_t>(func.overloads)) {
+                return std::get<impl::function::ast_function_t>(func.overloads)(args, vreg, freg);
             } else {
-                const auto& map = std::get<function::overload_t>(func.overloads);
+                const auto& map = std::get<impl::function::overload_t>(func.overloads);
 
                 std::vector<json> json_args;
                 std::string       arg_types;

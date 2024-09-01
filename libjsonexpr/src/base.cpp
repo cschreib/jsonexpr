@@ -30,7 +30,7 @@ std::string_view jsonexpr::get_dynamic_type_name(const json& j) noexcept {
     }
 }
 
-void function::add_overload(std::string key, basic_function_t func) {
+void impl::function::add_overload(std::string key, basic_function_t func) {
     if (!std::holds_alternative<overload_t>(overloads)) {
         overloads.emplace<overload_t>();
     }

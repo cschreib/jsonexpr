@@ -73,11 +73,15 @@ std::string_view get_type_name(const T&) noexcept {
 using ast_function_result = expected<json, error>;
 using function_result     = expected<json, std::string>;
 
+namespace impl {
 struct function;
-using function_registry = std::unordered_map<std::string, function>;
+}
+
+using function_registry = std::unordered_map<std::string, impl::function>;
 
 using variable_registry = std::unordered_map<std::string, json>;
 
+namespace impl {
 struct function {
     using ast_function_t   = std::function<ast_function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)>;
@@ -89,6 +93,7 @@ struct function {
 
     JSONEXPR_EXPORT void add_overload(std::string key, basic_function_t func);
 };
+} // namespace impl
 } // namespace jsonexpr
 
 #endif
