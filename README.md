@@ -296,6 +296,7 @@ jsonexpr::register_ast_function(
        const jsonexpr::function_registry& funcs) -> jsonexpr::ast_function_result {
         for (const jsonexpr::ast::node& arg : args) {
             // Evaluate the current argument.
+            // This returns an 'expected<json,error>'.
             const auto evaluated = jsonexpr::evaluate(arg, vars, funcs);
             if (!evaluated.has_value()) {
                 return jsonexpr::unexpected(evaluated.error());
@@ -308,9 +309,11 @@ jsonexpr::register_ast_function(
         }
 
         // No match found, return an error.
-        // NB: 'jsonexpr::error' contains both a message and a location (as the range of characters
-        // in the expression string), to help the user locate the actual part of the expression that is causing a problem. If the location is not specified (as we did here), the location
-        // will automatically be set to the whole function call.
+        // NB: 'jsonexpr::error' contains both a message and a location (as the range of
+        // characters in the expression string), to help the user locate the actual part
+        // of the expression that is causing a problem. If the location is not specified
+        // (as we did here), the location will automatically be set to the whole function
+        // call.
         return jsonexpr::unexpected(jsonexpr::error{.message = "all arguments were null"});
     });
 ```
