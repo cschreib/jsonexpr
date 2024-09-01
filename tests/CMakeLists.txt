@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.18)
 project(jsonexpr_tests LANGUAGES CXX)
 
 include(FetchContent)
+set(FETCHCONTENT_QUIET FALSE)
 
 set(SNITCH_DEFINE_MAIN OFF)
 FetchContent_Declare(snitch

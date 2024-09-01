@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.18)
 project(libjsonexpr LANGUAGES CXX)
 
 include(FetchContent)
+set(FETCHCONTENT_QUIET FALSE)
 
 if (NOT JSONEXPR_USE_SYSTEM_JSON)
     FetchContent_Declare(json
