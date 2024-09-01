@@ -1552,10 +1552,10 @@ error: expected operand
 error: expected expression
 (1
   ^
-error: expected group end
+error: expected ')'
 (1]
   ^
-error: expected group end
+error: expected ')'
 )
 ^
 error: expected operand

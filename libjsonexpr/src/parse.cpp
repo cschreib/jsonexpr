@@ -424,9 +424,9 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     }
 
     if (group_tokens.empty()) {
-        return unexpected(abort_parse("expected group end"));
+        return unexpected(abort_parse("expected ')'"));
     } else if (group_tokens.front().type != token::GROUP_CLOSE) {
-        return unexpected(abort_parse(group_tokens.front(), "expected group end"));
+        return unexpected(abort_parse(group_tokens.front(), "expected ')'"));
     }
 
     const token& end_token = group_tokens.front();
