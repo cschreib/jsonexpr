@@ -20,6 +20,7 @@
         - [Error handling](#error-handling-1)
         - [Overloading](#overloading)
         - [AST functions \(advanced\)](#ast-functions-advanced)
+- [Acknowledgments](#acknowledgments)
 
 <!-- /MarkdownTOC -->
 
@@ -324,3 +325,8 @@ first_non_null(null)          -> error: all arguments were null
 first_non_null(null, 1)       -> 1
 first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error since not evaluated)
 ```
+
+
+# Acknowledgments
+
+This library was written partly on my spare time, and partly during the course of my employment at [IBEX Innovations Ltd.](https://ibexinnovations.co.uk/). I would like to thank my employer for allowing me to open-source this library, with the hope that it is useful to others.
