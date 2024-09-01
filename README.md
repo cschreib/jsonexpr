@@ -193,7 +193,8 @@ Custom C++ functions can be registered for use in expressions:
 #include <jsonexpr/jsonexpr.hpp>
 
 int main() {
-    jsonexpr::function_registry funcs;
+    // Start with the default function set.
+    jsonexpr::function_registry funcs = jsonexpr::default_functions();
     // Define the function 'join' taking 2 arguments.
     jsonexpr::register_function(
         funcs, "join", [](const std::vector<jsonexpr::json>& array, const std::string& separator) {
@@ -208,8 +209,14 @@ int main() {
             return result;
         });
 
+    // Variable registry (as usual).
+    jsonexpr::variable_registry vars;
+    // ...
+
     // Use the function.
-    jsonexpr::evaluate("join(['some', 'string', 'here'], ',')").value(); // "some,string,here"
+    // Note how we now need pass the function registry here:          vvvvv
+    jsonexpr::evaluate("join(['some', 'string', 'here'], ',')", vars, funcs).value();
+    // Outputs: "some,string,here"
 
     return 0;
 }
