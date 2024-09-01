@@ -67,7 +67,7 @@ JSONEXPR_EXPORT void register_ast_function(
     std::function<ast_function_result(
         std::span<const ast::node>, const variable_registry&, const function_registry&)> func);
 
-JSONEXPR_EXPORT function_registry default_functions();
+JSONEXPR_EXPORT const function_registry& default_functions();
 } // namespace jsonexpr
 
 #endif

@@ -475,7 +475,8 @@ void jsonexpr::register_ast_function(
     funcs[std::string{name}] = {std::move(func)};
 }
 
-function_registry jsonexpr::default_functions() {
+namespace {
+function_registry make_default_functions() {
     function_registry freg;
 
     // Boolean operations are more complex since they short-circuit (avoid evaluation).
@@ -663,4 +664,10 @@ function_registry jsonexpr::default_functions() {
     register_function(freg, "max", &safe_max<string_t, string_t>);
 
     return freg;
+}
+} // namespace
+
+const function_registry& jsonexpr::default_functions() {
+    static function_registry funcs = make_default_functions();
+    return funcs;
 }
