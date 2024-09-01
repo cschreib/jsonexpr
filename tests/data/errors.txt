@@ -155,6 +155,9 @@ error: expected expression or ']'
 [][1:
      ^
 error: expected expression or ']'
+[][1:2
+      ^
+error: expected ']'
 [][*:]
    ^
 error: unknown unary operator '*'
@@ -7482,6 +7485,18 @@ error: unexpected content in expression
 ,'a':1}
 ^
 error: expected operand
+{#:1}
+ ^
+error: unexpected character
+{'a':#}
+     ^
+error: unexpected character
+{*:1}
+ ^
+error: unknown unary operator '*'
+{'a':*}
+     ^
+error: unknown unary operator '*'
 {1:'a'}
  ^
 error: object key must be a string, got 'int'
@@ -7507,12 +7522,6 @@ note: available overloads:
         +(int,int)
         +(float)
         +(int)
-{#:1}
- ^
-error: unexpected character
-{'a':#}
-     ^
-error: unexpected character
 obj['d']
 ^~~~~~~~
 error: unknown field 'd'

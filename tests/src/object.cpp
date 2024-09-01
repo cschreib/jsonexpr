@@ -13,11 +13,13 @@ TEST_CASE("object literal", "[object]") {
         CHECK_ERROR(":1}");
         CHECK_ERROR("'a':1}");
         CHECK_ERROR(",'a':1}");
+        CHECK_ERROR("{#:1}");
+        CHECK_ERROR("{'a':#}");
+        CHECK_ERROR("{*:1}");
+        CHECK_ERROR("{'a':*}");
         CHECK_ERROR("{1:'a'}");
         CHECK_ERROR("{1+'a':1}");
         CHECK_ERROR("{'a':1+'a'}");
-        CHECK_ERROR("{#:1}");
-        CHECK_ERROR("{'a':#}");
     }
 
     SECTION("good") {

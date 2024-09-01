@@ -114,6 +114,7 @@ TEST_CASE("array range access", "[array]") {
     SECTION("bad") {
         CHECK_ERROR("[][:");
         CHECK_ERROR("[][1:");
+        CHECK_ERROR("[][1:2");
         CHECK_ERROR("[][*:]");
         CHECK_ERROR("[][:*]");
         CHECK_ERROR("[][::]");
