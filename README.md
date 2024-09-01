@@ -19,6 +19,7 @@
         - [Basic example](#basic-example)
         - [Error handling](#error-handling-1)
         - [Overloading](#overloading)
+        - [AST functions \(advanced\)](#ast-functions-advanced)
 
 <!-- /MarkdownTOC -->
 
@@ -279,3 +280,44 @@ jsonexpr::register_function(
 ```
 
 Note: It is possible to mix overloads with static (as above) and dynamic types (using one or more parameters of type `jsonexpr::json`). In such cases, functions with static types will always be preferred over functions with dynamic types.
+
+
+#### AST functions (advanced)
+
+A more advanced use case are "AST functions", which work at a lower level on the Abstract Syntax Tree (AST). The input of the C++ function is the set of parsed (but not yet evaluated) expressions fed as arguments to the *jsonexpr* function call. Possible use cases:
+ - Short-circuiting; when it is not desirable to evaluate all function arguments before the call. Examples: shot-circuiting boolean logic; implement lazy evaluation for performance reasons; ...
+ - Reflection; to inspect and modify the content of the provided expression. Examples: insert a call to a specific function on each argument; return the type of the AST node making up each argument; ...
+
+In the example below, we implement a function that returns the first argument that does not evaluate to null, and does not evaluate the rest.
+```c++
+jsonexpr::register_ast_function(
+    funcs, "first_non_null",
+    [](std::span<const jsonexpr::ast::node> args, const jsonexpr::variable_registry& vars,
+       const jsonexpr::function_registry& funcs) -> jsonexpr::ast_function_result {
+        for (const jsonexpr::ast::node& arg : args) {
+            // Evaluate the current argument.
+            const auto evaluated = jsonexpr::evaluate(arg, vars, funcs);
+            if (!evaluated.has_value()) {
+                return jsonexpr::unexpected(evaluated.error());
+            }
+
+            // Stop and return it if not null, otherwise continue with next argument.
+            if (!evaluated.value().is_null()) {
+                return evaluated.value();
+            }
+        }
+
+        // No match found, return an error.
+        // NB: 'jsonexpr::error' contains both a message and a location (as the range of characters
+        // in the expression string), to help the user locate the actual part of the expression that is causing a problem. If the location is not specified (as we did here), the location
+        // will automatically be set to the whole function call.
+        return jsonexpr::unexpected(jsonexpr::error{.message = "all arguments were null"});
+    });
+```
+
+When used:
+```
+first_non_null(null)          -> error: all arguments were null
+first_non_null(null, 1)       -> 1
+first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error since not evaluated)
+```
