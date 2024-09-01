@@ -7,11 +7,6 @@ int main(int argc, const char* argv[]) {
     jsonexpr::variable_registry vars;
     jsonexpr::function_registry funcs = jsonexpr::default_functions();
 
-    jsonexpr::register_function(
-        funcs, "any", [](const jsonexpr::json&, jsonexpr::number_integer_t) { return "any1"; });
-    jsonexpr::register_function(
-        funcs, "any", [](jsonexpr::number_integer_t, const jsonexpr::json&) { return "any2"; });
-
     std::string_view expression;
     if (argc > 2) {
         expression           = argv[2];
