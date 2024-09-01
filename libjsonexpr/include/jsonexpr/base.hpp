@@ -73,9 +73,6 @@ std::string_view get_type_name(const T&) noexcept {
 using ast_function_result = expected<json, error>;
 using function_result     = expected<json, std::string>;
 
-template<typename... Args>
-using basic_function_ptr = function_result (*)(const Args&...);
-
 struct function;
 using function_registry = std::unordered_map<std::string, function>;
 
