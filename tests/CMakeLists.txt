@@ -5,7 +5,7 @@ project(jsonexpr_tests LANGUAGES CXX)
 include(FetchContent)
 set(FETCHCONTENT_QUIET FALSE)
 
-set(SNITCH_DEFINE_MAIN OFF)
+set(SNITCH_DEFINE_MAIN OFF CACHE INTERNAL "")
 FetchContent_Declare(snitch
                      URL https://github.com/snitch-org/snitch/archive/refs/tags/v1.2.5.zip)
 FetchContent_MakeAvailable(snitch)
