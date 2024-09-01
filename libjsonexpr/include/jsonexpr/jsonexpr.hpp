@@ -2,6 +2,7 @@
 #define JSONEXPR_HPP
 
 #include "jsonexpr/base.hpp"
+#include "jsonexpr/eval.hpp"
 #include "jsonexpr/expected.hpp"
 #include "jsonexpr/functions.hpp"
 
