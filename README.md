@@ -96,7 +96,7 @@ White spaces are not significant and will be ignored (except inside strings).
 
 ### Operators
 
- - Integers and floating point numbers can be mixed in all operations. If an operation involves an integer and a floating point number, the integer number is first converted to floating point before the operation. Available operations: `+`, `-`, `*`, `/`, `%` (modulo), `**` (exponentiation/power). Integer division and modulo by zero will raise an error. Integer overflow is undefined.
+ - Integers and floating point numbers can be mixed in all operations. If an operation involves an integer and a floating point number, the integer number is first converted to floating point before the operation. Available operations: `+`, `-`, `*`, `/`, `%` (modulo), `**` (exponentiation/power). Integer division/modulo by zero and integer overflow will raise an error.
  - Numbers can also be tested for equality (`==` and `!=`) and compared for ordering (`>`, `>=`, `<`, `<=`), with the same conversion rules.
  - Strings can be concatenated with `+`. They can be tested for equality and compared for ordering (using simple alphabetical ordering). Individual characters can be accessed with angled brackets (`'str'[0]`); the index must be an integer, and is zero-based (first character had index zero). Range access is also possible with `str[a:b]` (`a` is the index of the first character to extract, and `b` is 1 plus the index of the last character to extract, so `'abc'[0:2]` is `'ab'`; an empty string is returned if `a >= b`).
  - Booleans can only be tested for equality, and combined with the boolean operators `and` and `or`. The boolean operators are "short-circuiting"; namely, when evaluating `a and b` and `a` evaluates to `false`, `b` will not be evaluated. This allows bypassing evaluation of operations that would otherwise be invalid (e.g. accessing elements beyond the length of an array). Finally, booleans can also be negated (`not a`). No other operation is possible.
@@ -330,12 +330,9 @@ first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error si
 
 # Security
 
-All operations allowed in the language are meant to be safe, in the sense that they should not make the host process abort or behave in an unspecified manner (e.g., through out-of-bounds read or writes, use-after-free, incorrect type accesses, read of uninitialized memory, etc.). This is  tested by running the test suite with sanitizers, and by fuzzing. The underlying JSON library is also battle-tested.
+All operations allowed in the language are meant to be safe, in the sense that they should not make the host process abort or behave in an unspecified manner (e.g., through out-of-bounds read or writes, use-after-free, incorrect type accesses, read of uninitialized memory, signed overflow, division by zero, etc.). This is tested by running the test suite with sanitizers, and by fuzzing. The underlying JSON library is also battle-tested.
 
 Furthermore, the parser has a fixed maximum recursion depth to prevent stack overflows. This depth  can be changed with the CMake/compilation option `JSONEXPR_MAX_AST_DEPTH`.
-
-Despite the above, the library is not 100% risk-free. In particular, the following is currently unsafe:
- - integer overflow and underflow in evaluated expression
 
 The following would trigger an exception (or abort the process if exceptions are disabled):
  - running out of heap memory while parsing or evaluating an expression

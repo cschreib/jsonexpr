@@ -67,12 +67,44 @@ function_result safe_max(const T& lhs, const U& rhs) {
     }
 }
 
+constexpr number_integer_t int_max = std::numeric_limits<number_integer_t>::max();
+constexpr number_integer_t int_min = -int_max; // We loose the normally allowed most negative int.
+
+bool check_overflow_add(number_integer_t lhs, number_integer_t rhs) {
+    if (lhs >= 0) {
+        if (rhs > int_max - lhs) {
+            return true;
+        }
+    } else {
+        if (rhs < int_min - lhs) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool check_overflow_sub(number_integer_t lhs, number_integer_t rhs) {
+    return check_overflow_add(lhs, -rhs);
+}
+
+bool check_overflow_mul(number_integer_t lhs, number_integer_t rhs) {
+    return std::abs(lhs) > int_max / std::abs(rhs);
+}
+
 #define MATHS_OPERATOR(NAME, OPERATOR)                                                             \
     template<typename T, typename U>                                                               \
     function_result safe_##NAME(const T& lhs, const U& rhs) {                                      \
         if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {                \
             return static_cast<number_float_t>(lhs) OPERATOR static_cast<number_float_t>(rhs);     \
         } else {                                                                                   \
+            if constexpr (std::is_arithmetic_v<T> && std::is_arithmetic_v<U>) {                    \
+                if (check_overflow_##NAME(lhs, rhs)) {                                             \
+                    return unexpected(std::string(                                                 \
+                        "integer overflow in '" + std::to_string(lhs) + (" " #OPERATOR " ") +      \
+                        std::to_string(rhs) + "'"));                                               \
+                }                                                                                  \
+            }                                                                                      \
             return lhs OPERATOR rhs;                                                               \
         }                                                                                          \
     }

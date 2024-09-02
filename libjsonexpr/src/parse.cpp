@@ -351,6 +351,17 @@ try_parse_literal(depth_counter depth, std::span<const token>& tokens) {
         if (parsed.type() == json::value_t::discarded) {
             return unexpected(abort_parse(t, "could not parse literal"));
         }
+
+        if (parsed.type() == json::value_t::number_unsigned) {
+            const auto unsigned_value = parsed.get<json::number_unsigned_t>();
+            if (unsigned_value > static_cast<json::number_unsigned_t>(
+                                     std::numeric_limits<number_integer_t>::max())) {
+                return unexpected(
+                    abort_parse(t, "integer overflow in '" + std::string(t.content) + "'"));
+            }
+
+            parsed = static_cast<json::number_integer_t>(unsigned_value);
+        }
     }
 
     tokens = tokens.subspan(1);
