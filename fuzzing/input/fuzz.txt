@@ -1,0 +1,1 @@
+cat.colors[(bee.legs - cat.legs)/2]

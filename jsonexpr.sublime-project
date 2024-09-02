@@ -3,6 +3,10 @@
 	[
 		{
 			"path": ".",
+			"folder_exclude_patterns":
+			[
+				"fuzzing/output"
+			]
 		}
 	],
 	"settings":

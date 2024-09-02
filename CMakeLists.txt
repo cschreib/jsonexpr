@@ -18,8 +18,9 @@ else()
 endif()
 
 # Components (library is always built).
-set(JSONEXPR_APP   ON  CACHE BOOL "Build command line application.")
+set(JSONEXPR_APP   ON   CACHE BOOL "Build command line application.")
 set(JSONEXPR_TEST  OFF  CACHE BOOL "Build tests.")
+set(JSONEXPR_FUZZ  OFF  CACHE BOOL "Build fuzzing application.")
 
 # Dependencies.
 set(JSONEXPR_USE_SYSTEM_JSON     OFF CACHE BOOL "Use a pre-installed version of nlohmann::json. Else, download.")
@@ -39,4 +40,8 @@ endif()
 if (JSONEXPR_TEST)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if (JSONEXPR_FUZZ)
+    add_subdirectory(fuzzing/runner)
 endif()
