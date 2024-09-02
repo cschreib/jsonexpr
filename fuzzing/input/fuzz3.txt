@@ -1,0 +1,1 @@
+bee.has_tail or cat.has_tail

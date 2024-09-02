@@ -9,6 +9,14 @@ int main() {
     jsonexpr::variable_registry vars;
     jsonexpr::function_registry funcs = jsonexpr::default_functions();
 
+    vars["cat"] = R"({
+        "legs": 4, "has_tail": true, "sound": "meow", "colors": ["orange", "black"]
+    })"_json;
+
+    vars["bee"] = R"({
+        "legs": 6, "has_tail": false, "sound": "bzzz", "colors": ["yellow"]
+    })"_json;
+
 #ifdef __AFL_HAVE_MANUAL_CONTROL
     __AFL_INIT();
 #endif

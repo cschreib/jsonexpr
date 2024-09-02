@@ -1,0 +1,1 @@
+cat.sound if cat.has_tail else bee.sound

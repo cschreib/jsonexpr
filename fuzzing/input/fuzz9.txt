@@ -1,0 +1,1 @@
+bee.colors[0] in cat.colors

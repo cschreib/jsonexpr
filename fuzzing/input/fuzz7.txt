@@ -1,0 +1,1 @@
+cat.sound[0:2] + bee.sound[2:4]
