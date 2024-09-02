@@ -89,7 +89,7 @@ bool check_overflow_sub(number_integer_t lhs, number_integer_t rhs) {
 }
 
 bool check_overflow_mul(number_integer_t lhs, number_integer_t rhs) {
-    return std::abs(lhs) > int_max / std::abs(rhs);
+    return rhs != 0 && std::abs(lhs) > int_max / std::abs(rhs);
 }
 
 #define MATHS_OPERATOR(NAME, OPERATOR)                                                             \

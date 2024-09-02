@@ -108,6 +108,10 @@ TEST_CASE("muldiv", "[maths]") {
     }
 
     SECTION("int") {
+        CHECK(evaluate("2*1") == "2"_json);
+        CHECK(evaluate("1*2") == "2"_json);
+        CHECK(evaluate("1*0") == "0"_json);
+        CHECK(evaluate("0*1") == "0"_json);
         CHECK(evaluate("2*4") == "8"_json);
         CHECK(evaluate("4/2") == "2"_json);
         CHECK(evaluate("2/4") == "0"_json);
