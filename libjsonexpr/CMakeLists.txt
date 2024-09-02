@@ -68,6 +68,7 @@ if (BUILD_SHARED_LIBS)
     endif()
 endif()
 
+set_target_properties(libjsonexpr PROPERTIES PREFIX "")
 target_compile_features(libjsonexpr PUBLIC cxx_std_20)
 target_include_directories(libjsonexpr PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
