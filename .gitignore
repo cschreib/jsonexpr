@@ -2,3 +2,4 @@
 build*/
 .sublime-tests/
 fuzzing/output
+install/

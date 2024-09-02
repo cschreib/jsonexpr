@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+file(GLOB CONFIG_FILES "${CMAKE_CURRENT_LIST_DIR}/jsonexpr*-targets.cmake")
+foreach(f ${CONFIG_FILES})
+    include(${f})
+
+    string(REGEX MATCH "${CMAKE_CURRENT_LIST_DIR}/(jsonexpr.*)-targets.cmake" match ${f})
+    set(target ${CMAKE_MATCH_1})
+
+    if (NOT TARGET jsonexpr::${target})
+        add_library(jsonexpr::${target} ALIAS ${target})
+    endif()
+endforeach()

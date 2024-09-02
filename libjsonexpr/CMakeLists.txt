@@ -5,10 +5,12 @@ project(libjsonexpr LANGUAGES CXX)
 include(FetchContent)
 set(FETCHCONTENT_QUIET FALSE)
 
+set(LIBJSONEXPR_EXPORT_TARGETS "")
 if (NOT JSONEXPR_USE_SYSTEM_JSON)
     FetchContent_Declare(json
                          URL https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.zip)
     FetchContent_MakeAvailable(json)
+    list(APPEND LIBJSONEXPR_EXPORT_TARGETS nlohmann_json)
 else()
     find_package(nlohmann_json REQUIRED)
 endif()
@@ -19,6 +21,7 @@ if (NOT JSONEXPR_USE_STD_EXPECTED AND NOT JSONEXPR_USE_SYSTEM_EXPECTED)
     FetchContent_Declare(expected
                          URL https://github.com/TartanLlama/expected/archive/refs/tags/v1.1.0.zip)
     FetchContent_MakeAvailable(expected)
+    list(APPEND LIBJSONEXPR_EXPORT_TARGETS expected)
 else()
     find_package(tl-expected REQUIRED)
 endif()
@@ -82,3 +85,42 @@ if (NOT JSONEXPR_USE_STD_EXPECTED)
 endif()
 
 add_library(jsonexpr::libjsonexpr ALIAS libjsonexpr)
+set_target_properties(libjsonexpr PROPERTIES EXPORT_NAME jsonexpr::libjsonexpr)
+
+list(APPEND LIBJSONEXPR_EXPORT_TARGETS libjsonexpr)
+
+set(LIBJSONEXPR_INCLUDES
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/ast.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/base.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/eval.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/expected.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/functions.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/jsonexpr.hpp
+    ${PROJECT_SOURCE_DIR}/include/jsonexpr/parse.hpp
+    ${PROJECT_BINARY_DIR}/jsonexpr/config.hpp)
+
+install(
+    FILES ${LIBJSONEXPR_INCLUDES}
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/include/jsonexpr)
+
+# Setup CMake config file
+install(TARGETS ${LIBJSONEXPR_EXPORT_TARGETS} EXPORT libjsonexpr-targets)
+
+install(EXPORT libjsonexpr-targets
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/jsonexpr
+    NAMESPACE jsonexpr::
+    COMPONENT Development)
+
+export(EXPORT libjsonexpr-targets)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/jsonexpr-config.cmake.in"
+    "${PROJECT_BINARY_DIR}/jsonexpr-config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    NO_SET_AND_CHECK_MACRO)
+
+install(FILES
+    "${PROJECT_BINARY_DIR}/jsonexpr-config.cmake"
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/jsonexpr COMPONENT Development)
