@@ -61,6 +61,26 @@ match_failure match_failed(std::string message) {
     return match_failure{{.message = std::move(message)}};
 }
 
+struct depth_counter {
+    depth_counter() = default;
+    depth_counter(const depth_counter& d) : depth(d.depth + 1u) {}
+
+    std::size_t depth = 0u;
+};
+
+#define CHECK_MAX_DEPTH                                                                            \
+    do {                                                                                           \
+        if (depth.depth == JSONEXPR_MAX_AST_DEPTH) {                                               \
+            if (tokens.empty()) {                                                                  \
+                return unexpected(                                                                 \
+                    abort_parse("max depth of AST reached; increase JSONEXPR_MAX_AST_DEPTH"));     \
+            } else {                                                                               \
+                return unexpected(abort_parse(                                                     \
+                    tokens.front(), "max depth of AST reached; increase JSONEXPR_MAX_AST_DEPTH")); \
+            }                                                                                      \
+        }                                                                                          \
+    } while (0)
+
 bool is_any_of(char c, std::string_view list) noexcept {
     return list.find_first_of(c) != list.npos;
 }
@@ -129,7 +149,7 @@ constexpr std::string_view string_chars          = "\"'";
 constexpr std::string_view whitespace_chars      = " \t\n\r";
 constexpr char             escape_char           = '\\';
 
-expected<std::vector<token>, error> tokenize(std::string_view expression) noexcept {
+expected<std::vector<token>, error> tokenize(std::string_view expression) {
     std::vector<token> tokens;
     std::size_t        read_pos = 0;
 
@@ -157,7 +177,11 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
     std::string_view last_expression;
     while (!expression.empty()) {
         if (expression == last_expression) {
+#if JSONEXPR_FUZZ
+            assert(false && "infinite loop detected in tokenizer (bug)");
+#else
             return unexpected(error{{read_pos, 1}, "infinite loop detected in tokenizer (bug)"});
+#endif
         }
 
         last_expression = expression;
@@ -243,7 +267,10 @@ expected<std::vector<token>, error> tokenize(std::string_view expression) noexce
     return tokens;
 }
 
-expected<ast::node, parse_error> try_parse_identifier(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_identifier(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected identifier"));
     }
@@ -257,12 +284,12 @@ expected<ast::node, parse_error> try_parse_identifier(std::span<const token>& to
     return ast::node{t.location, ast::identifier{t.content}};
 }
 
-ast::node identifier_to_string(ast::node id) noexcept {
+ast::node identifier_to_string(ast::node id) {
     return ast::node{
         id.location, ast::literal{json(std::string(std::get<ast::identifier>(id.content).name))}};
 }
 
-std::string single_to_double_quote(std::string_view input) noexcept {
+std::string single_to_double_quote(std::string_view input) {
     std::string str;
     bool        escaped = false;
     for (std::size_t i = 0; i < input.size(); ++i) {
@@ -293,7 +320,10 @@ std::string single_to_double_quote(std::string_view input) noexcept {
     return str;
 }
 
-expected<ast::node, parse_error> try_parse_literal(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_literal(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected literal (number, string, boolean, null)"));
     }
@@ -326,11 +356,18 @@ expected<ast::node, parse_error> try_parse_literal(std::span<const token>& token
     return ast::node{t.location, ast::literal{std::move(parsed)}};
 }
 
-expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept;
+expected<ast::node, parse_error>
+try_parse_expr(depth_counter depth, std::span<const token>& tokens);
 
 template<typename ElemType, typename ElemParser>
 expected<std::vector<ElemType>, parse_error> try_parse_list(
-    std::span<const token>& tokens, auto end_token, ElemParser&& try_parse_elem) noexcept {
+    depth_counter           depth,
+    std::span<const token>& tokens,
+    auto                    end_token,
+    ElemParser&&            try_parse_elem) {
+
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected ')'"));
     }
@@ -341,8 +378,12 @@ expected<std::vector<ElemType>, parse_error> try_parse_list(
     bool                  first       = true;
     while (!args_tokens.empty()) {
         if (args_tokens.size() == prev_size) {
+#if JSONEXPR_FUZZ
+            assert(false && "infinite loop detected in list parser (bug)");
+#else
             return unexpected(
                 abort_parse(args_tokens.front(), "infinite loop detected in list parser (bug)"));
+#endif
         }
 
         prev_size = args_tokens.size();
@@ -359,7 +400,7 @@ expected<std::vector<ElemType>, parse_error> try_parse_list(
             args_tokens = args_tokens.subspan(1);
         }
 
-        auto arg = try_parse_elem(args_tokens);
+        auto arg = try_parse_elem(depth, args_tokens);
         if (!arg.has_value()) {
             return unexpected(abort_parse(arg.error()));
         }
@@ -372,7 +413,10 @@ expected<std::vector<ElemType>, parse_error> try_parse_list(
     return args;
 }
 
-expected<ast::node, parse_error> try_parse_function(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_function(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected function"));
     }
@@ -389,7 +433,7 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
     const token& func = tokens.front();
 
     auto args_tokens = tokens.subspan(2);
-    auto args        = try_parse_list<ast::node>(args_tokens, token::GROUP_CLOSE, &try_parse_expr);
+    auto args = try_parse_list<ast::node>(depth, args_tokens, token::GROUP_CLOSE, &try_parse_expr);
     if (!args.has_value()) {
         return unexpected(abort_parse(args.error()));
     }
@@ -408,7 +452,10 @@ expected<ast::node, parse_error> try_parse_function(std::span<const token>& toke
         ast::function{func.content, std::move(args.value())}};
 }
 
-expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_group(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected group"));
     }
@@ -418,7 +465,7 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
 
     const token& start_token  = tokens.front();
     auto         group_tokens = tokens.subspan(1);
-    auto         expr         = try_parse_expr(group_tokens);
+    auto         expr         = try_parse_expr(depth, group_tokens);
     if (!expr.has_value()) {
         return unexpected(abort_parse(expr.error()));
     }
@@ -439,7 +486,10 @@ expected<ast::node, parse_error> try_parse_group(std::span<const token>& tokens)
     return expr;
 }
 
-expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_array(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected array"));
     }
@@ -449,7 +499,7 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
 
     const token& start_token = tokens.front();
     auto         elem_tokens = tokens.subspan(1);
-    auto elems = try_parse_list<ast::node>(elem_tokens, token::ARRAY_CLOSE, &try_parse_expr);
+    auto elems = try_parse_list<ast::node>(depth, elem_tokens, token::ARRAY_CLOSE, &try_parse_expr);
     if (!elems.has_value()) {
         return unexpected(abort_parse(elems.error()));
     }
@@ -468,13 +518,15 @@ expected<ast::node, parse_error> try_parse_array(std::span<const token>& tokens)
 }
 
 expected<std::pair<ast::node, ast::node>, parse_error>
-try_parse_field(std::span<const token>& tokens) noexcept {
+try_parse_field(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected field"));
     }
 
     auto field_tokens = tokens;
-    auto key          = try_parse_expr(field_tokens);
+    auto key          = try_parse_expr(depth, field_tokens);
     if (!key.has_value()) {
         return unexpected(key.error());
     }
@@ -487,7 +539,7 @@ try_parse_field(std::span<const token>& tokens) noexcept {
     }
 
     field_tokens = field_tokens.subspan(1);
-    auto value   = try_parse_expr(field_tokens);
+    auto value   = try_parse_expr(depth, field_tokens);
     if (!value.has_value()) {
         return unexpected(abort_parse(value.error()));
     }
@@ -496,7 +548,10 @@ try_parse_field(std::span<const token>& tokens) noexcept {
     return std::pair<ast::node, ast::node>{std::move(key.value()), std::move(value.value())};
 }
 
-expected<ast::node, parse_error> try_parse_object(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_object(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected object"));
     }
@@ -507,7 +562,7 @@ expected<ast::node, parse_error> try_parse_object(std::span<const token>& tokens
     const token& start_token = tokens.front();
     auto         elem_tokens = tokens.subspan(1);
     auto         elems       = try_parse_list<std::pair<ast::node, ast::node>>(
-        elem_tokens, token::OBJECT_CLOSE, &try_parse_field);
+        depth, elem_tokens, token::OBJECT_CLOSE, &try_parse_field);
     if (!elems.has_value()) {
         return unexpected(elems.error());
     }
@@ -529,27 +584,30 @@ bool is_match(const expected<ast::node, parse_error>& result) {
     return result.has_value() || std::holds_alternative<error>(result.error());
 }
 
-expected<ast::node, parse_error> try_parse_operand(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_operand(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected operand"));
     }
 
-    if (auto op = try_parse_group(tokens); is_match(op)) {
+    if (auto op = try_parse_group(depth, tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_array(tokens); is_match(op)) {
+    if (auto op = try_parse_array(depth, tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_object(tokens); is_match(op)) {
+    if (auto op = try_parse_object(depth, tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_function(tokens); is_match(op)) {
+    if (auto op = try_parse_function(depth, tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_identifier(tokens); is_match(op)) {
+    if (auto op = try_parse_identifier(depth, tokens); is_match(op)) {
         return op;
     }
-    if (auto op = try_parse_literal(tokens); is_match(op)) {
+    if (auto op = try_parse_literal(depth, tokens); is_match(op)) {
         return op;
     }
 
@@ -557,7 +615,9 @@ expected<ast::node, parse_error> try_parse_operand(std::span<const token>& token
 }
 
 expected<std::vector<ast::node>, parse_error>
-try_parse_array_access(std::span<const token>& tokens) noexcept {
+try_parse_array_access(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected array access"));
     }
@@ -581,7 +641,7 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
                 ast::literal{json(std::numeric_limits<json::number_integer_t>::max())}});
         } else {
             // [:a]
-            auto end_index = try_parse_expr(tokens);
+            auto end_index = try_parse_expr(depth, tokens);
             if (!end_index.has_value()) {
                 return unexpected(abort_parse(end_index.error()));
             }
@@ -589,7 +649,7 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
             args.push_back(std::move(end_index.value()));
         }
     } else {
-        auto begin_index = try_parse_expr(tokens);
+        auto begin_index = try_parse_expr(depth, tokens);
         if (!begin_index.has_value()) {
             return unexpected(abort_parse(begin_index.error()));
         }
@@ -615,7 +675,7 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
                     ast::literal{json(std::numeric_limits<json::number_integer_t>::max())}});
             } else {
                 // [a:b]
-                auto index_end = try_parse_expr(tokens);
+                auto index_end = try_parse_expr(depth, tokens);
                 if (!index_end.has_value()) {
                     return unexpected(abort_parse(index_end.error()));
                 }
@@ -636,12 +696,15 @@ try_parse_array_access(std::span<const token>& tokens) noexcept {
     return args;
 }
 
-expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_access(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected array or object access"));
     }
 
-    auto object = try_parse_operand(tokens);
+    auto object = try_parse_operand(depth, tokens);
     if (!object.has_value()) {
         return unexpected(abort_parse(object.error()));
     }
@@ -655,7 +718,7 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
         const source_location* end_location = nullptr;
         std::string_view       function     = "[]";
         if (array_access) {
-            auto indices = try_parse_array_access(tokens);
+            auto indices = try_parse_array_access(depth, tokens);
             if (!indices.has_value()) {
                 return unexpected(abort_parse(indices.error()));
             }
@@ -669,7 +732,7 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
                 args.push_back(std::move(index));
             }
         } else {
-            auto index = try_parse_identifier(tokens);
+            auto index = try_parse_identifier(depth, tokens);
             if (!index.has_value()) {
                 return unexpected(abort_parse(index.error()));
             }
@@ -685,13 +748,16 @@ expected<ast::node, parse_error> try_parse_access(std::span<const token>& tokens
     return object;
 }
 
-expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_unary(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected unary expression"));
     }
 
     if (tokens.front().type != token::OPERATOR) {
-        return try_parse_access(tokens);
+        return try_parse_access(depth, tokens);
     }
 
     auto unary_tokens = tokens;
@@ -706,7 +772,7 @@ expected<ast::node, parse_error> try_parse_unary(std::span<const token>& tokens)
 
     unary_tokens = unary_tokens.subspan(1);
 
-    auto operand = try_parse_unary(unary_tokens);
+    auto operand = try_parse_unary(depth, unary_tokens);
     if (!operand.has_value()) {
         return unexpected(abort_parse(operand.error()));
     }
@@ -739,7 +805,10 @@ struct tagged_operator {
     std::size_t      precedence = 0;
 };
 
-expected<ast::node, parse_error> try_parse_operation(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_operation(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected operation"));
     }
@@ -752,8 +821,12 @@ expected<ast::node, parse_error> try_parse_operation(std::span<const token>& tok
     bool        first      = true;
     while (!ops_tokens.empty()) {
         if (ops_tokens.size() == prev_size) {
+#if JSONEXPR_FUZZ
+            assert(false && "infinite loop detected in expression parser (bug)");
+#else
             return unexpected(abort_parse(
                 ops_tokens.front(), "infinite loop detected in expression parser (bug)"));
+#endif
         }
 
         prev_size = ops_tokens.size();
@@ -774,7 +847,7 @@ expected<ast::node, parse_error> try_parse_operation(std::span<const token>& tok
             ops_tokens = ops_tokens.subspan(1);
         }
 
-        auto operand = try_parse_unary(ops_tokens);
+        auto operand = try_parse_unary(depth, ops_tokens);
         if (!operand.has_value()) {
             return unexpected(operand.error());
         }
@@ -807,12 +880,15 @@ expected<ast::node, parse_error> try_parse_operation(std::span<const token>& tok
     return nodes.front();
 }
 
-expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) noexcept {
+expected<ast::node, parse_error>
+try_parse_expr(depth_counter depth, std::span<const token>& tokens) {
+    CHECK_MAX_DEPTH;
+
     if (tokens.empty()) {
         return unexpected(match_failed("expected expression"));
     }
 
-    auto first = try_parse_operation(tokens);
+    auto first = try_parse_operation(depth, tokens);
     if (!first.has_value()) {
         return unexpected(first.error());
     }
@@ -822,7 +898,7 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
     }
 
     tokens    = tokens.subspan(1);
-    auto cond = try_parse_operation(tokens);
+    auto cond = try_parse_operation(depth, tokens);
     if (!cond.has_value()) {
         return unexpected(cond.error());
     }
@@ -832,7 +908,7 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
     }
 
     tokens      = tokens.subspan(1);
-    auto second = try_parse_expr(tokens);
+    auto second = try_parse_expr(depth, tokens);
     if (!second.has_value()) {
         return unexpected(second.error());
     }
@@ -845,7 +921,7 @@ expected<ast::node, parse_error> try_parse_expr(std::span<const token>& tokens) 
 }
 } // namespace
 
-expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept {
+expected<ast::node, error> jsonexpr::parse(std::string_view expression) {
     const auto tokenizer_result = tokenize(expression);
     if (!tokenizer_result.has_value()) {
         return unexpected(tokenizer_result.error());
@@ -861,7 +937,7 @@ expected<ast::node, error> jsonexpr::parse(std::string_view expression) noexcept
     }
 
     std::span<const token> tokens(tokenizer_result.value().begin(), tokenizer_result.value().end());
-    const auto             parse_result = try_parse_expr(tokens);
+    const auto             parse_result = try_parse_expr(depth_counter{}, tokens);
     if (!parse_result.has_value()) {
         const auto err = parse_result.error();
         return unexpected(std::visit([](const auto& e) -> error { return e; }, err));

@@ -28,6 +28,9 @@ set(JSONEXPR_USE_SYSTEM_EXPECTED OFF CACHE BOOL "Use a pre-installed version of 
 set(JSONEXPR_USE_STD_EXPECTED    OFF CACHE BOOL "Use std::expected (requires C++23). Else, use tl::expected.")
 set(JSONEXPR_USE_STD_FROM_CHARS  ON  CACHE BOOL "Use std::from_chars (requires C++17). Else, use streams.")
 
+# Configurable parameters
+set(JSONEXPR_MAX_AST_DEPTH 32 CACHE STRING "Maximum depth of the parsed AST (0=infinite)")
+
 # Development options.
 set(JSONEXPR_DEV OFF CACHE BOOL "Enable warnings in compilation.")
 

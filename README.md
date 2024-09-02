@@ -20,6 +20,7 @@
         - [Error handling](#error-handling-1)
         - [Overloading](#overloading)
         - [AST functions \(advanced\)](#ast-functions-advanced)
+- [Security](#security)
 - [Acknowledgments](#acknowledgments)
 
 <!-- /MarkdownTOC -->
@@ -325,6 +326,19 @@ first_non_null(null)          -> error: all arguments were null
 first_non_null(null, 1)       -> 1
 first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error since not evaluated)
 ```
+
+
+# Security
+
+All operations allowed in the language are meant to be safe, in the sense that they should not make the host process abort or behave in an unspecified manner (e.g., through out-of-bounds read or writes, use-after-free, incorrect type accesses, read of uninitialized memory, etc.). This is  tested by running the test suite with sanitizers, and by fuzzing.
+
+Furthermore, the parser has a fixed maximum recursion depth to prevent stack overflows. This depth is set to 32 by default, and can be changed with the CMake option `JSONEXPR_MAX_AST_DEPTH`.
+
+Despite the above, the library is not 100% risk-free. In particular, the following is currently unsafe:
+ - integer overflow and underflow in evaluated expression
+
+The following would trigger an exception (or abort the process if exceptions are disabled):
+ - running out of heap memory while parsing or evaluating an expression
 
 
 # Acknowledgments
