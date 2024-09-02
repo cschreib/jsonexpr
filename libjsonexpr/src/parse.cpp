@@ -70,13 +70,14 @@ struct depth_counter {
 
 #define CHECK_MAX_DEPTH                                                                            \
     do {                                                                                           \
-        if (depth.depth == JSONEXPR_MAX_AST_DEPTH) {                                               \
+        if (depth.depth == JSONEXPR_MAX_PARSER_DEPTH) {                                            \
             if (tokens.empty()) {                                                                  \
-                return unexpected(                                                                 \
-                    abort_parse("max depth of AST reached; increase JSONEXPR_MAX_AST_DEPTH"));     \
+                return unexpected(abort_parse(                                                     \
+                    "max depth of parser reached; increase JSONEXPR_MAX_PARSER_DEPTH"));           \
             } else {                                                                               \
                 return unexpected(abort_parse(                                                     \
-                    tokens.front(), "max depth of AST reached; increase JSONEXPR_MAX_AST_DEPTH")); \
+                    tokens.front(),                                                                \
+                    "max depth of parser reached; increase JSONEXPR_MAX_PARSER_DEPTH"));           \
             }                                                                                      \
         }                                                                                          \
     } while (0)

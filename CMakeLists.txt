@@ -29,7 +29,7 @@ set(JSONEXPR_USE_STD_EXPECTED    OFF CACHE BOOL "Use std::expected (requires C++
 set(JSONEXPR_USE_STD_FROM_CHARS  ON  CACHE BOOL "Use std::from_chars (requires C++17). Else, use streams.")
 
 # Configurable parameters
-set(JSONEXPR_MAX_AST_DEPTH 32 CACHE STRING "Maximum depth of the parsed AST (0=infinite)")
+set(JSONEXPR_MAX_PARSER_DEPTH 128 CACHE STRING "Maximum depth of the parser (0=infinite)")
 
 # Development options.
 set(JSONEXPR_DEV OFF CACHE BOOL "Enable warnings in compilation.")

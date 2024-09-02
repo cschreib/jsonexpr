@@ -79,6 +79,11 @@ TEST_CASE("stress test", "[general]") {
         CHECK_ERROR("~~~~~~~~~~~~");
         CHECK_ERROR("%%%%%%%%%%%%");
 
+        CHECK_ERROR(std::string(4096, '('));
+        CHECK_ERROR(std::string(4096, '+'));
+        CHECK_ERROR(std::string(4096, '['));
+        CHECK_ERROR(std::string(4096, '{'));
+
         CHECK_ERROR("1 << 2");
         CHECK_ERROR("1 >> 2");
         CHECK_ERROR("1 <> 2");

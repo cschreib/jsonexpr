@@ -330,9 +330,9 @@ first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error si
 
 # Security
 
-All operations allowed in the language are meant to be safe, in the sense that they should not make the host process abort or behave in an unspecified manner (e.g., through out-of-bounds read or writes, use-after-free, incorrect type accesses, read of uninitialized memory, etc.). This is  tested by running the test suite with sanitizers, and by fuzzing.
+All operations allowed in the language are meant to be safe, in the sense that they should not make the host process abort or behave in an unspecified manner (e.g., through out-of-bounds read or writes, use-after-free, incorrect type accesses, read of uninitialized memory, etc.). This is  tested by running the test suite with sanitizers, and by fuzzing. The underlying JSON library is also battle-tested.
 
-Furthermore, the parser has a fixed maximum recursion depth to prevent stack overflows. This depth is set to 32 by default, and can be changed with the CMake option `JSONEXPR_MAX_AST_DEPTH`.
+Furthermore, the parser has a fixed maximum recursion depth to prevent stack overflows. This depth  can be changed with the CMake/compilation option `JSONEXPR_MAX_AST_DEPTH`.
 
 Despite the above, the library is not 100% risk-free. In particular, the following is currently unsafe:
  - integer overflow and underflow in evaluated expression
