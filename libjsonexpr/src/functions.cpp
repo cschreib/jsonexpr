@@ -490,6 +490,38 @@ ast_function_result safe_if_else(
         return evaluate(args[2], vars, funs);
     }
 }
+
+ast_function_result safe_object_access(
+    std::span<const ast::node> args, const variable_registry& vars, const function_registry& funs) {
+    if (args.size() != 2u) {
+        return unexpected(error{
+            .message =
+                "function takes 2 arguments, but " + std::to_string(args.size()) + " provided"});
+    }
+
+    // Evaluate object first.
+    const auto lhs = evaluate(args[0], vars, funs);
+    if (!lhs.has_value()) {
+        return unexpected(lhs.error());
+    }
+
+    if (!lhs.value().is_object()) {
+        return unexpected(node_error(
+            args[0], std::string("expected object, got ") +
+                         std::string(get_dynamic_type_name(lhs.value()))));
+    }
+
+    const auto& object = lhs.value().get_ref<const object_t&>();
+
+    // Find specified field.
+    const std::string field = std::string{std::get<ast::identifier>(args[1].content).name};
+    const auto        iter  = object.find(field);
+    if (iter == object.end()) {
+        return unexpected(error{.message = "unknown field '" + field + "'"});
+    }
+
+    return iter->second;
+}
 } // namespace
 
 void jsonexpr::impl::add_type(std::string& key, std::string_view type) {
@@ -626,6 +658,8 @@ function_registry make_default_functions() {
 
     register_function(freg, "[:]", &safe_range_access<string_t, number_integer_t>);
     register_function(freg, "[:]", &safe_range_access<array_t, number_integer_t>);
+
+    register_ast_function(freg, ".", &safe_object_access);
 
     register_function(freg, "in", &safe_contains<true, number_integer_t, array_t>);
     register_function(freg, "in", &safe_contains<true, number_float_t, array_t>);

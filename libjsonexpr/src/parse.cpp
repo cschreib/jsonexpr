@@ -285,11 +285,6 @@ try_parse_identifier(depth_counter depth, std::span<const token>& tokens) {
     return ast::node{t.location, ast::identifier{t.content}};
 }
 
-ast::node identifier_to_string(ast::node id) {
-    return ast::node{
-        id.location, ast::literal{json(std::string(std::get<ast::identifier>(id.content).name))}};
-}
-
 std::string single_to_double_quote(std::string_view input) {
     std::string str;
     bool        escaped = false;
@@ -749,7 +744,8 @@ try_parse_access(depth_counter depth, std::span<const token>& tokens) {
                 return unexpected(abort_parse(index.error()));
             }
 
-            args.push_back(identifier_to_string(index.value()));
+            function = ".";
+            args.push_back(std::move(index.value()));
             end_location = &args.back().location;
         }
 
