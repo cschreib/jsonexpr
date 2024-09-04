@@ -5,6 +5,7 @@
 #include "jsonexpr/eval.hpp"
 #include "jsonexpr/expected.hpp"
 #include "jsonexpr/functions.hpp"
+#include "jsonexpr/parse.hpp"
 
 namespace jsonexpr {
 JSONEXPR_EXPORT expected<json, error> evaluate(
