@@ -34,8 +34,11 @@ int main(int argc, const char* argv[]) {
         for (const auto& [key, value] : data.items()) {
             vars[key] = value;
         }
-    } else {
+    } else if (argc == 2) {
         expression = argv[1];
+    } else {
+        std::cerr << "error: no expression provided" << std::endl;
+        return 1;
     }
 
     const auto result = jsonexpr::evaluate(expression, vars, funcs);
