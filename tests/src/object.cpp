@@ -64,6 +64,8 @@ TEST_CASE("object access", "[object]") {
         CHECK_ERROR("obj[(]", vars);
         CHECK_ERROR("obj[>]", vars);
         CHECK_ERROR("obj[#]", vars);
+        CHECK_ERROR("(1+'').a", vars);
+        CHECK_ERROR("''.a", vars);
     }
 
     SECTION("good") {

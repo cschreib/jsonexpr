@@ -7676,6 +7676,20 @@ error: unknown unary operator '>'
 obj[#]
     ^
 error: unexpected character
+(1+'').a
+^~~~~~
+error: no overload of '+' accepts the provided types (int,string)
+note: available overloads:
+        +(string,string)
+        +(float,float)
+        +(float,int)
+        +(int,float)
+        +(int,int)
+        +(float)
+        +(int)
+''.a
+^~
+error: expected object, got string
 '"
 ^~
 error: unterminated string
