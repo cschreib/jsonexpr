@@ -36,7 +36,7 @@ function_result call(
 JSONEXPR_EXPORT void add_type(std::string& key, std::string_view type);
 
 template<typename T>
-concept function_ptr = std::is_function_v<std::remove_pointer_t<T>>;
+concept function_ptr = std::is_function_v<std::remove_pointer_t<std::remove_cvref_t<T>>>;
 
 template<typename T>
 concept stateless_lambda = (!function_ptr<T>) && requires(const T& func) {
