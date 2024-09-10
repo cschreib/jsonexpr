@@ -65,7 +65,7 @@ struct depth_counter {
     depth_counter() = default;
     depth_counter(const depth_counter& d) : depth(d.depth + 1u) {}
 
-    std::size_t depth = 0u;
+    std::size_t depth = 1u;
 };
 
 #define CHECK_MAX_DEPTH                                                                            \
