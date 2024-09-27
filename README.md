@@ -11,7 +11,9 @@
     - [Types](#types)
     - [Operators](#operators)
     - [Default functions](#default-functions)
+    - [Differences with Python and JavaScript](#differences-with-python-and-javascript)
     - [Differences with Python](#differences-with-python)
+    - [Differences with JavaScript](#differences-with-javascript)
 - [C++ API](#c-api)
     - [Basic example usage](#basic-example-usage)
     - [Error handling](#error-handling)
@@ -28,7 +30,7 @@
 
 ## Introduction
 
-Simple expression language with Python-like syntax, implemented in C++, and meant to operate on JSON values. It understands:
+Simple expression language with Python/JavaScript-like syntax, implemented in C++, and meant to operate on JSON values. It understands:
  - The following types: numbers (float and integers), strings (single or double-quoted), booleans, arrays, objects.
  - The usual mathematical operators for numbers (`*` `/` `+` `-`), modulo (`%`) and exponentiation (`**`).
  - The usual boolean operators (`and` `or` `not`), with short-circuiting.
@@ -129,14 +131,28 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
 This list can be extended with your own functions, see below.
 
 
+### Differences with Python and JavaScript
+
+ - The comparison operators `==` and `!=` raise an error when attempting to compare values of incompatible types (other than `null`).
+ - When the division operation `/` is used with two integers, this results in integer division.
+ - Bitwise operators are not implemented.
+
+
 ### Differences with Python
 
  - Boolean constants are spelled `true` and `false`, not `True` and `False`.
  - The null/none value is spelled `null`, not `None`.
  - The return value of the modulo operation `%` has the same sign as the *left* operand (in Python, it takes the sign of the *right* operand).
- - When the division operation `/` is used with two integers, this results in integer division (Python's `//`).
  - The following expressions are not implemented: `a is b`, `x for x in v`, `x for x in v if c`.
- - Bitwise operators are not implemented.
+
+
+### Differences with JavaScript
+
+ - Boolean operators are spelled `and`, `or`, and `not`, not `&&`, `||`, and `!`.
+ - Array slices are spelled `a[b:c]`, not `a.slice(b, c)`.
+ - Ternary expressions are spelled `b if a else c`, not `a ? b : c`.
+ - Checking if a value is in an array, or a substring in a string, is spelled `b in a`, not `a.includes(b)`.
+ - The following expressions are not implemented: `a ?? b`, `a?.b`.
 
 
 ## C++ API
