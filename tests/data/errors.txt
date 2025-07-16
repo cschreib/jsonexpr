@@ -20,35 +20,35 @@ error: expected operand
  ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 [1,1+'a']
    ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 [1+'a',1]
  ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 [#]
  ^
 error: unexpected character
@@ -92,8 +92,8 @@ obj[1.0]
 ^~~~~~~~
 error: no overload of '[]' accepts the provided types (array,float)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[-6]
 ^~~~~~~
@@ -102,29 +102,29 @@ obj[[0]]
 ^~~~~~~~
 error: no overload of '[]' accepts the provided types (array,array)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj['a']
 ^~~~~~~~
 error: no overload of '[]' accepts the provided types (array,string)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[false]
 ^~~~~~~~~~
 error: no overload of '[]' accepts the provided types (array,bool)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[{}]
 ^~~~~~~
 error: no overload of '[]' accepts the provided types (array,object)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[+]
      ^
@@ -142,13 +142,13 @@ obj[1+'a']
     ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 [][:
     ^
 error: expected expression or ']'
@@ -390,11 +390,11 @@ min(1)
 ^~~~~~
 error: no overload of 'min' accepts the provided types (int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 abs(+)
      ^
 error: expected operand
@@ -429,470 +429,470 @@ min()
 ^~~~~
 error: no overload of 'min' accepts the provided types ()
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1)
 ^~~~~~
 error: no overload of 'min' accepts the provided types (int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1,2,3)
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (int,int,int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1,'a')
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (int,string)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min('a',1)
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (string,int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1,true)
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (int,bool)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(true,1)
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (bool,int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1,[])
 ^~~~~~~~~
 error: no overload of 'min' accepts the provided types (int,array)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min([],1)
 ^~~~~~~~~
 error: no overload of 'min' accepts the provided types (array,int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(1,{})
 ^~~~~~~~~
 error: no overload of 'min' accepts the provided types (int,object)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min({},1)
 ^~~~~~~~~
 error: no overload of 'min' accepts the provided types (object,int)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min('a',true)
 ^~~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (string,bool)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(true,'a')
 ^~~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (bool,string)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min('a',[])
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (string,array)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min([],'a')
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (array,string)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min('a',{})
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (string,object)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min({},'a')
 ^~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (object,string)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(true,true)
 ^~~~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (bool,bool)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(true,[])
 ^~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (bool,array)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min([],true)
 ^~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (array,bool)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min(true,{})
 ^~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (bool,object)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min({},true)
 ^~~~~~~~~~~~
 error: no overload of 'min' accepts the provided types (object,bool)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min([],[])
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (array,array)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min([],{})
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (array,object)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min({},[])
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (object,array)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 min({},{})
 ^~~~~~~~~~
 error: no overload of 'min' accepts the provided types (object,object)
 note: available overloads:
-        min(string,string)
         min(float,float)
         min(float,int)
         min(int,float)
         min(int,int)
+        min(string,string)
 max()
 ^~~~~
 error: no overload of 'max' accepts the provided types ()
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1)
 ^~~~~~
 error: no overload of 'max' accepts the provided types (int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1,2,3)
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (int,int,int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1,'a')
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (int,string)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max('a',1)
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (string,int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1,true)
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (int,bool)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(true,1)
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (bool,int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1,[])
 ^~~~~~~~~
 error: no overload of 'max' accepts the provided types (int,array)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max([],1)
 ^~~~~~~~~
 error: no overload of 'max' accepts the provided types (array,int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(1,{})
 ^~~~~~~~~
 error: no overload of 'max' accepts the provided types (int,object)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max({},1)
 ^~~~~~~~~
 error: no overload of 'max' accepts the provided types (object,int)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max('a',true)
 ^~~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (string,bool)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(true,'a')
 ^~~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (bool,string)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max('a',[])
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (string,array)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max([],'a')
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (array,string)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max('a',{})
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (string,object)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max({},'a')
 ^~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (object,string)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(true,true)
 ^~~~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (bool,bool)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(true,[])
 ^~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (bool,array)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max([],true)
 ^~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (array,bool)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max(true,{})
 ^~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (bool,object)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max({},true)
 ^~~~~~~~~~~~
 error: no overload of 'max' accepts the provided types (object,bool)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max([],[])
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (array,array)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max([],{})
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (array,object)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max({},[])
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (object,array)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 max({},{})
 ^~~~~~~~~~
 error: no overload of 'max' accepts the provided types (object,object)
 note: available overloads:
-        max(string,string)
         max(float,float)
         max(float,int)
         max(int,float)
         max(int,int)
+        max(string,string)
 abs()
 ^~~~~
 error: no overload of 'abs' accepts the provided types ()
@@ -1077,36 +1077,36 @@ len()
 ^~~~~
 error: no overload of 'len' accepts the provided types ()
 note: available overloads:
-        len(object)
         len(array)
+        len(object)
         len(string)
 len('a','b')
 ^~~~~~~~~~~~
 error: no overload of 'len' accepts the provided types (string,string)
 note: available overloads:
-        len(object)
         len(array)
+        len(object)
         len(string)
 len(true)
 ^~~~~~~~~
 error: no overload of 'len' accepts the provided types (bool)
 note: available overloads:
-        len(object)
         len(array)
+        len(object)
         len(string)
 len(1)
 ^~~~~~
 error: no overload of 'len' accepts the provided types (int)
 note: available overloads:
-        len(object)
         len(array)
+        len(object)
         len(string)
 len(1.0)
 ^~~~~~~~
 error: no overload of 'len' accepts the provided types (float)
 note: available overloads:
-        len(object)
         len(array)
+        len(object)
         len(string)
 in
 ^~
@@ -1121,106 +1121,106 @@ error: unknown unary operator 'in'
 ^~~~~~
 error: no overload of 'in' accepts the provided types (int,int)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 1 in 'a'
 ^~~~~~~~
 error: no overload of 'in' accepts the provided types (int,string)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 1 in {}
 ^~~~~~~
 error: no overload of 'in' accepts the provided types (int,object)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 1 in null
 ^~~~~~~~~
 error: no overload of 'in' accepts the provided types (int,null)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 1 in true
 ^~~~~~~~~
 error: no overload of 'in' accepts the provided types (int,bool)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 '' in 1
 ^~~~~~~
 error: no overload of 'in' accepts the provided types (string,int)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 '' in null
 ^~~~~~~~~~
 error: no overload of 'in' accepts the provided types (string,null)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 '' in true
 ^~~~~~~~~~
 error: no overload of 'in' accepts the provided types (string,bool)
 note: available overloads:
-        in(object,array)
-        in(null,array)
         in(array,array)
+        in(bool,array)
+        in(float,array)
+        in(int,array)
+        in(null,array)
+        in(object,array)
+        in(string,array)
         in(string,object)
         in(string,string)
-        in(float,array)
-        in(string,array)
-        in(bool,array)
-        in(int,array)
 not in
 ^~~~~~
 error: unknown unary operator 'not in'
@@ -1234,70 +1234,70 @@ error: unknown unary operator 'not in'
 ^~~~~~~~~~
 error: no overload of 'not in' accepts the provided types (int,int)
 note: available overloads:
-        not in(object,array)
-        not in(null,array)
         not in(array,array)
+        not in(bool,array)
+        not in(float,array)
+        not in(int,array)
+        not in(null,array)
+        not in(object,array)
+        not in(string,array)
         not in(string,object)
         not in(string,string)
-        not in(float,array)
-        not in(string,array)
-        not in(bool,array)
-        not in(int,array)
 1 not in 'a'
 ^~~~~~~~~~~~
 error: no overload of 'not in' accepts the provided types (int,string)
 note: available overloads:
-        not in(object,array)
-        not in(null,array)
         not in(array,array)
+        not in(bool,array)
+        not in(float,array)
+        not in(int,array)
+        not in(null,array)
+        not in(object,array)
+        not in(string,array)
         not in(string,object)
         not in(string,string)
-        not in(float,array)
-        not in(string,array)
-        not in(bool,array)
-        not in(int,array)
 1 not in {}
 ^~~~~~~~~~~
 error: no overload of 'not in' accepts the provided types (int,object)
 note: available overloads:
-        not in(object,array)
-        not in(null,array)
         not in(array,array)
+        not in(bool,array)
+        not in(float,array)
+        not in(int,array)
+        not in(null,array)
+        not in(object,array)
+        not in(string,array)
         not in(string,object)
         not in(string,string)
-        not in(float,array)
-        not in(string,array)
-        not in(bool,array)
-        not in(int,array)
 '' not in 1
 ^~~~~~~~~~~
 error: no overload of 'not in' accepts the provided types (string,int)
 note: available overloads:
-        not in(object,array)
-        not in(null,array)
         not in(array,array)
+        not in(bool,array)
+        not in(float,array)
+        not in(int,array)
+        not in(null,array)
+        not in(object,array)
+        not in(string,array)
         not in(string,object)
         not in(string,string)
-        not in(float,array)
-        not in(string,array)
-        not in(bool,array)
-        not in(int,array)
 int()
 ^~~~~
 error: no overload of 'int' accepts the provided types ()
 note: available overloads:
-        int(string)
         int(bool)
         int(float)
         int(int)
+        int(string)
 int(1,2)
 ^~~~~~~~
 error: no overload of 'int' accepts the provided types (int,int)
 note: available overloads:
-        int(string)
         int(bool)
         int(float)
         int(int)
+        int(string)
 int(0.0/0.0)
 ^~~~~~~~~~~~
 error: could not convert float '-nan' to int
@@ -1317,26 +1317,26 @@ int([])
 ^~~~~~~
 error: no overload of 'int' accepts the provided types (array)
 note: available overloads:
-        int(string)
         int(bool)
         int(float)
         int(int)
+        int(string)
 int({})
 ^~~~~~~
 error: no overload of 'int' accepts the provided types (object)
 note: available overloads:
-        int(string)
         int(bool)
         int(float)
         int(int)
+        int(string)
 int(null)
 ^~~~~~~~~
 error: no overload of 'int' accepts the provided types (null)
 note: available overloads:
-        int(string)
         int(bool)
         int(float)
         int(int)
+        int(string)
 int('')
 ^~~~~~~
 error: could not convert string '' to int
@@ -1368,42 +1368,42 @@ float()
 ^~~~~~~
 error: no overload of 'float' accepts the provided types ()
 note: available overloads:
-        float(string)
         float(bool)
         float(float)
         float(int)
+        float(string)
 float(1,2)
 ^~~~~~~~~~
 error: no overload of 'float' accepts the provided types (int,int)
 note: available overloads:
-        float(string)
         float(bool)
         float(float)
         float(int)
+        float(string)
 float([])
 ^~~~~~~~~
 error: no overload of 'float' accepts the provided types (array)
 note: available overloads:
-        float(string)
         float(bool)
         float(float)
         float(int)
+        float(string)
 float({})
 ^~~~~~~~~
 error: no overload of 'float' accepts the provided types (object)
 note: available overloads:
-        float(string)
         float(bool)
         float(float)
         float(int)
+        float(string)
 float(null)
 ^~~~~~~~~~~
 error: no overload of 'float' accepts the provided types (null)
 note: available overloads:
-        float(string)
         float(bool)
         float(float)
         float(int)
+        float(string)
 float('')
 ^~~~~~~~~
 error: could not convert string '' to float
@@ -1432,18 +1432,18 @@ bool()
 ^~~~~~
 error: no overload of 'bool' accepts the provided types ()
 note: available overloads:
-        bool(string)
         bool(bool)
         bool(float)
         bool(int)
+        bool(string)
 bool(1,2)
 ^~~~~~~~~
 error: no overload of 'bool' accepts the provided types (int,int)
 note: available overloads:
-        bool(string)
         bool(bool)
         bool(float)
         bool(int)
+        bool(string)
 bool(0.0/0.0)
 ^~~~~~~~~~~~~
 error: could not convert float '-nan' to bool
@@ -1457,26 +1457,26 @@ bool([])
 ^~~~~~~~
 error: no overload of 'bool' accepts the provided types (array)
 note: available overloads:
-        bool(string)
         bool(bool)
         bool(float)
         bool(int)
+        bool(string)
 bool({})
 ^~~~~~~~
 error: no overload of 'bool' accepts the provided types (object)
 note: available overloads:
-        bool(string)
         bool(bool)
         bool(float)
         bool(int)
+        bool(string)
 bool(null)
 ^~~~~~~~~~
 error: no overload of 'bool' accepts the provided types (null)
 note: available overloads:
-        bool(string)
         bool(bool)
         bool(float)
         bool(int)
+        bool(string)
 bool('')
 ^~~~~~~~
 error: could not convert string '' to bool
@@ -1677,2986 +1677,2454 @@ arr == int
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (array,int)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 arr == flt
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (array,float)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 arr == str
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (array,string)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 arr == obj
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (array,object)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 arr == bool
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (array,bool)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 obj == int
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (object,int)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 obj == flt
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (object,float)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 obj == str
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (object,string)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 obj == arr
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (object,array)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 obj == bool
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (object,bool)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 bool == int
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (bool,int)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 bool == flt
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (bool,float)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 bool == str
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (bool,string)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 bool == obj
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (bool,object)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 bool == arr
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (bool,array)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 str == int
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (string,int)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 str == flt
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (string,float)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 str == bool
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (string,bool)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 str == obj
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (string,object)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 str == arr
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (string,array)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 int == str
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (int,string)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 int == bool
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (int,bool)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 int == obj
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (int,object)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 int == arr
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (int,array)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 flt == str
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (float,string)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 flt == bool
 ^~~~~~~~~~~
 error: no overload of '==' accepts the provided types (float,bool)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 flt == obj
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (float,object)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 flt == arr
 ^~~~~~~~~~
 error: no overload of '==' accepts the provided types (float,array)
 note: available overloads:
-        ==(object,null)
-        ==(null,array)
-        ==(object,object)
-        ==(null,string)
-        ==(null,bool)
-        ==(null,float)
-        ==(int,int)
-        ==(string,null)
-        ==(int,float)
-        ==(int,null)
-        ==(null,null)
-        ==(array,null)
+        ==(array,array)
+        ==(bool,bool)
         ==(float,float)
         ==(float,int)
-        ==(bool,bool)
-        ==(float,null)
-        ==(array,array)
-        ==(bool,null)
-        ==(null,object)
-        ==(null,int)
+        ==(int,float)
+        ==(int,int)
+        ==(json,null)
+        ==(null,json)
+        ==(null,null)
+        ==(object,object)
         ==(string,string)
 arr != int
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (array,int)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 arr != flt
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (array,float)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 arr != str
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (array,string)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 arr != obj
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (array,object)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 arr != bool
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (array,bool)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 obj != int
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (object,int)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 obj != flt
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (object,float)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 obj != str
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (object,string)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 obj != arr
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (object,array)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 obj != bool
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (object,bool)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 bool != int
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (bool,int)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 bool != flt
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (bool,float)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 bool != str
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (bool,string)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 bool != obj
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (bool,object)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 bool != arr
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (bool,array)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 str != int
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (string,int)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 str != flt
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (string,float)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 str != bool
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (string,bool)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 str != obj
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (string,object)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 str != arr
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (string,array)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 int != str
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (int,string)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 int != bool
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (int,bool)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 int != obj
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (int,object)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 int != arr
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (int,array)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 flt != str
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (float,string)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 flt != bool
 ^~~~~~~~~~~
 error: no overload of '!=' accepts the provided types (float,bool)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 flt != obj
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (float,object)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 flt != arr
 ^~~~~~~~~~
 error: no overload of '!=' accepts the provided types (float,array)
 note: available overloads:
-        !=(object,null)
-        !=(null,array)
-        !=(object,object)
-        !=(null,string)
-        !=(null,bool)
-        !=(null,float)
-        !=(int,int)
-        !=(string,null)
-        !=(int,float)
-        !=(int,null)
-        !=(null,null)
-        !=(array,null)
+        !=(array,array)
+        !=(bool,bool)
         !=(float,float)
         !=(float,int)
-        !=(bool,bool)
-        !=(float,null)
-        !=(array,array)
-        !=(bool,null)
-        !=(null,object)
-        !=(null,int)
+        !=(int,float)
+        !=(int,int)
+        !=(json,null)
+        !=(null,json)
+        !=(null,null)
+        !=(object,null)
+        !=(object,object)
         !=(string,string)
 arr > int
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (array,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > flt
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (array,float)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > str
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (array,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > obj
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (array,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > bool
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (array,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > int
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (object,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > flt
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (object,float)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > str
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (object,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > arr
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (object,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > bool
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (object,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > int
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > flt
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,float)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > str
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > obj
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > arr
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > int
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (string,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > flt
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (string,float)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > bool
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (string,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > obj
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (string,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > arr
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (string,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 int > str
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (int,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 int > bool
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (int,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 int > obj
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (int,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 int > arr
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (int,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 flt > str
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (float,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 flt > bool
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (float,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 flt > obj
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (float,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 flt > arr
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (float,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > obj
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (object,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > arr
 ^~~~~~~~~
 error: no overload of '>' accepts the provided types (array,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > null
 ^~~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > int
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > flt
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,float)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > bool
 ^~~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > obj
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,object)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > arr
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,array)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 null > str
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (null,string)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 int > null
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (int,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 flt > null
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (float,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > null
 ^~~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 obj > null
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (object,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr > null
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (array,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 str > null
 ^~~~~~~~~~
 error: no overload of '>' accepts the provided types (string,null)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 bool > bool
 ^~~~~~~~~~~
 error: no overload of '>' accepts the provided types (bool,bool)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 arr >= int
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= flt
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,float)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= str
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= obj
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= bool
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= int
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= flt
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,float)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= str
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= arr
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= bool
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= int
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= flt
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,float)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= str
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= obj
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= arr
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= int
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= flt
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,float)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= bool
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= obj
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= arr
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 int >= str
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (int,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 int >= bool
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (int,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 int >= obj
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (int,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 int >= arr
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (int,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 flt >= str
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (float,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 flt >= bool
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (float,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 flt >= obj
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (float,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 flt >= arr
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (float,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= obj
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= arr
 ^~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= null
 ^~~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= int
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= flt
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,float)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= bool
 ^~~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= obj
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,object)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= arr
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,array)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 null >= str
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (null,string)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 int >= null
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (int,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 flt >= null
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (float,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= null
 ^~~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 obj >= null
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (object,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr >= null
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (array,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 str >= null
 ^~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (string,null)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 bool >= bool
 ^~~~~~~~~~~~
 error: no overload of '>=' accepts the provided types (bool,bool)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 arr < int
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (array,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < flt
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (array,float)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < str
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (array,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < obj
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (array,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < bool
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (array,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < int
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (object,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < flt
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (object,float)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < str
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (object,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < arr
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (object,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < bool
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (object,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < int
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < flt
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,float)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < str
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < obj
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < arr
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < int
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (string,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < flt
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (string,float)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < bool
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (string,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < obj
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (string,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < arr
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (string,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 int < str
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (int,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 int < bool
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (int,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 int < obj
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (int,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 int < arr
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (int,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 flt < str
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (float,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 flt < bool
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (float,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 flt < obj
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (float,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 flt < arr
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (float,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < obj
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (object,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < arr
 ^~~~~~~~~
 error: no overload of '<' accepts the provided types (array,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < null
 ^~~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < int
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < flt
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,float)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < bool
 ^~~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < obj
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,object)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < arr
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,array)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 null < str
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (null,string)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 int < null
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (int,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 flt < null
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (float,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < null
 ^~~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 obj < null
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (object,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr < null
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (array,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 str < null
 ^~~~~~~~~~
 error: no overload of '<' accepts the provided types (string,null)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 bool < bool
 ^~~~~~~~~~~
 error: no overload of '<' accepts the provided types (bool,bool)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 arr <= int
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= flt
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,float)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= str
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= obj
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= bool
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= int
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= flt
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,float)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= str
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= arr
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= bool
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= int
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= flt
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,float)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= str
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= obj
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= arr
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= int
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= flt
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,float)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= bool
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= obj
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= arr
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 int <= str
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (int,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 int <= bool
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (int,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 int <= obj
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (int,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 int <= arr
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (int,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 flt <= str
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (float,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 flt <= bool
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (float,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 flt <= obj
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (float,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 flt <= arr
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (float,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= obj
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= arr
 ^~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= null
 ^~~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= int
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= flt
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,float)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= bool
 ^~~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= obj
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,object)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= arr
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,array)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 null <= str
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (null,string)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 int <= null
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (int,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 flt <= null
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (float,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= null
 ^~~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 obj <= null
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (object,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr <= null
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (array,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 str <= null
 ^~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (string,null)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 bool <= bool
 ^~~~~~~~~~~~
 error: no overload of '<=' accepts the provided types (bool,bool)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 arr * int
 ^~~~~~~~~
 error: no overload of '*' accepts the provided types (array,int)
@@ -5365,1031 +4833,1031 @@ arr + int
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (array,int)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + flt
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (array,float)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + str
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (array,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + obj
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (array,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + bool
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (array,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + int
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (object,int)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + flt
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (object,float)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + str
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (object,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + arr
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (object,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + bool
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (object,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + int
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,int)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + flt
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,float)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + str
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + obj
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + arr
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + int
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (string,int)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + flt
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (string,float)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + bool
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (string,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + obj
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (string,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + arr
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (string,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 int + str
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 int + bool
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (int,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 int + obj
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (int,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 int + arr
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (int,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 flt + str
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (float,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 flt + bool
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (float,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 flt + obj
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (float,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 flt + arr
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (float,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + obj
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (object,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + arr
 ^~~~~~~~~
 error: no overload of '+' accepts the provided types (array,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + null
 ^~~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + int
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,int)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + flt
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,float)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + bool
 ^~~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + obj
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + arr
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 null + str
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (null,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 int + null
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (int,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 flt + null
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (float,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + null
 ^~~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj + null
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (object,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr + null
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (array,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 str + null
 ^~~~~~~~~~
 error: no overload of '+' accepts the provided types (string,null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 bool + bool
 ^~~~~~~~~~~
 error: no overload of '+' accepts the provided types (bool,bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 + str
 ^~~~~
 error: no overload of '+' accepts the provided types (string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 + arr
 ^~~~~
 error: no overload of '+' accepts the provided types (array)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 + obj
 ^~~~~
 error: no overload of '+' accepts the provided types (object)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 + bool
 ^~~~~~
 error: no overload of '+' accepts the provided types (bool)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 + null
 ^~~~~~
 error: no overload of '+' accepts the provided types (null)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 arr - int
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (array,int)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - flt
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (array,float)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - str
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (array,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - obj
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (array,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - bool
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (array,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - int
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (object,int)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - flt
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (object,float)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - str
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (object,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - arr
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (object,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - bool
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (object,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - int
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,int)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - flt
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,float)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - str
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - obj
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - arr
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - int
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (string,int)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - flt
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (string,float)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - bool
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (string,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - obj
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (string,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - arr
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (string,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 int - str
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (int,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 int - bool
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (int,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 int - obj
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (int,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 int - arr
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (int,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 flt - str
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (float,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 flt - bool
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (float,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 flt - obj
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (float,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 flt - arr
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (float,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - obj
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (object,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - arr
 ^~~~~~~~~
 error: no overload of '-' accepts the provided types (array,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - null
 ^~~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - int
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,int)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - flt
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,float)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - bool
 ^~~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - obj
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - arr
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 null - str
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (null,string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 int - null
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (int,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 flt - null
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (float,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - null
 ^~~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 obj - null
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (object,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr - null
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (array,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 str - null
 ^~~~~~~~~~
 error: no overload of '-' accepts the provided types (string,null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 bool - bool
 ^~~~~~~~~~~
 error: no overload of '-' accepts the provided types (bool,bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 - str
 ^~~~~
 error: no overload of '-' accepts the provided types (string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 - arr
 ^~~~~
 error: no overload of '-' accepts the provided types (array)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 - obj
 ^~~~~
 error: no overload of '-' accepts the provided types (object)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 - bool
 ^~~~~~
 error: no overload of '-' accepts the provided types (bool)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 - null
 ^~~~~~
 error: no overload of '-' accepts the provided types (null)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 arr % int
 ^~~~~~~~~
 error: no overload of '%' accepts the provided types (array,int)
@@ -7591,24 +7059,24 @@ error: object key must be a string, got 'int'
  ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 {'a':1+'a'}
      ^~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 obj['d']
 ^~~~~~~~
 error: unknown field 'd'
@@ -7637,22 +7105,22 @@ obj[['a']]
 ^~~~~~~~~~
 error: no overload of '[]' accepts the provided types (object,array)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[false]
 ^~~~~~~~~~
 error: no overload of '[]' accepts the provided types (object,bool)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[{}]
 ^~~~~~~
 error: no overload of '[]' accepts the provided types (object,object)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj..a
     ^
@@ -7661,8 +7129,8 @@ obj[0]
 ^~~~~~
 error: no overload of '[]' accepts the provided types (object,int)
 note: available overloads:
-        [](object,string)
         [](array,int)
+        [](object,string)
         [](string,int)
 obj[+]
      ^
@@ -7680,13 +7148,13 @@ error: unexpected character
 ^~~~~~
 error: no overload of '+' accepts the provided types (int,string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 ''.a
 ^~
 error: expected object, got string
@@ -7724,23 +7192,23 @@ error: expected unary expression
 ^~~~
 error: no overload of '+' accepts the provided types (string)
 note: available overloads:
-        +(string,string)
+        +(float)
         +(float,float)
         +(float,int)
+        +(int)
         +(int,float)
         +(int,int)
-        +(float)
-        +(int)
+        +(string,string)
 -'b'
 ^~~~
 error: no overload of '-' accepts the provided types (string)
 note: available overloads:
+        -(float)
         -(float,float)
         -(float,int)
+        -(int)
         -(int,float)
         -(int,int)
-        -(float)
-        -(int)
 'a'*'b'
 ^~~~~~~
 error: no overload of '*' accepts the provided types (string,string)
@@ -7783,38 +7251,38 @@ error: expected boolean, got string
 ^~~~~~~
 error: no overload of '<' accepts the provided types (string,int)
 note: available overloads:
-        <(string,string)
         <(float,float)
         <(float,int)
         <(int,float)
         <(int,int)
+        <(string,string)
 'a' <= 1
 ^~~~~~~~
 error: no overload of '<=' accepts the provided types (string,int)
 note: available overloads:
-        <=(string,string)
         <=(float,float)
         <=(float,int)
         <=(int,float)
         <=(int,int)
+        <=(string,string)
 'a' > 1
 ^~~~~~~
 error: no overload of '>' accepts the provided types (string,int)
 note: available overloads:
-        >(string,string)
         >(float,float)
         >(float,int)
         >(int,float)
         >(int,int)
+        >(string,string)
 'a' >= 1
 ^~~~~~~~
 error: no overload of '>=' accepts the provided types (string,int)
 note: available overloads:
-        >=(string,string)
         >=(float,float)
         >=(float,int)
         >=(int,float)
         >=(int,int)
+        >=(string,string)
 not 'a'
     ^~~
 error: expected boolean, got string

@@ -98,11 +98,16 @@ expected<json, error> eval(
                                 std::string message = "ambiguous overload of '" +
                                                       std::string{f.name} + "' for types (" +
                                                       arg_types + ")\n" + "note: candidates are:";
+
+                                std::vector<std::string> available;
                                 for (const auto& [key, value] : map) {
                                     if (is_match(arg_types, key)) {
-                                        message +=
-                                            "\n        " + std::string{f.name} + "(" + key + ")";
+                                        available.push_back(key);
                                     }
+                                }
+
+                                for (const auto& key : available) {
+                                    message += "\n        " + std::string{f.name} + "(" + key + ")";
                                 }
 
                                 return unexpected(node_error(n, message));
@@ -117,7 +122,14 @@ expected<json, error> eval(
                     std::string message = "no overload of '" + std::string{f.name} +
                                           "' accepts the provided types (" + arg_types + ")\n" +
                                           "note: available overloads:";
+
+                    std::vector<std::string> available;
                     for (const auto& [key, value] : map) {
+                        available.push_back(key);
+                    }
+
+                    std::sort(available.begin(), available.end());
+                    for (const auto& key : available) {
                         message += "\n        " + std::string{f.name} + "(" + key + ")";
                     }
 
