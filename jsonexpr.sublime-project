@@ -15,13 +15,13 @@
 		{
 		    "format_on_save": true,
 		},
-		"TestExplorer":
+		"TestManager":
 		{
 			"data_location": ".sublime-tests",
-			"frameworks": [
+			"test_suites": [
 				{
 					"id": "catch2",
-					"type": "catch2",
+					"framework": "catch2",
 					"executable_pattern": "build/tests/jsonexpr_tests",
 					"path_prefix_style": "basename"
 				}
