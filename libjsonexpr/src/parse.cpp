@@ -793,9 +793,18 @@ try_parse_unary(depth_counter depth, std::span<const token>& tokens) {
 }
 
 // From least to highest precedence. Operators with the same precedence are evaluated left-to-right.
+// clang-format off
 const std::vector<std::vector<std::string_view>> operator_precedence = {
-    {"||", "or"},           {"&&", "and"}, {"in", "not in"}, {"==", "!="},
-    {"<", "<=", ">", ">="}, {"+", "-"},    {"*", "/", "%"},  {"^", "**"}};
+    {"or"},
+    {"and"},
+    {"in", "not in"},
+    {"==", "!="},
+    {"<", "<=", ">", ">="},
+    {"+", "-"},
+    {"*", "/", "%"},
+    {"**"},
+};
+// clang-format on
 
 std::size_t get_precedence(std::string_view op) noexcept {
     for (std::size_t p = 0; p < operator_precedence.size(); ++p) {
