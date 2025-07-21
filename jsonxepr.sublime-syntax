@@ -1,0 +1,75 @@
+%YAML 1.2
+---
+name: jsonexpr
+scope: source.jsonexpr
+
+contexts:
+  main:
+    - match: \b(if|else)\b
+      scope: keyword.control.jsonexpr
+    - match: \b(not|in|and|or)\b
+      scope: keyword.operator.jsonexpr
+    - match: '==|!=|>=|>|<=|<|\+|\-|\/|\*\*|\*|\%|\.'
+      scope: keyword.operator.jsonexpr
+    - match: '[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?'
+      scope: constant.numeric.jsonexpr
+    - match: \b(true|false)\b
+      scope: constant.language.boolean.jsonexpr
+    - match: \b(null)\b
+      scope: constant.language.jsonexpr
+    - match: '([a-zA-Z_]+[a-zA-Z0-9_]*)\s*(\()'
+      scope:
+      captures:
+        1: variable.function.jsonexpr
+        2: punctuation.section.group.start.jsonexpr
+      push:
+        - include: main
+        - match: \,
+          scope: punctuation.separator.jsonexpr
+          pop: 1
+        - match: \)
+          scope: punctuation.section.group.end.jsonexpr
+          pop: 1
+    - match: \(
+      scope: punctuation.section.group.start.jsonexpr
+      push:
+        - include: main
+        - match: \)
+          scope: punctuation.section.group.end.jsonexpr
+          pop: 1
+    - match: \[
+      scope: punctuation.section.group.start.jsonexpr
+      push:
+        - include: main
+        - match: '\,|\:'
+          scope: punctuation.separator.jsonexpr
+        - match: \]
+          scope: punctuation.section.group.end.jsonexpr
+          pop: 1
+    - match: \{
+      scope: punctuation.section.group.start.jsonexpr
+      push:
+        - include: main
+        - match: '\,|\:'
+          scope: punctuation.separator.jsonexpr
+        - match: \}
+          scope: punctuation.section.group.end.jsonexpr
+          pop: 1
+    - match: \'
+      scope: punctuation.definition.string.begin.jsonexpr
+      push:
+        - meta_scope: string.quoted.single.jsonexpr
+        - match: \\.
+          scope: constant.character.escape.jsonexpr
+        - match: \'
+          scope: punctuation.definition.string.end.jsonexpr
+          pop: 1
+    - match: \"
+      scope: punctuation.definition.string.begin.jsonexpr
+      push:
+        - meta_scope: string.quoted.double.jsonexpr
+        - match: \\.
+          scope: constant.character.escape.jsonexpr
+        - match: \"
+          scope: punctuation.definition.string.end.jsonexpr
+          pop: 1
