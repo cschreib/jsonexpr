@@ -23,6 +23,7 @@
         - [Overloading](#overloading)
         - [AST functions \(advanced\)](#ast-functions-advanced)
 - [Security](#security)
+- [Grammar](#grammar)
 - [Acknowledgments](#acknowledgments)
 
 <!-- /MarkdownTOC -->
@@ -352,6 +353,133 @@ Furthermore, the parser has a fixed maximum recursion depth to prevent stack ove
 
 The following would trigger an exception (or abort the process if exceptions are disabled):
  - running out of heap memory while parsing or evaluating an expression
+
+
+# Grammar
+
+The formal grammar for the language is provided below. This uses a format similar to [Python's grammar specification](https://docs.python.org/3/reference/grammar.html).
+
+```
+expression:
+    | disjunction 'if' disjunction 'else' expression
+    | disjunction
+
+disjunction:
+    | conjunction ('or' conjunction)+
+    | conjunction
+
+conjunction:
+    | inclusion ('and' inclusion)+
+    | inclusion
+
+inclusion:
+    | equality (inclusion_operator equality)+
+    | equality
+
+inclusion_operator:
+    | 'in'
+    | 'not in'
+
+equality:
+    | comparison (equality_operator comparison)+
+    | comparison
+
+equality_operator:
+    | '=='
+    | '!='
+
+comparison:
+    | addition (comparison_operator addition)+
+    | addition
+
+comparison_operator:
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+
+addition:
+    | multiplication (addition_operator multiplication)+
+    | multiplication
+
+addition_operator:
+    | '+'
+    | '-'
+
+multiplication:
+    | exponentiation (multiplication_operator exponentiation)+
+    | exponentiation
+
+multiplication_operator:
+    | '*'
+    | '/'
+    | '%'
+
+exponentiation:
+    | unary_operation ('**' unary_operation)+
+    | unary_operation
+
+unary_operation:
+    | unary_operator access
+    | access
+
+unary_operator:
+    | '+'
+    | '-'
+    | 'not'
+
+access:
+    | operand '[' expression? ':' expression? ']'
+    | operand '[' expression ']'
+    | operand '.' identifier
+
+operand:
+    | litteral
+    | group
+    | function_call
+    | identifier
+
+litteral:
+    | array
+    | object
+    | string
+    | number
+    | boolean
+    | null
+
+group:
+    | '(' expression ')'
+
+array:
+    | '[' (expression (',' expression)*)? ']'
+
+object:
+    | '{' (object_field (',' object_field)*)? '}'
+
+object_field:
+    | expression ':' expression
+
+function_call:
+    | identifier '(' (expression (',' expression)*)? ')'
+
+identifier:
+    | [a-zA-Z_]+[a-zA-Z0-9_]*
+      /* ASCII-only letters and digits, plus underscore; cannot start with a digit */
+
+string:
+    | /* single-quoted string, single quotes escaped with \' */
+    | /* double-quoted string, double quotes escaped with \" */
+
+number:
+    | /* same as JSON */
+
+boolean:
+    | 'true'
+    | 'false'
+
+null:
+    | 'null'
+```
 
 
 # Acknowledgments
