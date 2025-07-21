@@ -110,7 +110,7 @@ White spaces are not significant and will be ignored (except inside strings).
 In addition to the above, the following generic operators are also available:
  - `a if c else b`: evaluate and return `a` if condition `c` evaluates to `true`, else evaluate and return `b` (NB: this short-circuits evaluation of the unused operand).
  - `a in b`: return true if `b` (a string, array, or object) contains `a`, false otherwise.
- - `a not in b`: return true if `b` (a string, array, or object) does not contains `a`, false otherwise.
+ - `a not in b`: return true if `b` (a string, array, or object) does not contain `a`, false otherwise.
 
 
 ### Default functions
@@ -247,7 +247,7 @@ Supported types for the C++ function parameters:
  - `jsonexpr::number_float_t = double`, for floating-point numbers.
  - `jsonexpr::boolean_t = bool`, for booleans.
  - `jsonexpr::string_t = std::string`, for strings.
- - `jsonexpr::array_t = std::array<jsonexpr::json>`, for arrays.
+ - `jsonexpr::array_t = std::vector<jsonexpr::json>`, for arrays.
  - `jsonexpr::object_t = std::unordered_map<std::string, jsonexpr::json>`, for objects.
  - `jsonexpr::null_t = std::nullptr_t`, for null.
  - `jsonexpr::json = nlohmann::json`, for "any of the above" (handle type checks yourself).
