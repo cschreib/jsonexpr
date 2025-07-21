@@ -10,6 +10,7 @@
     - [General](#general)
     - [Types](#types)
     - [Operators](#operators)
+    - [Implicit conversions](#implicit-conversions)
     - [Default functions](#default-functions)
     - [Differences with Python and JavaScript](#differences-with-python-and-javascript)
     - [Differences with Python](#differences-with-python)
@@ -113,6 +114,11 @@ In addition to the above, the following generic operators are also available:
  - `a not in b`: return true if `b` (a string, array, or object) does not contain `a`, false otherwise.
 
 
+### Implicit conversions
+
+Implicit type conversions are not allowed: types must match exactly the constraints listed above, otherwise an error is raised.
+
+
 ### Default functions
 
 To keep the library lightweight, jsonexpr comes with only the most basic functions by default. This includes:
@@ -129,12 +135,14 @@ To keep the library lightweight, jsonexpr comes with only the most basic functio
  - `ceil(a)`: return nearest integer value to `a` (rounding up).
  - `len(a)`: return the size (length) or an array, object, or string.
 
-This list can be extended with your own functions, see below.
+This list can be extended with custom functions, see below.
 
 
 ### Differences with Python and JavaScript
 
  - The comparison operators `==` and `!=` raise an error when attempting to compare values of incompatible types (other than `null`).
+ - Any operation involving `null` (other than `==` and `!=`) will raise an error.
+ - Using values other than booleans in `if`/`else`, `and`, or `or` will raise an error.
  - When the division operation `/` is used with two integers, this results in integer division.
  - Bitwise operators are not implemented.
 
