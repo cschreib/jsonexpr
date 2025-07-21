@@ -25,7 +25,6 @@ eval(const ast::node&, const ast::literal& v, const variable_registry&, const fu
 expected<json, error>
 eval(const ast::node& n, const variable_registry& vreg, const function_registry& freg);
 
-namespace {
 std::string_view pop_arg(std::string_view& list) noexcept {
     const auto p = list.find_first_of(",");
     if (p == list.npos) {
@@ -50,7 +49,6 @@ bool is_match(std::string_view args, std::string_view signature) noexcept {
 
     return args.empty() && signature.empty();
 }
-} // namespace
 
 expected<json, error> eval(
     const ast::node&         n,
