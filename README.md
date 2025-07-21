@@ -23,6 +23,7 @@
         - [Error handling](#error-handling-1)
         - [Overloading](#overloading)
         - [AST functions \(advanced\)](#ast-functions-advanced)
+        - [Example: implicit bool conversion](#example-implicit-bool-conversion)
 - [Security](#security)
 - [Grammar](#grammar)
 - [Acknowledgments](#acknowledgments)
@@ -116,7 +117,11 @@ In addition to the above, the following generic operators are also available:
 
 ### Implicit conversions
 
-Implicit type conversions are not allowed: types must match exactly the constraints listed above, otherwise an error is raised.
+By default, implicit type conversions are not allowed: types must match exactly the constraints listed above, otherwise an error is raised.
+
+However, a standard mechanism exists to extended the library and define implicit conversion to booleans. This is enabled for operators `and`, `or`, `not`, and `if`/`else`: if these operators are used with a non-boolean value, a conversion will be attempted by calling the custom function `implicit bool`. If no such function exists for the provided type, an error is raised. By default `implicit bool` is not defined, so an error is raised unconditionally.
+
+See below for instructions on defining custom functions.
 
 
 ### Default functions
@@ -352,6 +357,14 @@ first_non_null(null, 1)       -> 1
 first_non_null(1, 1+'abc')    -> 1 (second argument was invalid, but no error since not evaluated)
 ```
 
+
+#### Example: implicit bool conversion
+
+This is an example of how to enable implicitly converting `null` to `false`:
+
+```c++
+jsonexpr::register_function(funcs, "implicit bool", [](jsonexpr::null_t) { return false; });
+```
 
 # Security
 

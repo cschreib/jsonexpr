@@ -359,6 +359,38 @@ error: unknown function 'error'
 false or error() or true
          ^~~~~~~
 error: unknown function 'error'
+true and null
+         ^~~~
+error: expected boolean, got null
+false or null
+         ^~~~
+error: expected boolean, got null
+1 if null else 2
+     ^~~~
+error: expected boolean, got null
+not null
+    ^~~~
+error: expected boolean, got null
+true and 1
+         ^
+error: no overload of 'implicit bool' accepts the provided types (int)
+note: available overloads:
+        implicit bool(null)
+false or 1
+         ^
+error: no overload of 'implicit bool' accepts the provided types (int)
+note: available overloads:
+        implicit bool(null)
+1 if 1 else 2
+     ^
+error: no overload of 'implicit bool' accepts the provided types (int)
+note: available overloads:
+        implicit bool(null)
+not 1
+    ^
+error: no overload of 'implicit bool' accepts the provided types (int)
+note: available overloads:
+        implicit bool(null)
 foo()
 ^~~~~
 error: unknown function 'foo'

@@ -106,4 +106,25 @@ TEST_CASE("boolean", "[maths]") {
         CHECK_ERROR("error() or true or false");
         CHECK_ERROR("false or error() or true");
     }
+
+    SECTION("implicit") {
+        CHECK_ERROR("true and null");
+        CHECK_ERROR("false or null");
+        CHECK_ERROR("1 if null else 2");
+        CHECK_ERROR("not null");
+
+        // Define implicit conversion from null to bool.
+        auto funs = default_functions();
+        register_function(funs, "implicit bool", [](null_t) { return false; });
+
+        CHECK(evaluate("true and null", {}, funs) == "false"_json);
+        CHECK(evaluate("false or null", {}, funs) == "false"_json);
+        CHECK(evaluate("1 if null else 2", {}, funs) == "2"_json);
+        CHECK(evaluate("not null", {}, funs) == "true"_json);
+
+        CHECK_ERROR("true and 1", {}, funs);
+        CHECK_ERROR("false or 1", {}, funs);
+        CHECK_ERROR("1 if 1 else 2", {}, funs);
+        CHECK_ERROR("not 1", {}, funs);
+    }
 }

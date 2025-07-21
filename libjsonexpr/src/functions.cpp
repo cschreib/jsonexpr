@@ -387,13 +387,42 @@ expected<bool, error> evaluate_as_bool(
         return unexpected(eval_result.error());
     }
 
+    // Shortcut: already a boolean, take it.
     if (eval_result.value().is_boolean()) {
         return eval_result.value().get<boolean_t>();
-    } else {
+    }
+
+    if (funs.find("implicit bool") == funs.end()) {
+        // No implicit conversion to bool defined; just error.
         return unexpected(node_error(
             node, std::string("expected boolean, got ") +
                       std::string(get_dynamic_type_name(eval_result.value()))));
     }
+
+    // Attempt implicit conversion to bool.
+    const auto convert_result = evaluate(
+        ast::node{
+            .location = node.location,
+            .content =
+                ast::function{
+                    .name = "implicit bool",
+                    .args = {ast::node{
+                        .location = node.location, .content = ast::literal{eval_result.value()}}}}},
+        vars, funs);
+
+    if (!convert_result.has_value()) {
+        return unexpected(convert_result.error());
+    }
+
+    // Check we did get a boolean.
+    if (!convert_result.value().is_boolean()) {
+        return unexpected(error{
+            .message = "implicit conversion from " +
+                       std::string(get_dynamic_type_name(eval_result.value())) +
+                       " to bool did not return a boolean"});
+    }
+
+    return convert_result.value().get<boolean_t>();
 }
 
 ast_function_result safe_not(
